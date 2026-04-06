@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="procedure_standard" model="recouvrement.procedure">
+            <field name="name">Procédure Standard</field>
+            <field name="code">STANDARD</field>
+            <field name="description">Procédure standard pour les clients normaux.</field>
+            <field name="delay_appel">7</field>
+            <field name="delay_relance_1">14</field>
+            <field name="delay_relance_2">30</field>
+            <field name="delay_contentieux">60</field>
+        </record>
+
+        <record id="procedure_grands_comptes" model="recouvrement.procedure">
+            <field name="name">Procédure Grands Comptes</field>
+            <field name="code">GRANDS_COMPTES</field>
+            <field name="description">Délais plus longs pour les grands comptes.</field>
+            <field name="delay_appel">14</field>
+            <field name="delay_relance_1">30</field>
+            <field name="delay_relance_2">60</field>
+            <field name="delay_contentieux">90</field>
+        </record>
+
+        <record id="procedure_contentieux" model="recouvrement.procedure">
+            <field name="name">Procédure Contentieux</field>
+            <field name="code">CONTENTIEUX</field>
+            <field name="description">Procédure renforcée pour cas difficiles.</field>
+            <field name="delay_appel">7</field>
+            <field name="delay_relance_1">21</field>
+            <field name="delay_relance_2">45</field>
+            <field name="delay_contentieux">15</field>
+        </record>
+
+        <record id="type_client_standard" model="recouvrement.client.type">
+            <field name="name">Client standard</field>
+            <field name="code">STANDARD</field>
+            <field name="procedure_id" ref="procedure_standard"/>
+        </record>
+
+        <record id="type_client_grands_comptes" model="recouvrement.client.type">
+            <field name="name">Grands comptes</field>
+            <field name="code">GRANDS_COMPTES</field>
+            <field name="procedure_id" ref="procedure_grands_comptes"/>
+        </record>
+
+        <record id="type_client_contentieux" model="recouvrement.client.type">
+            <field name="name">Contentieux</field>
+            <field name="code">CONTENTIEUX</field>
+            <field name="procedure_id" ref="procedure_contentieux"/>
+        </record>
+
+        <record id="template_appel_standard" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_standard"/>
+            <field name="sequence">10</field>
+            <field name="name">Appel client</field>
+            <field name="action_type">appel</field>
+            <field name="delay">7</field>
+        </record>
+
+        <record id="template_relance_1_standard" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_standard"/>
+            <field name="sequence">20</field>
+            <field name="name">Relance 1</field>
+            <field name="action_type">relance_1</field>
+            <field name="delay">14</field>
+        </record>
+
+        <record id="template_relance_2_standard" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_standard"/>
+            <field name="sequence">30</field>
+            <field name="name">Relance 2</field>
+            <field name="action_type">relance_2</field>
+            <field name="delay">30</field>
+        </record>
+    </data>
+</odoo>

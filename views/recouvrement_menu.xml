@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="recouvrement_menu_root" model="ir.ui.menu">
+            <field name="name">Recouvrement</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="recouvrement_menu_factures" model="ir.ui.menu">
+            <field name="name">Factures</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="recouvrement_menu_recouvrements" model="ir.ui.menu">
+            <field name="name">Recouvrements</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="recouvrement_menu_actions" model="ir.ui.menu">
+            <field name="name">Actions de recouvrement</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="recouvrement_menu_encaissements" model="ir.ui.menu">
+            <field name="name">Encaissements</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">40</field>
+        </record>
+
+        <record id="recouvrement_menu_parametrage" model="ir.ui.menu">
+            <field name="name">Paramétrage</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">50</field>
+        </record>
+
+        <record id="recouvrement_menu_dashboard" model="ir.ui.menu">
+            <field name="name">Tableaux de bord</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">60</field>
+        </record>
+
+        <record id="action_recouvrement_facture" model="ir.actions.act_window">
+            <field name="name">Factures</field>
+            <field name="res_model">recouvrement.facture</field>
+            <field name="view_mode">list,form</field>
+            <field name="help">Importez puis suivez les factures dans le parcours de recouvrement.</field>
+        </record>
+
+        <record id="action_recouvrement_recouvrement" model="ir.actions.act_window">
+            <field name="name">Recouvrements</field>
+            <field name="res_model">recouvrement.recouvrement</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="action_recouvrement_action" model="ir.actions.act_window">
+            <field name="name">Actions de recouvrement</field>
+            <field name="res_model">recouvrement.action</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="action_recouvrement_encaissement" model="ir.actions.act_window">
+            <field name="name">Encaissements</field>
+            <field name="res_model">recouvrement.encaissement</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="action_recouvrement_procedure" model="ir.actions.act_window">
+            <field name="name">Procédures de recouvrement</field>
+            <field name="res_model">recouvrement.procedure</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="action_recouvrement_action_template" model="ir.actions.act_window">
+            <field name="name">Modèles d’actions</field>
+            <field name="res_model">recouvrement.action.template</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="action_recouvrement_client_type" model="ir.actions.act_window">
+            <field name="name">Types de clients</field>
+            <field name="res_model">recouvrement.client.type</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="recouvrement_menu_factures_list" model="ir.ui.menu">
+            <field name="name">Toutes les factures</field>
+            <field name="parent_id" ref="recouvrement_menu_factures"/>
+            <field name="action" ref="action_recouvrement_facture"/>
+        </record>
+
+        <record id="recouvrement_menu_recouvrements_list" model="ir.ui.menu">
+            <field name="name">Tous les recouvrements</field>
+            <field name="parent_id" ref="recouvrement_menu_recouvrements"/>
+            <field name="action" ref="action_recouvrement_recouvrement"/>
+        </record>
+
+        <record id="recouvrement_menu_actions_list" model="ir.ui.menu">
+            <field name="name">Toutes les actions</field>
+            <field name="parent_id" ref="recouvrement_menu_actions"/>
+            <field name="action" ref="action_recouvrement_action"/>
+        </record>
+
+        <record id="recouvrement_menu_encaissements_list" model="ir.ui.menu">
+            <field name="name">Tous les encaissements</field>
+            <field name="parent_id" ref="recouvrement_menu_encaissements"/>
+            <field name="action" ref="action_recouvrement_encaissement"/>
+        </record>
+
+        <record id="recouvrement_menu_parametrage_procedures" model="ir.ui.menu">
+            <field name="name">Procédures de recouvrement</field>
+            <field name="parent_id" ref="recouvrement_menu_parametrage"/>
+            <field name="action" ref="action_recouvrement_procedure"/>
+        </record>
+
+        <record id="recouvrement_menu_parametrage_action_templates" model="ir.ui.menu">
+            <field name="name">Modèles d’actions</field>
+            <field name="parent_id" ref="recouvrement_menu_parametrage"/>
+            <field name="action" ref="action_recouvrement_action_template"/>
+        </record>
+
+        <record id="recouvrement_menu_parametrage_client_types" model="ir.ui.menu">
+            <field name="name">Types de clients</field>
+            <field name="parent_id" ref="recouvrement_menu_parametrage"/>
+            <field name="action" ref="action_recouvrement_client_type"/>
+        </record>
+    </data>
+</odoo>

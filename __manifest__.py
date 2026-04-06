@@ -1,0 +1,22 @@
+{
+    'name': 'Recouvrement, litiges et contentieux',
+    'version': '19.0.1.0.0',
+    'summary': 'Gestion des factures, recouvrements, actions et procédures',
+    'description': 'Module de gestion des recouvrements, litiges et contentieux pour CID Développement.',
+    'category': 'Accounting',
+    'sequence': 10,
+    'author': 'CID Développement',
+    'website': 'https://cid.ma',
+    'license': 'OPL-1',
+    'depends': ['base', 'account'],
+    'data': [
+        'security/recouvrement_security.xml',
+        'security/ir.model.access.csv',
+        'data/recouvrement_data.xml',
+        'views/recouvrement_menu.xml',
+        'views/recouvrement_views.xml',
+    ],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+}
