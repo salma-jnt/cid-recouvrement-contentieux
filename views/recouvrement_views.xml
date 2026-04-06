@@ -6,9 +6,14 @@
             <field name="model">recouvrement.facture</field>
             <field name="arch" type="xml">
                 <list string="Factures">
+                    <header>
+                        <button name="%(recouvrement_contentieux.action_recouvrement_import_factures)d" type="action" string="Importer Excel" class="btn-primary" display="always"/>
+                    </header>
                     <field name="name"/>
                     <field name="facture_type"/>
+                    <field name="source_sheet"/>
                     <field name="client_id"/>
+                    <field name="code_affaire"/>
                     <field name="date_facture"/>
                     <field name="date_depot_client"/>
                     <field name="montant_ttc"/>
@@ -22,27 +27,42 @@
             <field name="model">recouvrement.facture</field>
             <field name="arch" type="xml">
                 <form string="Facture">
+                    <header>
+                        <button name="%(recouvrement_contentieux.action_recouvrement_import_factures)d" type="action" string="Importer Excel" class="btn-primary"/>
+                    </header>
                     <sheet>
                         <group>
                             <field name="name"/>
                             <field name="facture_type"/>
+                            <field name="source_sheet" readonly="1"/>
                             <field name="client_id"/>
                             <field name="state"/>
                         </group>
                         <group>
+                            <field name="date_reception_ordre"/>
                             <field name="date_facture"/>
                             <field name="date_signature"/>
                             <field name="date_depot_client"/>
+                        </group>
+                        <group>
+                            <field name="chez_laila"/>
+                            <field name="chez_bennis"/>
                             <field name="reference_justificatif"/>
+                            <field name="depot_comment"/>
                         </group>
                         <group>
                             <field name="montant_ttc"/>
                             <field name="montant_ht"/>
-                            <field name="division"/>
-                            <field name="pole"/>
+                            <field name="division_id"/>
+                            <field name="pole_id"/>
                         </group>
                         <group>
                             <field name="code_affaire"/>
+                            <field name="numero_enreg"/>
+                            <field name="ice"/>
+                            <field name="numero_marche"/>
+                        </group>
+                        <group>
                             <field name="nature"/>
                             <field name="recouvrement_id"/>
                         </group>
@@ -303,10 +323,20 @@
                 <search>
                     <field name="name"/>
                     <field name="client_id"/>
-                    <filter name="factures_standard" string="Factures standard" domain="[('facture_type','=','standard')]"/>
-                    <filter name="factures_proforma" string="Factures proforma" domain="[('facture_type','=','proforma')]"/>
-                    <filter name="factures_groupement" string="Factures groupement" domain="[('facture_type','=','groupement')]"/>
-                    <filter name="factures_autre" string="Autres types" domain="[('facture_type','=','autre')]"/>
+                    <field name="source_sheet"/>
+                    <filter name="factures_standard" string="Standard" domain="[('facture_type','=','standard')]"/>
+                    <filter name="factures_proforma" string="Proforma" domain="[('facture_type','=','proforma')]"/>
+                    <filter name="factures_groupement" string="Groupement" domain="[('facture_type','=','groupement')]"/>
+                    <filter name="factures_avance" string="Avances" domain="[('facture_type','=','avance')]"/>
+                    <filter name="factures_autre" string="Autres" domain="[('facture_type','=','autre')]"/>
+                    <separator/>
+                    <filter name="feuille_groupement" string="Feuille Groupement" domain="[('source_sheet','ilike','GROUPEMENT')]"/>
+                    <filter name="feuille_proforma" string="Feuille Proforma" domain="[('source_sheet','ilike','PRO-FORMA')]"/>
+                    <filter name="feuille_avances" string="Feuille Avances" domain="[('source_sheet','ilike','AVANCES')]"/>
+                    <separator/>
+                    <filter name="group_by_type" string="Grouper par type" context="{'group_by': 'facture_type'}"/>
+                    <filter name="group_by_sheet" string="Grouper par feuille" context="{'group_by': 'source_sheet'}"/>
+                    <filter name="group_by_client" string="Grouper par client" context="{'group_by': 'client_id'}"/>
                 </search>
             </field>
         </record>

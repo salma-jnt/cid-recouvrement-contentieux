@@ -85,10 +85,82 @@
             <field name="view_mode">list,form</field>
         </record>
 
+        <record id="action_recouvrement_import_factures" model="ir.actions.act_window">
+            <field name="name">Importer des factures</field>
+            <field name="res_model">recouvrement.facture.import.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <record id="action_recouvrement_facture_standard" model="ir.actions.act_window">
+            <field name="name">Factures standard</field>
+            <field name="res_model">recouvrement.facture</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">['|', ('facture_type','=','standard'), '|', ('source_sheet','ilike','SUIVI DE FACTURATION'), ('source_sheet','ilike','2EME ENVOI')]</field>
+        </record>
+
+        <record id="action_recouvrement_facture_groupement" model="ir.actions.act_window">
+            <field name="name">Factures groupement</field>
+            <field name="res_model">recouvrement.facture</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">['|', ('facture_type','=','groupement'), ('source_sheet','ilike','GROUPEMENT')]</field>
+        </record>
+
+        <record id="action_recouvrement_facture_proforma" model="ir.actions.act_window">
+            <field name="name">Factures proforma</field>
+            <field name="res_model">recouvrement.facture</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">['|', ('facture_type','=','proforma'), ('source_sheet','ilike','PRO-FORMA')]</field>
+        </record>
+
+        <record id="action_recouvrement_facture_avance" model="ir.actions.act_window">
+            <field name="name">Factures d'avance</field>
+            <field name="res_model">recouvrement.facture</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">['|', ('facture_type','=','avance'), ('source_sheet','ilike','AVANCES')]</field>
+        </record>
+
+        <record id="recouvrement_menu_factures" model="ir.ui.menu">
+            <field name="action" ref="action_recouvrement_facture"/>
+        </record>
+
+        <record id="recouvrement_menu_root" model="ir.ui.menu">
+            <field name="action" ref="action_recouvrement_facture"/>
+        </record>
+
         <record id="recouvrement_menu_factures_list" model="ir.ui.menu">
             <field name="name">Toutes les factures</field>
             <field name="parent_id" ref="recouvrement_menu_factures"/>
             <field name="action" ref="action_recouvrement_facture"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="recouvrement_menu_factures_standard" model="ir.ui.menu">
+            <field name="name">Standard</field>
+            <field name="parent_id" ref="recouvrement_menu_factures"/>
+            <field name="action" ref="action_recouvrement_facture_standard"/>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="recouvrement_menu_factures_groupement" model="ir.ui.menu">
+            <field name="name">Groupement</field>
+            <field name="parent_id" ref="recouvrement_menu_factures"/>
+            <field name="action" ref="action_recouvrement_facture_groupement"/>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="recouvrement_menu_factures_proforma" model="ir.ui.menu">
+            <field name="name">Proforma</field>
+            <field name="parent_id" ref="recouvrement_menu_factures"/>
+            <field name="action" ref="action_recouvrement_facture_proforma"/>
+            <field name="sequence">40</field>
+        </record>
+
+        <record id="recouvrement_menu_factures_avance" model="ir.ui.menu">
+            <field name="name">Avances</field>
+            <field name="parent_id" ref="recouvrement_menu_factures"/>
+            <field name="action" ref="action_recouvrement_facture_avance"/>
+            <field name="sequence">50</field>
         </record>
 
         <record id="recouvrement_menu_recouvrements_list" model="ir.ui.menu">

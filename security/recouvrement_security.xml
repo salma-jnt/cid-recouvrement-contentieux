@@ -9,5 +9,6 @@
             <field name="name">Manager Recouvrement</field>
             <field name="implied_ids" eval="[(4, ref('group_recouvrement_user'))]"/>
         </record>
+
     </data>
 </odoo>
