@@ -1,47 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
-        <record id="recouvrement_menu_root" model="ir.ui.menu">
-            <field name="name">Recouvrement</field>
-            <field name="sequence">10</field>
-        </record>
-
-        <record id="recouvrement_menu_factures" model="ir.ui.menu">
-            <field name="name">Factures</field>
-            <field name="parent_id" ref="recouvrement_menu_root"/>
-            <field name="sequence">10</field>
-        </record>
-
-        <record id="recouvrement_menu_recouvrements" model="ir.ui.menu">
-            <field name="name">Recouvrements</field>
-            <field name="parent_id" ref="recouvrement_menu_root"/>
-            <field name="sequence">20</field>
-        </record>
-
-        <record id="recouvrement_menu_actions" model="ir.ui.menu">
-            <field name="name">Actions de recouvrement</field>
-            <field name="parent_id" ref="recouvrement_menu_root"/>
-            <field name="sequence">30</field>
-        </record>
-
-        <record id="recouvrement_menu_encaissements" model="ir.ui.menu">
-            <field name="name">Encaissements</field>
-            <field name="parent_id" ref="recouvrement_menu_root"/>
-            <field name="sequence">40</field>
-        </record>
-
-        <record id="recouvrement_menu_parametrage" model="ir.ui.menu">
-            <field name="name">Paramétrage</field>
-            <field name="parent_id" ref="recouvrement_menu_root"/>
-            <field name="sequence">50</field>
-        </record>
-
-        <record id="recouvrement_menu_dashboard" model="ir.ui.menu">
-            <field name="name">Tableaux de bord</field>
-            <field name="parent_id" ref="recouvrement_menu_root"/>
-            <field name="sequence">60</field>
-        </record>
-
         <record id="action_recouvrement_facture" model="ir.actions.act_window">
             <field name="name">Factures</field>
             <field name="res_model">recouvrement.facture</field>
@@ -50,7 +9,7 @@
         </record>
 
         <record id="action_recouvrement_recouvrement" model="ir.actions.act_window">
-            <field name="name">Recouvrements</field>
+            <field name="name">Dossiers de recouvrement</field>
             <field name="res_model">recouvrement.recouvrement</field>
             <field name="view_mode">list,form</field>
         </record>
@@ -120,83 +79,120 @@
             <field name="domain">['|', ('facture_type','=','avance'), ('source_sheet','ilike','AVANCES')]</field>
         </record>
 
-        <record id="recouvrement_menu_factures" model="ir.ui.menu">
-            <field name="action" ref="action_recouvrement_facture"/>
+        <record id="action_recouvrement_dashboard" model="ir.actions.client">
+            <field name="name">Tableau de bord Recouvrement</field>
+            <field name="tag">recouvrement_contentieux.dashboard</field>
         </record>
 
         <record id="recouvrement_menu_root" model="ir.ui.menu">
+            <field name="name">Recouvrement</field>
+            <field name="sequence">10</field>
             <field name="action" ref="action_recouvrement_facture"/>
         </record>
 
-        <record id="recouvrement_menu_factures_list" model="ir.ui.menu">
+        <record id="recouvrement_menu_facturation_section" model="ir.ui.menu">
+            <field name="name">Facturation</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">10</field>
+            <field name="active">False</field>
+        </record>
+
+        <record id="recouvrement_menu_suivi_section" model="ir.ui.menu">
+            <field name="name">Suivi de recouvrement</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">20</field>
+            <field name="active">False</field>
+        </record>
+
+        <record id="recouvrement_menu_parametrage" model="ir.ui.menu">
+            <field name="name">Paramétrage</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">30</field>
+            <field name="active">False</field>
+        </record>
+
+        <record id="recouvrement_menu_factures" model="ir.ui.menu">
             <field name="name">Toutes les factures</field>
-            <field name="parent_id" ref="recouvrement_menu_factures"/>
+            <field name="parent_id" ref="recouvrement_menu_facturation_section"/>
             <field name="action" ref="action_recouvrement_facture"/>
             <field name="sequence">10</field>
         </record>
 
         <record id="recouvrement_menu_factures_standard" model="ir.ui.menu">
-            <field name="name">Standard</field>
-            <field name="parent_id" ref="recouvrement_menu_factures"/>
+            <field name="name">Factures standard</field>
+            <field name="parent_id" ref="recouvrement_menu_facturation_section"/>
             <field name="action" ref="action_recouvrement_facture_standard"/>
             <field name="sequence">20</field>
         </record>
 
         <record id="recouvrement_menu_factures_groupement" model="ir.ui.menu">
-            <field name="name">Groupement</field>
-            <field name="parent_id" ref="recouvrement_menu_factures"/>
+            <field name="name">Factures groupement</field>
+            <field name="parent_id" ref="recouvrement_menu_facturation_section"/>
             <field name="action" ref="action_recouvrement_facture_groupement"/>
             <field name="sequence">30</field>
         </record>
 
         <record id="recouvrement_menu_factures_proforma" model="ir.ui.menu">
-            <field name="name">Proforma</field>
-            <field name="parent_id" ref="recouvrement_menu_factures"/>
+            <field name="name">Factures proforma</field>
+            <field name="parent_id" ref="recouvrement_menu_facturation_section"/>
             <field name="action" ref="action_recouvrement_facture_proforma"/>
             <field name="sequence">40</field>
         </record>
 
         <record id="recouvrement_menu_factures_avance" model="ir.ui.menu">
-            <field name="name">Avances</field>
-            <field name="parent_id" ref="recouvrement_menu_factures"/>
+            <field name="name">Factures d’avance</field>
+            <field name="parent_id" ref="recouvrement_menu_facturation_section"/>
             <field name="action" ref="action_recouvrement_facture_avance"/>
             <field name="sequence">50</field>
         </record>
 
-        <record id="recouvrement_menu_recouvrements_list" model="ir.ui.menu">
-            <field name="name">Tous les recouvrements</field>
-            <field name="parent_id" ref="recouvrement_menu_recouvrements"/>
+        <record id="recouvrement_menu_factures_import" model="ir.ui.menu">
+            <field name="name">Importer des factures</field>
+            <field name="parent_id" ref="recouvrement_menu_facturation_section"/>
+            <field name="action" ref="action_recouvrement_import_factures"/>
+            <field name="sequence">60</field>
+        </record>
+
+        <record id="recouvrement_menu_recouvrements" model="ir.ui.menu">
+            <field name="name">Dossiers de recouvrement</field>
+            <field name="parent_id" ref="recouvrement_menu_suivi_section"/>
             <field name="action" ref="action_recouvrement_recouvrement"/>
+            <field name="sequence">10</field>
         </record>
 
-        <record id="recouvrement_menu_actions_list" model="ir.ui.menu">
-            <field name="name">Toutes les actions</field>
-            <field name="parent_id" ref="recouvrement_menu_actions"/>
+        <record id="recouvrement_menu_actions" model="ir.ui.menu">
+            <field name="name">Actions de recouvrement</field>
+            <field name="parent_id" ref="recouvrement_menu_suivi_section"/>
             <field name="action" ref="action_recouvrement_action"/>
+            <field name="sequence">20</field>
         </record>
 
-        <record id="recouvrement_menu_encaissements_list" model="ir.ui.menu">
-            <field name="name">Tous les encaissements</field>
-            <field name="parent_id" ref="recouvrement_menu_encaissements"/>
+        <record id="recouvrement_menu_encaissements" model="ir.ui.menu">
+            <field name="name">Encaissements</field>
+            <field name="parent_id" ref="recouvrement_menu_suivi_section"/>
             <field name="action" ref="action_recouvrement_encaissement"/>
+            <field name="sequence">30</field>
         </record>
 
         <record id="recouvrement_menu_parametrage_procedures" model="ir.ui.menu">
             <field name="name">Procédures de recouvrement</field>
             <field name="parent_id" ref="recouvrement_menu_parametrage"/>
             <field name="action" ref="action_recouvrement_procedure"/>
+            <field name="sequence">10</field>
         </record>
 
         <record id="recouvrement_menu_parametrage_action_templates" model="ir.ui.menu">
             <field name="name">Modèles d’actions</field>
             <field name="parent_id" ref="recouvrement_menu_parametrage"/>
             <field name="action" ref="action_recouvrement_action_template"/>
+            <field name="sequence">20</field>
         </record>
 
         <record id="recouvrement_menu_parametrage_client_types" model="ir.ui.menu">
             <field name="name">Types de clients</field>
             <field name="parent_id" ref="recouvrement_menu_parametrage"/>
             <field name="action" ref="action_recouvrement_client_type"/>
+            <field name="sequence">30</field>
         </record>
     </data>
 </odoo>

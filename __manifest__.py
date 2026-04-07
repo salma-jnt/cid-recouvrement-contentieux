@@ -16,6 +16,13 @@
         'views/recouvrement_views.xml',
         'views/recouvrement_import_wizard.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'recouvrement_contentieux/static/src/scss/recouvrement_dashboard.scss',
+            'recouvrement_contentieux/static/src/js/recouvrement_dashboard.js',
+            'recouvrement_contentieux/static/src/xml/recouvrement_dashboard.xml',
+        ],
+    },
     'installable': True,
     'application': True,
     'auto_install': False,
