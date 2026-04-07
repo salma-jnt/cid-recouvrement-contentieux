@@ -10,14 +10,11 @@
                         <button name="%(recouvrement_contentieux.action_recouvrement_import_factures)d" type="action" string="Importer Excel" class="btn-primary" display="always"/>
                     </header>
                     <field name="name"/>
-                    <field name="facture_type"/>
-                    <field name="source_sheet"/>
                     <field name="client_id"/>
                     <field name="code_affaire"/>
                     <field name="date_facture"/>
-                    <field name="date_depot_client"/>
+                    <field name="depot_display" string="Dépôt client"/>
                     <field name="montant_ttc"/>
-                    <field name="state"/>
                 </list>
             </field>
         </record>
@@ -33,10 +30,9 @@
                     <sheet>
                         <group>
                             <field name="name"/>
-                            <field name="facture_type"/>
-                            <field name="source_sheet" readonly="1"/>
                             <field name="client_id"/>
-                            <field name="state"/>
+                            <field name="code_affaire"/>
+                            <field name="numero_enreg"/>
                         </group>
                         <group>
                             <field name="date_reception_ordre"/>
@@ -57,10 +53,10 @@
                             <field name="pole_id"/>
                         </group>
                         <group>
-                            <field name="code_affaire"/>
-                            <field name="numero_enreg"/>
                             <field name="ice"/>
                             <field name="numero_marche"/>
+                            <field name="division_id"/>
+                            <field name="pole_id"/>
                         </group>
                         <group>
                             <field name="nature"/>
@@ -91,19 +87,25 @@
             <field name="model">recouvrement.recouvrement</field>
             <field name="arch" type="xml">
                 <form string="Dossier de recouvrement">
+                    <header>
+                        <button name="action_generate_actions" type="object" string="Générer les actions" class="btn-primary"/>
+                        <button name="action_mark_closed" type="object" string="Clôturer" class="btn-secondary"/>
+                    </header>
                     <sheet>
                         <group>
                             <field name="name"/>
                             <field name="facture_id"/>
                             <field name="client_id" readonly="1"/>
                             <field name="procedure_id"/>
-                            <field name="state"/>
+                            <field name="state" readonly="1"/>
                         </group>
                         <group>
                             <field name="date_depot_client"/>
                             <field name="montant_ttc" readonly="1"/>
                             <field name="montant_encaisse" readonly="1"/>
                             <field name="next_action_date" readonly="1"/>
+                            <field name="last_action_date" readonly="1"/>
+                            <field name="action_count" readonly="1"/>
                         </group>
                         <notebook>
                             <page string="Actions">
@@ -111,7 +113,10 @@
                                     <list editable="bottom">
                                         <field name="name"/>
                                         <field name="action_type"/>
+                                        <field name="responsible_id"/>
+                                        <field name="priority"/>
                                         <field name="mandatory_date"/>
+                                        <field name="date_done"/>
                                         <field name="state"/>
                                     </list>
                                 </field>
@@ -129,8 +134,11 @@
                 <list string="Actions de recouvrement">
                     <field name="name"/>
                     <field name="recouvrement_id"/>
+                    <field name="responsible_id"/>
                     <field name="action_type"/>
+                    <field name="priority"/>
                     <field name="mandatory_date"/>
+                    <field name="date_done"/>
                     <field name="state"/>
                 </list>
             </field>
@@ -149,9 +157,14 @@
                             <field name="procedure_id" readonly="1"/>
                         </group>
                         <group>
+                            <field name="responsible_id"/>
+                            <field name="priority"/>
                             <field name="mandatory_date"/>
+                        </group>
+                        <group>
                             <field name="state"/>
                             <field name="date_done"/>
+                            <field name="is_overdue" readonly="1"/>
                         </group>
                         <group>
                             <field name="comment"/>
@@ -159,6 +172,7 @@
                         <footer>
                             <button name="action_done" type="object" string="Marquer réalisée" class="btn-primary"/>
                             <button name="action_reset" type="object" string="Réinitialiser" class="btn-secondary"/>
+                            <button name="action_cancel" type="object" string="Annuler" class="btn-secondary"/>
                         </footer>
                     </sheet>
                 </form>
@@ -363,10 +377,17 @@
                 <search>
                     <field name="name"/>
                     <field name="recouvrement_id"/>
+                    <field name="responsible_id"/>
                     <field name="action_type"/>
                     <field name="state"/>
+                    <filter name="a_faire" string="À faire" domain="[('state','=','todo')]"/>
+                    <filter name="realisees" string="Réalisées" domain="[('state','=','done')]"/>
                     <filter name="aujourd_hui" string="Aujourd’hui" domain="[('mandatory_date','=', context_today())]"/>
                     <filter name="en_retard" string="En retard" domain="[('mandatory_date','&lt;', context_today()), ('state', '!=', 'done')]"/>
+                    <separator/>
+                    <filter name="group_by_type" string="Par type" context="{'group_by': 'action_type'}"/>
+                    <filter name="group_by_responsable" string="Par responsable" context="{'group_by': 'responsible_id'}"/>
+                    <filter name="group_by_statut" string="Par statut" context="{'group_by': 'state'}"/>
                 </search>
             </field>
         </record>

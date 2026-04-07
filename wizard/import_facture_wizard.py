@@ -9,8 +9,10 @@ from odoo.exceptions import UserError
 
 try:
     import openpyxl
+    from openpyxl.utils.datetime import from_excel
 except ImportError:
     openpyxl = None
+    from_excel = None
 
 
 class RecouvrementFactureImportWizard(models.TransientModel):
@@ -73,6 +75,54 @@ class RecouvrementFactureImportWizard(models.TransientModel):
         }
         return mapping.get(header, None)
 
+    def _extract_date_from_text(self, value, default_year=None):
+        if value in [None, '']:
+            return False
+
+        text = str(value).strip()
+        if not text:
+            return False
+
+        normalized = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('ascii').lower()
+        normalized = normalized.replace('.', '/').replace('-', '/')
+        month_map = {
+            'janvier': '01', 'janv': '01',
+            'fevrier': '02', 'fevr': '02', 'fev': '02',
+            'mars': '03',
+            'avril': '04', 'avr': '04',
+            'mai': '05',
+            'juin': '06',
+            'juillet': '07', 'juil': '07',
+            'aout': '08',
+            'septembre': '09', 'sept': '09',
+            'octobre': '10', 'oct': '10',
+            'novembre': '11', 'nov': '11',
+            'decembre': '12', 'dec': '12',
+        }
+        for label, month in month_map.items():
+            normalized = re.sub(rf'\b{label}\b', f'/{month}/', normalized)
+
+        normalized = re.sub(r'\s+', ' ', normalized)
+        match = re.search(r'(?P<day>\d{1,2})\s*/\s*(?P<month>\d{1,2})\s*/\s*(?P<year>\d{2,4})', normalized)
+        if not match:
+            match = re.search(r'(?P<day>\d{1,2})\s*/\s*(?P<month>\d{1,2})(?!\s*/)', normalized)
+        if not match:
+            return False
+
+        day = int(match.group('day'))
+        month = int(match.group('month'))
+        year_text = match.groupdict().get('year')
+        year = default_year or fields.Date.today().year
+        if year_text:
+            year = int(year_text)
+            if year < 100:
+                year += 2000
+
+        try:
+            return date(year, month, day)
+        except ValueError:
+            return False
+
     def _normalize_type(self, value):
         if not value:
             return False
@@ -130,12 +180,24 @@ class RecouvrementFactureImportWizard(models.TransientModel):
                 return value.date()
             if isinstance(value, date):
                 return value
+            if isinstance(value, (int, float)) and not isinstance(value, bool) and from_excel:
+                try:
+                    converted = from_excel(value)
+                    return converted.date() if hasattr(converted, 'date') else converted
+                except Exception:
+                    pass
             text = str(value).strip()
-            for fmt in ('%m/%d/%Y', '%m/%d/%y', '%d/%m/%Y', '%d/%m/%y', '%Y-%m-%d'):
+            for fmt in (
+                '%m/%d/%Y', '%m/%d/%y', '%d/%m/%Y', '%d/%m/%y',
+                '%Y-%m-%d', '%Y-%m-%d %H:%M:%S', '%m/%d/%Y %H:%M:%S', '%d/%m/%Y %H:%M:%S'
+            ):
                 try:
                     return datetime.strptime(text, fmt).date()
                 except ValueError:
                     continue
+            extracted_date = self._extract_date_from_text(text)
+            if extracted_date:
+                return extracted_date
             return False
 
         if field_name in ['montant_ttc', 'montant_ht']:
@@ -227,8 +289,12 @@ class RecouvrementFactureImportWizard(models.TransientModel):
                             values['facture_type'] = type_value
                         continue
                     converted_value = self._convert_value(field_name, cell)
-                    if field_name == 'date_depot_client' and not converted_value and cell not in [None, '']:
-                        values['depot_comment'] = str(cell).strip()
+                    if field_name == 'date_depot_client' and cell not in [None, '']:
+                        cell_text = str(cell).strip()
+                        if cell_text:
+                            values['depot_comment'] = cell_text
+                        if converted_value:
+                            values['date_depot_client'] = converted_value
                         continue
                     values[field_name] = converted_value
 
@@ -255,7 +321,7 @@ class RecouvrementFactureImportWizard(models.TransientModel):
                         search_domain.append(('code_affaire', '=', values['code_affaire']))
                     facture = facture_obj.search(search_domain, limit=1)
                     if facture:
-                        update_vals = {k: v for k, v in values.items() if v not in [None, '']}
+                        update_vals = {k: v for k, v in values.items() if v not in [None, '', False]}
                         if update_vals:
                             facture.with_context(recouvrement_import=True).write(update_vals)
                             updated += 1
@@ -264,7 +330,7 @@ class RecouvrementFactureImportWizard(models.TransientModel):
                             'state': 'imported',
                             'currency_id': self.env.company.currency_id.id,
                         }
-                        defaults.update({k: v for k, v in values.items() if v not in [None, '']})
+                        defaults.update({k: v for k, v in values.items() if v not in [None, '', False]})
                         facture_obj.create(defaults)
                         created += 1
                 except Exception as exc:

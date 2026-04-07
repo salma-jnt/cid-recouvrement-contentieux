@@ -5,7 +5,7 @@ from odoo.exceptions import UserError
 class RecouvrementFacture(models.Model):
     _name = 'recouvrement.facture'
     _description = 'Facture de recouvrement'
-    _order = 'date_depot_client desc, name'
+    _order = 'date_facture desc, id desc'
 
     @api.model
     def _infer_facture_type_from_sheet(self, source_sheet):
@@ -20,7 +20,7 @@ class RecouvrementFacture(models.Model):
             return 'standard'
         return False
 
-    name = fields.Char(string='Référence facture', required=True, index=True)
+    name = fields.Char(string='N° facture', required=True, index=True)
     facture_type = fields.Selection([
         ('standard', 'Facture standard'),
         ('proforma', 'Facture proforma'),
@@ -35,7 +35,8 @@ class RecouvrementFacture(models.Model):
     date_facture = fields.Date(string='Date de la facture')
     date_signature = fields.Date(string='Date de signature')
     date_depot_client = fields.Date(string='Date de dépôt chez le client')
-    depot_comment = fields.Text(string='Commentaire dépôt client')
+    depot_comment = fields.Text(string='Statut / commentaire de dépôt')
+    depot_display = fields.Char(string='Dépôt client', compute='_compute_depot_display', store=True)
     montant_ttc = fields.Monetary(string='Montant TTC')
     montant_ht = fields.Monetary(string='Montant HT')
     reference_justificatif = fields.Char(string='Référence justificatif')
@@ -54,6 +55,14 @@ class RecouvrementFacture(models.Model):
     ], string='Statut', default='draft')
     currency_id = fields.Many2one('res.currency', string='Devise', default=lambda self: self.env.company.currency_id)
     recouvrement_id = fields.Many2one('recouvrement.recouvrement', string='Recouvrement associé')
+
+    @api.depends('date_depot_client', 'depot_comment')
+    def _compute_depot_display(self):
+        for rec in self:
+            if rec.date_depot_client:
+                rec.depot_display = rec.date_depot_client.strftime('%d/%m/%Y')
+            else:
+                rec.depot_display = rec.depot_comment or ''
 
     @api.model_create_multi
     def create(self, vals_list):
