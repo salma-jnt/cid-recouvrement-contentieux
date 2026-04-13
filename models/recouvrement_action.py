@@ -26,9 +26,11 @@ class RecouvrementAction(models.Model):
     name = fields.Char(string='Action', required=True)
     recouvrement_id = fields.Many2one('recouvrement.recouvrement', string='Dossier de recouvrement', required=True, ondelete='cascade')
     action_type = fields.Selection([
-        ('appel', 'Appel'),
-        ('relance_1', 'Relance 1'),
-        ('relance_2', 'Relance 2'),
+        ('appel', 'Appel / contact'),
+        ('relance_1', 'Relance téléphonique 1'),
+        ('relance_2', 'Relance téléphonique 2'),
+        ('courrier', 'Relance écrite'),
+        ('suivi', 'Suivi / coordination'),
         ('mise_en_demeure', 'Mise en demeure'),
         ('contentieux', 'Contentieux'),
     ], string='Type', required=True, default='appel')

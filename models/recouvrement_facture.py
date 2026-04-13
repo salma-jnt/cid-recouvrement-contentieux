@@ -79,21 +79,3 @@ class RecouvrementFacture(models.Model):
         if inferred_type:
             vals['facture_type'] = inferred_type
         return super().write(vals)
-
-
-class RecouvrementEncaissement(models.Model):
-    _name = 'recouvrement.encaissement'
-    _description = 'Encaissement de recouvrement'
-
-    name = fields.Char(string='Référence', required=True)
-    facture_id = fields.Many2one('recouvrement.facture', string='Facture', required=True)
-    recouvrement_id = fields.Many2one('recouvrement.recouvrement', string='Dossier de recouvrement')
-    montant = fields.Monetary(string='Montant encaissé', required=True)
-    date_encaissement = fields.Date(string='Date d’encaissement', required=True)
-    mode_paiement = fields.Selection([
-        ('virement', 'Virement'),
-        ('espece', 'Espèces'),
-        ('cheque', 'Chèque'),
-        ('autre', 'Autre'),
-    ], string='Mode de paiement', default='virement')
-    currency_id = fields.Many2one('res.currency', string='Devise', default=lambda self: self.env.company.currency_id)

@@ -25,34 +25,55 @@
 
     <t t-name="recouvrement_contentieux.RecouvrementDashboard">
         <div class="o_recouvrement_dashboard">
-            <aside class="o_recouvrement_sidebar">
-                <div class="o_recouvrement_sidebar_brand">
-                    <div class="o_recouvrement_brand_title">Recouvrement</div>
-                    <div class="o_recouvrement_brand_subtitle">Navigation rapide</div>
-                </div>
-
-                <t t-foreach="sections" t-as="section" t-key="section.title">
-                    <div class="o_recouvrement_sidebar_section">
-                        <div class="o_recouvrement_sidebar_section_title" t-esc="section.title"/>
-                        <t t-foreach="section.items" t-as="item" t-key="item.actionXmlId">
-                            <button type="button" class="o_recouvrement_nav_item" t-on-click="() => this.openAction(item.actionXmlId)">
-                                <i t-att-class="`fa ${item.icon}`"/>
-                                <span t-esc="item.label"/>
-                            </button>
-                        </t>
-                    </div>
-                </t>
-            </aside>
-
             <section class="o_recouvrement_dashboard_content">
                 <div class="o_recouvrement_hero_card">
                     <div>
-                        <h1>Gestion des recouvrements</h1>
-                        <p>Accédez rapidement aux factures, dossiers, actions et encaissements depuis cette barre latérale.</p>
+                        <h1>Tableau de bord du recouvrement</h1>
+                        <p>Suivez les indicateurs clés, les dossiers à traiter et les derniers mouvements depuis une seule vue.</p>
                     </div>
-                    <button type="button" class="btn btn-primary" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_facture')">
-                        Ouvrir les factures
-                    </button>
+                    <div class="o_recouvrement_hero_actions">
+                        <button type="button" class="btn btn-light" t-on-click="() => this.loadDashboard()">
+                            Actualiser
+                        </button>
+                        <button type="button" class="btn btn-primary" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_facture')">
+                            Ouvrir les factures
+                        </button>
+                    </div>
+                </div>
+
+                <div class="o_recouvrement_kpis">
+                    <t t-if="state.loading">
+                        <div class="o_recouvrement_kpi_card">Chargement...</div>
+                    </t>
+                    <t t-else="" t-foreach="state.kpis" t-as="kpi" t-key="kpi.label">
+                        <button type="button" class="o_recouvrement_kpi_card" t-on-click="() => this.openAction(kpi.actionXmlId)">
+                            <div class="o_recouvrement_kpi_icon">
+                                <i t-att-class="`fa ${kpi.icon}`"/>
+                            </div>
+                            <div class="o_recouvrement_kpi_text">
+                                <div class="o_recouvrement_kpi_value" t-esc="kpi.value"/>
+                                <div class="o_recouvrement_kpi_label" t-esc="kpi.label"/>
+                            </div>
+                        </button>
+                    </t>
+                </div>
+
+                <div class="o_recouvrement_status_panel">
+                    <div class="o_recouvrement_panel_header">
+                        <h3>Répartition par statut</h3>
+                        <button type="button" class="btn btn-link" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_recouvrement')">Voir les dossiers</button>
+                    </div>
+                    <div class="o_recouvrement_status_grid">
+                        <t t-if="state.loading">
+                            <div class="o_recouvrement_status_card">Chargement...</div>
+                        </t>
+                        <t t-else="" t-foreach="state.statusBreakdown" t-as="item" t-key="item.label">
+                            <button type="button" t-att-class="`o_recouvrement_status_card o_recouvrement_status_${item.tone}`" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_recouvrement')">
+                                <span class="o_recouvrement_status_value" t-esc="item.value"/>
+                                <span class="o_recouvrement_status_label" t-esc="item.label"/>
+                            </button>
+                        </t>
+                    </div>
                 </div>
 
                 <div class="o_recouvrement_shortcuts">
@@ -60,14 +81,79 @@
                         <i class="fa fa-folder-open-o"/>
                         <span>Dossiers de recouvrement</span>
                     </button>
-                    <button type="button" class="o_recouvrement_shortcut" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_action')">
-                        <i class="fa fa-phone"/>
-                        <span>Actions de recouvrement</span>
-                    </button>
                     <button type="button" class="o_recouvrement_shortcut" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_import_factures')">
                         <i class="fa fa-upload"/>
                         <span>Importer des factures</span>
                     </button>
+                </div>
+
+                <div class="o_recouvrement_panels">
+                    <div class="o_recouvrement_panel">
+                        <div class="o_recouvrement_panel_header">
+                            <h3>Factures récentes</h3>
+                            <button type="button" class="btn btn-link" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_facture')">Voir tout</button>
+                        </div>
+                        <t t-if="state.recentFactures.length">
+                            <t t-foreach="state.recentFactures" t-as="item" t-key="item.id">
+                                <div class="o_recouvrement_panel_row">
+                                    <div>
+                                        <strong t-esc="item.name"/>
+                                        <div class="text-muted" t-esc="item.client"/>
+                                    </div>
+                                    <div class="text-end">
+                                        <div t-esc="item.montant"/>
+                                        <div class="text-muted" t-esc="item.depot"/>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                        <div t-else="" class="o_recouvrement_empty">Aucune facture à afficher.</div>
+                    </div>
+
+                    <div class="o_recouvrement_panel">
+                        <div class="o_recouvrement_panel_header">
+                            <h3>Dossiers en retard</h3>
+                            <button type="button" class="btn btn-link" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_recouvrement')">Voir tout</button>
+                        </div>
+                        <t t-if="state.lateRecouvrements.length">
+                            <t t-foreach="state.lateRecouvrements" t-as="item" t-key="item.id">
+                                <div class="o_recouvrement_panel_row">
+                                    <div>
+                                        <strong t-esc="item.name"/>
+                                        <div class="text-muted" t-esc="item.client"/>
+                                    </div>
+                                    <div class="text-end">
+                                        <div t-esc="item.montant"/>
+                                        <div class="text-danger">Échéance : <t t-esc="item.nextAction"/></div>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                        <div t-else="" class="o_recouvrement_empty">Aucun dossier en retard.</div>
+                    </div>
+
+
+                    <div class="o_recouvrement_panel">
+                        <div class="o_recouvrement_panel_header">
+                            <h3>Encaissements récents</h3>
+                            <button type="button" class="btn btn-link" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_encaissement')">Voir tout</button>
+                        </div>
+                        <t t-if="state.recentEncaissements.length">
+                            <t t-foreach="state.recentEncaissements" t-as="item" t-key="item.id">
+                                <div class="o_recouvrement_panel_row">
+                                    <div>
+                                        <strong t-esc="item.name"/>
+                                        <div class="text-muted" t-esc="item.facture"/>
+                                    </div>
+                                    <div class="text-end">
+                                        <div t-esc="item.montant"/>
+                                        <div class="text-muted" t-esc="item.date"/>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                        <div t-else="" class="o_recouvrement_empty">Aucun encaissement récent.</div>
+                    </div>
                 </div>
             </section>
         </div>

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
         <record id="procedure_standard" model="recouvrement.procedure">
             <field name="name">Procédure Standard</field>
             <field name="code">STANDARD</field>
-            <field name="description">Procédure standard pour les clients normaux.</field>
+            <field name="description">Procédure standard de recouvrement : contact initial, suivi avant échéance, relances téléphoniques, relances écrites puis mise en demeure si nécessaire.</field>
             <field name="delay_appel">7</field>
-            <field name="delay_relance_1">14</field>
-            <field name="delay_relance_2">30</field>
-            <field name="delay_contentieux">60</field>
+            <field name="delay_relance_1">30</field>
+            <field name="delay_relance_2">45</field>
+            <field name="delay_contentieux">180</field>
         </record>
 
         <record id="procedure_grands_comptes" model="recouvrement.procedure">
@@ -52,25 +52,64 @@
         <record id="template_appel_standard" model="recouvrement.action.template">
             <field name="procedure_id" ref="procedure_standard"/>
             <field name="sequence">10</field>
-            <field name="name">Appel client</field>
+            <field name="name">Premier contact avec le client</field>
             <field name="action_type">appel</field>
             <field name="delay">7</field>
+            <field name="description">Par téléphone, 1 semaine après la réception, pour confirmer la bonne réception et l’approbation de la facture.</field>
         </record>
 
         <record id="template_relance_1_standard" model="recouvrement.action.template">
             <field name="procedure_id" ref="procedure_standard"/>
             <field name="sequence">20</field>
-            <field name="name">Relance 1</field>
-            <field name="action_type">relance_1</field>
+            <field name="name">Deuxième contact avant échéance</field>
+            <field name="action_type">suivi</field>
             <field name="delay">14</field>
+            <field name="description">Suivi régulier avant l’arrivée à échéance pour obtenir le service fait ou lever les blocages techniques côté client.</field>
         </record>
 
         <record id="template_relance_2_standard" model="recouvrement.action.template">
             <field name="procedure_id" ref="procedure_standard"/>
             <field name="sequence">30</field>
-            <field name="name">Relance 2</field>
-            <field name="action_type">relance_2</field>
+            <field name="name">Premier appel de relance</field>
+            <field name="action_type">relance_1</field>
             <field name="delay">30</field>
+            <field name="description">Par téléphone, à la fin du mois de l’échéance si le virement n’est pas reçu.</field>
+        </record>
+
+        <record id="template_relance_telephone_2_standard" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_standard"/>
+            <field name="sequence">40</field>
+            <field name="name">Deuxième appel de relance</field>
+            <field name="action_type">relance_2</field>
+            <field name="delay">45</field>
+            <field name="description">Par téléphone, 15 jours après la première relance si aucun virement n’est constaté.</field>
+        </record>
+
+        <record id="template_relance_ecrite_1_standard" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_standard"/>
+            <field name="sequence">50</field>
+            <field name="name">Première relance par écrit</field>
+            <field name="action_type">courrier</field>
+            <field name="delay">75</field>
+            <field name="description">Lettre envoyée par fax et courrier papier, 1 mois après le dernier appel de relance.</field>
+        </record>
+
+        <record id="template_relance_ecrite_2_standard" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_standard"/>
+            <field name="sequence">60</field>
+            <field name="name">Deuxième relance par écrit</field>
+            <field name="action_type">courrier</field>
+            <field name="delay">165</field>
+            <field name="description">Deuxième courrier de relance, 3 mois après la première lettre si le règlement n’est toujours pas reçu.</field>
+        </record>
+
+        <record id="template_mise_en_demeure_standard" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_standard"/>
+            <field name="sequence">70</field>
+            <field name="name">Décision sur l’action à prendre / mise en demeure</field>
+            <field name="action_type">mise_en_demeure</field>
+            <field name="delay">345</field>
+            <field name="description">Décider de poursuivre les relances ou d’envoyer une mise en demeure, 6 mois après la dernière lettre de relance.</field>
         </record>
     </data>
 </odoo>

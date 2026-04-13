@@ -1,5 +1,6 @@
 from . import res_partner
 from . import recouvrement_facture
+from . import recouvrement_encaissement
 from . import recouvrement_recouvrement
 from . import recouvrement_action
 from . import recouvrement_procedure

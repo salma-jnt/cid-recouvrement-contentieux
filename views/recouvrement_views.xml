@@ -24,9 +24,6 @@
             <field name="model">recouvrement.facture</field>
             <field name="arch" type="xml">
                 <form string="Facture">
-                    <header>
-                        <button name="%(recouvrement_contentieux.action_recouvrement_import_factures)d" type="action" string="Importer Excel" class="btn-primary"/>
-                    </header>
                     <sheet>
                         <group>
                             <field name="name"/>
@@ -41,25 +38,18 @@
                             <field name="date_depot_client"/>
                         </group>
                         <group>
-                            <field name="chez_laila"/>
-                            <field name="chez_bennis"/>
                             <field name="reference_justificatif"/>
                             <field name="depot_comment"/>
-                        </group>
-                        <group>
                             <field name="montant_ttc"/>
                             <field name="montant_ht"/>
-                            <field name="division_id"/>
-                            <field name="pole_id"/>
                         </group>
                         <group>
+                            <field name="division_id"/>
+                            <field name="pole_id"/>
                             <field name="ice"/>
                             <field name="numero_marche"/>
-                            <field name="division_id"/>
-                            <field name="pole_id"/>
                         </group>
                         <group>
-                            <field name="nature"/>
                             <field name="recouvrement_id"/>
                         </group>
                     </sheet>
@@ -72,12 +62,15 @@
             <field name="model">recouvrement.recouvrement</field>
             <field name="arch" type="xml">
                 <list string="Recouvrements">
-                    <field name="name"/>
                     <field name="facture_id"/>
                     <field name="client_id"/>
                     <field name="procedure_id"/>
+                    <field name="phase_courante"/>
                     <field name="state"/>
-                    <field name="next_action_date"/>
+                    <field name="motif_blocage" optional="hide"/>
+                    <field name="reste_a_recouvrer"/>
+                    <field name="date_echeance"/>
+                    <field name="prochaine_echeance"/>
                 </list>
             </field>
         </record>
@@ -87,41 +80,22 @@
             <field name="model">recouvrement.recouvrement</field>
             <field name="arch" type="xml">
                 <form string="Dossier de recouvrement">
-                    <header>
-                        <button name="action_generate_actions" type="object" string="Générer les actions" class="btn-primary"/>
-                        <button name="action_mark_closed" type="object" string="Clôturer" class="btn-secondary"/>
-                    </header>
                     <sheet>
                         <group>
-                            <field name="name"/>
                             <field name="facture_id"/>
                             <field name="client_id" readonly="1"/>
                             <field name="procedure_id"/>
-                            <field name="state" readonly="1"/>
+                            <field name="phase_courante" readonly="1"/>
                         </group>
                         <group>
-                            <field name="date_depot_client"/>
-                            <field name="montant_ttc" readonly="1"/>
-                            <field name="montant_encaisse" readonly="1"/>
-                            <field name="next_action_date" readonly="1"/>
-                            <field name="last_action_date" readonly="1"/>
-                            <field name="action_count" readonly="1"/>
+                            <field name="state"/>
+                            <field name="motif_blocage" placeholder="Préciser le motif si le dossier est bloqué" invisible="state != 'blocked'"/>
+                            <field name="reste_a_recouvrer" readonly="1"/>
                         </group>
-                        <notebook>
-                            <page string="Actions">
-                                <field name="action_ids">
-                                    <list editable="bottom">
-                                        <field name="name"/>
-                                        <field name="action_type"/>
-                                        <field name="responsible_id"/>
-                                        <field name="priority"/>
-                                        <field name="mandatory_date"/>
-                                        <field name="date_done"/>
-                                        <field name="state"/>
-                                    </list>
-                                </field>
-                            </page>
-                        </notebook>
+                        <group>
+                            <field name="date_echeance"/>
+                            <field name="prochaine_echeance" readonly="1"/>
+                        </group>
                     </sheet>
                 </form>
             </field>
@@ -184,12 +158,14 @@
             <field name="model">recouvrement.encaissement</field>
             <field name="arch" type="xml">
                 <list string="Encaissements">
-                    <field name="name"/>
-                    <field name="facture_id"/>
-                    <field name="recouvrement_id"/>
+                    <field name="pole_id"/>
+                    <field name="code_affaire"/>
+                    <field name="client_id"/>
                     <field name="montant"/>
-                    <field name="date_encaissement"/>
-                    <field name="mode_paiement"/>
+                    <field name="penalite"/>
+                    <field name="date_operation"/>
+                    <field name="banque"/>
+                    <field name="observation"/>
                 </list>
             </field>
         </record>
@@ -204,12 +180,22 @@
                             <field name="name"/>
                             <field name="facture_id"/>
                             <field name="recouvrement_id"/>
+                            <field name="client_id"/>
+                        </group>
+                        <group>
+                            <field name="pole_id"/>
+                            <field name="code_affaire"/>
+                            <field name="banque"/>
+                            <field name="mode_paiement"/>
                         </group>
                         <group>
                             <field name="montant"/>
-                            <field name="date_encaissement"/>
-                            <field name="mode_paiement"/>
+                            <field name="penalite"/>
+                            <field name="date_operation"/>
                             <field name="currency_id"/>
+                        </group>
+                        <group>
+                            <field name="observation"/>
                         </group>
                     </sheet>
                 </form>
@@ -363,9 +349,11 @@
                     <field name="name"/>
                     <field name="client_id"/>
                     <field name="state"/>
-                    <filter name="en_cours" string="En cours" domain="[('state','=','open')]"/>
-                    <filter name="en_retard" string="En retard" domain="[('state','=','late')]"/>
-                    <filter name="clotures" string="Clôturés" domain="[('state','=','closed')]"/>
+                    <filter name="normaux" string="Normal" domain="[('state','=','draft')]"/>
+                    <filter name="precontentieux" string="Précontentieux" domain="[('state','=','open')]"/>
+                    <filter name="contentieux" string="Contentieux" domain="[('state','=','late')]"/>
+                    <filter name="bloques" string="Bloqués" domain="[('state','=','blocked')]"/>
+                    <filter name="recouvres" string="Recouvrés" domain="[('state','=','closed')]"/>
                 </search>
             </field>
         </record>

@@ -87,7 +87,7 @@
         <record id="recouvrement_menu_root" model="ir.ui.menu">
             <field name="name">Recouvrement</field>
             <field name="sequence">10</field>
-            <field name="action" ref="action_recouvrement_facture"/>
+            <field name="action" ref="action_recouvrement_dashboard"/>
         </record>
 
         <record id="recouvrement_menu_facturation_section" model="ir.ui.menu">
@@ -165,6 +165,7 @@
             <field name="parent_id" ref="recouvrement_menu_suivi_section"/>
             <field name="action" ref="action_recouvrement_action"/>
             <field name="sequence">20</field>
+            <field name="active">False</field>
         </record>
 
         <record id="recouvrement_menu_encaissements" model="ir.ui.menu">

@@ -30,6 +30,7 @@ class RecouvrementFactureImportWizard(models.TransientModel):
         if header is None:
             return ''
         value = str(header).strip().lower().replace('\r', ' ').replace('\n', ' ')
+        value = value.replace('…', '...')
         value = value.replace('n°', 'numero ').replace('nº', 'numero ').replace("l'ordre", 'ordre')
         value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
         value = re.sub(r'\s+', ' ', value)
@@ -62,9 +63,23 @@ class RecouvrementFactureImportWizard(models.TransientModel):
             'date de depot client (3)': 'date_depot_client',
             'date depot': 'date_depot_client',
             'montant facture en ttc': 'montant_ttc',
+            'montant de la facture en ttc': 'montant_ttc',
+            'montant facture ttc': 'montant_ttc',
             'montant ttc': 'montant_ttc',
+            'montant total ttc': 'montant_ttc',
             'montant ht': 'montant_ht',
+            'montant facture en ht': 'montant_ht',
+            'montant de la facture ht': 'montant_ht',
+            'montant de la facture en ht': 'montant_ht',
+            'montant facture ht': 'montant_ht',
+            'montant total ht': 'montant_ht',
             'reference justificatif': 'reference_justificatif',
+            'reference du justificatif': 'reference_justificatif',
+            'reference du justificatif de la facture': 'reference_justificatif',
+            'reference du justificatif de la facture (dp, attachement, email client...)': 'reference_justificatif',
+            'reference du justificatif de la facture (dp, attachement, email client)': 'reference_justificatif',
+            'ref justificatif': 'reference_justificatif',
+            'ref. justificatif': 'reference_justificatif',
             'nature': 'nature',
             'division': 'division_id',
             'pole': 'pole_id',
@@ -73,7 +88,20 @@ class RecouvrementFactureImportWizard(models.TransientModel):
             'numero marche': 'numero_marche',
             'devise': 'currency_id',
         }
-        return mapping.get(header, None)
+        field_name = mapping.get(header)
+        if field_name:
+            return field_name
+
+        if 'reference' in header and 'justificatif' in header:
+            return 'reference_justificatif'
+        if 'montant' in header and 'ttc' in header:
+            return 'montant_ttc'
+        if 'montant' in header and 'ht' in header:
+            return 'montant_ht'
+        if 'date' in header and 'depot' in header:
+            return 'date_depot_client'
+
+        return None
 
     def _extract_date_from_text(self, value, default_year=None):
         if value in [None, '']:
@@ -189,7 +217,9 @@ class RecouvrementFactureImportWizard(models.TransientModel):
             text = str(value).strip()
             for fmt in (
                 '%m/%d/%Y', '%m/%d/%y', '%d/%m/%Y', '%d/%m/%y',
-                '%Y-%m-%d', '%Y-%m-%d %H:%M:%S', '%m/%d/%Y %H:%M:%S', '%d/%m/%Y %H:%M:%S'
+                '%Y-%m-%d', '%Y-%m-%d %H:%M', '%Y-%m-%d %H:%M:%S',
+                '%m/%d/%Y %H:%M', '%m/%d/%Y %H:%M:%S',
+                '%d/%m/%Y %H:%M', '%d/%m/%Y %H:%M:%S'
             ):
                 try:
                     return datetime.strptime(text, fmt).date()
@@ -204,8 +234,13 @@ class RecouvrementFactureImportWizard(models.TransientModel):
             if isinstance(value, (int, float)) and not isinstance(value, bool):
                 return float(value)
             text = str(value).strip().replace('\xa0', '').replace(' ', '')
-            if text.count(',') == 1:
-                text = text.replace('.', '').replace(',', '.')
+            if ',' in text and '.' in text:
+                if text.rfind(',') > text.rfind('.'):
+                    text = text.replace('.', '').replace(',', '.')
+                else:
+                    text = text.replace(',', '')
+            elif ',' in text:
+                text = text.replace(',', '.')
             try:
                 return float(text)
             except (TypeError, ValueError):
@@ -291,10 +326,10 @@ class RecouvrementFactureImportWizard(models.TransientModel):
                     converted_value = self._convert_value(field_name, cell)
                     if field_name == 'date_depot_client' and cell not in [None, '']:
                         cell_text = str(cell).strip()
-                        if cell_text:
-                            values['depot_comment'] = cell_text
                         if converted_value:
                             values['date_depot_client'] = converted_value
+                        elif cell_text:
+                            values['depot_comment'] = cell_text
                         continue
                     values[field_name] = converted_value
 
@@ -321,7 +356,7 @@ class RecouvrementFactureImportWizard(models.TransientModel):
                         search_domain.append(('code_affaire', '=', values['code_affaire']))
                     facture = facture_obj.search(search_domain, limit=1)
                     if facture:
-                        update_vals = {k: v for k, v in values.items() if v not in [None, '', False]}
+                        update_vals = {k: v for k, v in values.items() if v is not None and v != '' and v is not False}
                         if update_vals:
                             facture.with_context(recouvrement_import=True).write(update_vals)
                             updated += 1
@@ -330,7 +365,7 @@ class RecouvrementFactureImportWizard(models.TransientModel):
                             'state': 'imported',
                             'currency_id': self.env.company.currency_id.id,
                         }
-                        defaults.update({k: v for k, v in values.items() if v not in [None, '', False]})
+                        defaults.update({k: v for k, v in values.items() if v is not None and v != '' and v is not False})
                         facture_obj.create(defaults)
                         created += 1
                 except Exception as exc:

@@ -104,6 +104,12 @@ body.o_recouvrement_sidebar_active .o_action_container {
     box-shadow: 0 10px 25px rgba(91, 77, 178, 0.22);
 }
 
+.o_recouvrement_hero_actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
 .o_recouvrement_hero_card h1 {
     margin: 0 0 6px;
     font-size: 28px;
@@ -113,6 +119,108 @@ body.o_recouvrement_sidebar_active .o_action_container {
     margin: 0;
     max-width: 700px;
     opacity: 0.92;
+}
+
+.o_recouvrement_kpis {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.o_recouvrement_kpi_card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    border-radius: 14px;
+    padding: 16px;
+    color: #111827;
+    text-align: left;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+}
+
+.o_recouvrement_kpi_icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ede9fe;
+    color: #5b4db2;
+}
+
+.o_recouvrement_kpi_value {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.o_recouvrement_kpi_label {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.o_recouvrement_status_panel {
+    margin-top: 20px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+}
+
+.o_recouvrement_status_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.o_recouvrement_status_card {
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    background: #f8fafc;
+    padding: 14px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: #111827;
+}
+
+.o_recouvrement_status_value {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.o_recouvrement_status_label {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.o_recouvrement_status_draft {
+    background: #f8fafc;
+}
+
+.o_recouvrement_status_open {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.o_recouvrement_status_late {
+    background: #fff7ed;
+    border-color: #fdba74;
+}
+
+.o_recouvrement_status_blocked {
+    background: #fef2f2;
+    border-color: #fca5a5;
+}
+
+.o_recouvrement_status_closed {
+    background: #ecfdf5;
+    border-color: #86efac;
 }
 
 .o_recouvrement_shortcuts {
@@ -137,4 +245,52 @@ body.o_recouvrement_sidebar_active .o_action_container {
 .o_recouvrement_shortcut:hover {
     transform: translateY(-1px);
     box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.o_recouvrement_panels {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.o_recouvrement_panel {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+}
+
+.o_recouvrement_panel_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.o_recouvrement_panel_header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.o_recouvrement_panel_row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 0;
+    border-top: 1px solid #f1f5f9;
+}
+
+.o_recouvrement_panel_row:first-of-type {
+    border-top: none;
+}
+
+.o_recouvrement_empty {
+    color: #6b7280;
+    font-size: 13px;
+    padding: 10px 0 4px;
 }
