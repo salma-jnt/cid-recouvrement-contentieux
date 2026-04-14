@@ -5,3 +5,5 @@ from . import recouvrement_recouvrement
 from . import recouvrement_action
 from . import recouvrement_procedure
 from . import recouvrement_client_type
+from . import recouvrement_appel
+from . import recouvrement_email

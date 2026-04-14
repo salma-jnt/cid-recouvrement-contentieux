@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- APPELS DE RELANCE -->
+        <record id="view_recouvrement_appel_list" model="ir.ui.view">
+            <field name="name">recouvrement.appel.list</field>
+            <field name="model">recouvrement.appel</field>
+            <field name="arch" type="xml">
+                <list string="Appels de relance">
+                    <field name="name"/>
+                    <field name="client_id"/>
+                    <field name="date_appel"/>
+                    <field name="statut"/>
+                    <field name="responsable_id"/>
+                    <field name="action_prise"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_recouvrement_appel_form" model="ir.ui.view">
+            <field name="name">recouvrement.appel.form</field>
+            <field name="model">recouvrement.appel</field>
+            <field name="arch" type="xml">
+                <form string="Appel de relance">
+                    <header>
+                        <button name="action_marquer_realise" string="Marquer comme réalisé" type="object" class="oe_highlight" invisible="statut != 'brouillon'"/>
+                        <button name="action_marquer_non_joignable" string="Non joignable" type="object" invisible="statut != 'brouillon'"/>
+                        <button name="action_planifier_rappel" string="Planifier rappel" type="object" invisible="not ((statut == 'non_joignable') or (statut == 'rappel_needed'))"/>
+                        <field name="statut" widget="statusbar" options="{'clickable': False}"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="recouvrement_id"/>
+                                <field name="client_id" readonly="1"/>
+                                <field name="date_appel"/>
+                            </group>
+                            <group>
+                                <field name="responsable_id"/>
+                                <field name="duree_minutes"/>
+                                <field name="action_prise"/>
+                                <field name="date_prochain_appel"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="notes" nolabel="1" placeholder="Notes de l'appel..."/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_recouvrement_appel_search" model="ir.ui.view">
+            <field name="name">recouvrement.appel.search</field>
+            <field name="model">recouvrement.appel</field>
+            <field name="arch" type="xml">
+                <search string="Appels de relance">
+                    <field name="name"/>
+                    <field name="client_id"/>
+                    <field name="responsable_id"/>
+                    <filter string="Brouillon" name="brouillon" domain="[('statut', '=', 'brouillon')]"/>
+                    <filter string="Réalisés" name="realises" domain="[('statut', '=', 'realise')]"/>
+                    <filter string="Non joignable" name="non_joignable" domain="[('statut', '=', 'non_joignable')]"/>
+                    <filter string="À faire" name="a_faire" domain="[('statut', 'in', ['brouillon', 'rappel_needed'])]"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_recouvrement_appel" model="ir.actions.act_window">
+            <field name="name">Appels de relance</field>
+            <field name="res_model">recouvrement.appel</field>
+            <field name="view_mode">list,form</field>
+            <field name="help">Gérez les appels de relance auprès des clients.</field>
+        </record>
+
+        <!-- EMAILS DE RELANCE -->
+        <record id="view_recouvrement_email_list" model="ir.ui.view">
+            <field name="name">recouvrement.email.list</field>
+            <field name="model">recouvrement.email</field>
+            <field name="arch" type="xml">
+                <list string="Emails de relance">
+                    <field name="name"/>
+                    <field name="client_id"/>
+                    <field name="destinataire_email"/>
+                    <field name="date_email"/>
+                    <field name="statut"/>
+                    <field name="responsable_id"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_recouvrement_email_form" model="ir.ui.view">
+            <field name="name">recouvrement.email.form</field>
+            <field name="model">recouvrement.email</field>
+            <field name="arch" type="xml">
+                <form string="Email de relance">
+                    <header>
+                        <button name="action_envoyer_brouillon" string="Envoyer l'email" type="object" class="oe_highlight" invisible="statut != 'brouillon'"/>
+                        <button name="action_marquer_lu" string="Marquer comme lu" type="object" invisible="statut != 'envoye'"/>
+                        <button name="action_ajouter_reponse" string="Ajouter réponse" type="object" invisible="not ((statut == 'lu') or (statut == 'reponse'))"/>
+                        <field name="statut" widget="statusbar" options="{'clickable': False}"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="recouvrement_id"/>
+                                <field name="client_id" readonly="1"/>
+                                <field name="destinataire_email"/>
+                                <field name="date_email"/>
+                            </group>
+                            <group>
+                                <field name="responsable_id"/>
+                                <field name="modele_utilise"/>
+                                <field name="date_lecture"/>
+                                <field name="date_reponse"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="corps_email" nolabel="1" placeholder="Contenu de l'email..."/>
+                        </group>
+                        <group>
+                            <field name="contenu_reponse" placeholder="Réponse reçue..." nolabel="1"/>
+                        </group>
+                        <group>
+                            <field name="pieces_jointes_ids" nolabel="1" widget="many2many_binary"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_recouvrement_email_search" model="ir.ui.view">
+            <field name="name">recouvrement.email.search</field>
+            <field name="model">recouvrement.email</field>
+            <field name="arch" type="xml">
+                <search string="Emails de relance">
+                    <field name="name"/>
+                    <field name="client_id"/>
+                    <field name="destinataire_email"/>
+                    <field name="responsable_id"/>
+                    <filter string="Brouillon" name="brouillon" domain="[('statut', '=', 'brouillon')]"/>
+                    <filter string="Envoyés" name="envoyes" domain="[('statut', '=', 'envoye')]"/>
+                    <filter string="Lus" name="lus" domain="[('statut', '=', 'lu')]"/>
+                    <filter string="Réponse reçue" name="reponse" domain="[('statut', '=', 'reponse')]"/>
+                    <filter string="Erreur" name="erreur" domain="[('statut', '=', 'erreur')]"/>
+                    <filter string="À envoyer" name="a_envoyer" domain="[('statut', '=', 'brouillon')]"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_recouvrement_email" model="ir.actions.act_window">
+            <field name="name">Emails de relance</field>
+            <field name="res_model">recouvrement.email</field>
+            <field name="view_mode">list,form</field>
+            <field name="help">Gérez les emails de relance auprès des clients.</field>
+        </record>
+    </data>
+</odoo>

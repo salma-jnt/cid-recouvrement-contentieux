@@ -40,6 +40,8 @@ class Recouvrement(models.Model):
             if vals.get('facture_id') and not vals.get('date_echeance'):
                 facture = self.env['recouvrement.facture'].browse(vals['facture_id'])
                 vals['date_echeance'] = facture.date_facture or facture.date_depot_client
+                if not vals.get('procedure_id') and facture.client_id.client_type_id.procedure_id:
+                    vals['procedure_id'] = facture.client_id.client_type_id.procedure_id.id
         records = super().create(vals_list)
         for record in records:
             if record.name == 'Nouveau recouvrement' and record.facture_id:

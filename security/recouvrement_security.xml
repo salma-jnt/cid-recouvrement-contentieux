@@ -9,6 +9,12 @@
             <field name="name">Manager Recouvrement</field>
             <field name="implied_ids" eval="[(4, ref('group_recouvrement_user'))]"/>
         </record>
+    </data>
 
+    <data>
+        <!-- Temporaire: donner les droits manager recouvrement a tous les utilisateurs internes. -->
+        <record id="base.group_user" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('recouvrement_contentieux.group_recouvrement_manager'))]"/>
+        </record>
     </data>
 </odoo>

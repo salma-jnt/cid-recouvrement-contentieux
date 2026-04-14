@@ -53,6 +53,13 @@ class RecouvrementFacture(models.Model):
         ('imported', 'Importée'),
         ('validated', 'Validée'),
     ], string='Statut', default='draft')
+    recouvrement_status = fields.Selection([
+        ('normal', 'Normal'),
+        ('precontentieux', 'Précontentieux'),
+        ('contentieux', 'Contentieux'),
+        ('bloque', 'Bloqué'),
+        ('recouvre', 'Recouvré'),
+    ], string='Statut recouvrement', default='normal')
     currency_id = fields.Many2one('res.currency', string='Devise', default=lambda self: self.env.company.currency_id)
     recouvrement_id = fields.Many2one('recouvrement.recouvrement', string='Recouvrement associé')
 

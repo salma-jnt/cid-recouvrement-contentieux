@@ -12,6 +12,7 @@
                     <field name="name"/>
                     <field name="client_id"/>
                     <field name="code_affaire"/>
+                    <field name="recouvrement_status"/>
                     <field name="date_facture"/>
                     <field name="depot_display" string="Dépôt client"/>
                     <field name="montant_ttc"/>
@@ -50,6 +51,7 @@
                             <field name="numero_marche"/>
                         </group>
                         <group>
+                            <field name="recouvrement_status"/>
                             <field name="recouvrement_id"/>
                         </group>
                     </sheet>
@@ -324,11 +326,18 @@
                     <field name="name"/>
                     <field name="client_id"/>
                     <field name="source_sheet"/>
+                    <field name="recouvrement_status"/>
                     <filter name="factures_standard" string="Standard" domain="[('facture_type','=','standard')]"/>
                     <filter name="factures_proforma" string="Proforma" domain="[('facture_type','=','proforma')]"/>
                     <filter name="factures_groupement" string="Groupement" domain="[('facture_type','=','groupement')]"/>
                     <filter name="factures_avance" string="Avances" domain="[('facture_type','=','avance')]"/>
                     <filter name="factures_autre" string="Autres" domain="[('facture_type','=','autre')]"/>
+                    <separator/>
+                    <filter name="statut_normal" string="Normal" domain="['|', ('recouvrement_status','=','normal'), ('recouvrement_status','=',False)]"/>
+                    <filter name="statut_precontentieux" string="Précontentieux" domain="[('recouvrement_status','=','precontentieux')]"/>
+                    <filter name="statut_contentieux" string="Contentieux" domain="[('recouvrement_status','=','contentieux')]"/>
+                    <filter name="statut_bloque" string="Bloqué" domain="[('recouvrement_status','=','bloque')]"/>
+                    <filter name="statut_recouvre" string="Recouvré" domain="[('recouvrement_status','=','recouvre')]"/>
                     <separator/>
                     <filter name="feuille_groupement" string="Feuille Groupement" domain="[('source_sheet','ilike','GROUPEMENT')]"/>
                     <filter name="feuille_proforma" string="Feuille Proforma" domain="[('source_sheet','ilike','PRO-FORMA')]"/>

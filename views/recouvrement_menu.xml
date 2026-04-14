@@ -26,6 +26,13 @@
             <field name="view_mode">list,form</field>
         </record>
 
+        <record id="action_recouvrement_import_encaissements" model="ir.actions.act_window">
+            <field name="name">Importer des encaissements</field>
+            <field name="res_model">recouvrement.encaissement.import.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
         <record id="action_recouvrement_procedure" model="ir.actions.act_window">
             <field name="name">Procédures de recouvrement</field>
             <field name="res_model">recouvrement.procedure</field>
@@ -42,6 +49,27 @@
             <field name="name">Types de clients</field>
             <field name="res_model">recouvrement.client.type</field>
             <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="action_recouvrement_clients" model="ir.actions.act_window">
+            <field name="name">Clients</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">[("customer_rank", ">", 0)]</field>
+        </record>
+
+        <record id="action_recouvrement_clients_list_view" model="ir.actions.act_window.view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">list</field>
+            <field name="view_id" ref="recouvrement_contentieux.view_recouvrement_partner_list"/>
+            <field name="act_window_id" ref="recouvrement_contentieux.action_recouvrement_clients"/>
+        </record>
+
+        <record id="action_recouvrement_clients_form_view" model="ir.actions.act_window.view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="recouvrement_contentieux.view_recouvrement_partner_form"/>
+            <field name="act_window_id" ref="recouvrement_contentieux.action_recouvrement_clients"/>
         </record>
 
         <record id="action_recouvrement_import_factures" model="ir.actions.act_window">
@@ -111,6 +139,13 @@
             <field name="active">False</field>
         </record>
 
+        <record id="recouvrement_menu_encaissement_section" model="ir.ui.menu">
+            <field name="name">Encaissement</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">25</field>
+            <field name="active">False</field>
+        </record>
+
         <record id="recouvrement_menu_factures" model="ir.ui.menu">
             <field name="name">Toutes les factures</field>
             <field name="parent_id" ref="recouvrement_menu_facturation_section"/>
@@ -170,9 +205,16 @@
 
         <record id="recouvrement_menu_encaissements" model="ir.ui.menu">
             <field name="name">Encaissements</field>
-            <field name="parent_id" ref="recouvrement_menu_suivi_section"/>
+            <field name="parent_id" ref="recouvrement_menu_encaissement_section"/>
             <field name="action" ref="action_recouvrement_encaissement"/>
-            <field name="sequence">30</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="recouvrement_menu_import_encaissements" model="ir.ui.menu">
+            <field name="name">Importer des encaissements</field>
+            <field name="parent_id" ref="recouvrement_menu_encaissement_section"/>
+            <field name="action" ref="action_recouvrement_import_encaissements"/>
+            <field name="sequence">20</field>
         </record>
 
         <record id="recouvrement_menu_parametrage_procedures" model="ir.ui.menu">
@@ -194,6 +236,35 @@
             <field name="parent_id" ref="recouvrement_menu_parametrage"/>
             <field name="action" ref="action_recouvrement_client_type"/>
             <field name="sequence">30</field>
+        </record>
+
+        <record id="recouvrement_menu_parametrage_clients" model="ir.ui.menu">
+            <field name="name">Clients</field>
+            <field name="parent_id" ref="recouvrement_menu_parametrage"/>
+            <field name="action" ref="action_recouvrement_clients"/>
+            <field name="sequence">35</field>
+        </record>
+
+        <!-- MENU RELANCES -->
+        <record id="recouvrement_menu_relances_section" model="ir.ui.menu">
+            <field name="name">Relances</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">27</field>
+            <field name="active">False</field>
+        </record>
+
+        <record id="recouvrement_menu_appels" model="ir.ui.menu">
+            <field name="name">Appels</field>
+            <field name="parent_id" ref="recouvrement_menu_relances_section"/>
+            <field name="action" ref="action_recouvrement_appel"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="recouvrement_menu_emails" model="ir.ui.menu">
+            <field name="name">Emails</field>
+            <field name="parent_id" ref="recouvrement_menu_relances_section"/>
+            <field name="action" ref="action_recouvrement_email"/>
+            <field name="sequence">20</field>
         </record>
     </data>
 </odoo>

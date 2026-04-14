@@ -26,7 +26,13 @@ const SIDEBAR_SECTIONS = [
         title: "Suivi de recouvrement",
         items: [
             { label: "Dossiers de recouvrement", icon: "fa-folder-open-o", actionXmlId: "recouvrement_contentieux.action_recouvrement_recouvrement" },
+        ],
+    },
+    {
+        title: "Encaissement",
+        items: [
             { label: "Encaissements", icon: "fa-credit-card", actionXmlId: "recouvrement_contentieux.action_recouvrement_encaissement" },
+            { label: "Importer des encaissements", icon: "fa-upload", actionXmlId: "recouvrement_contentieux.action_recouvrement_import_encaissements" },
         ],
     },
     {
@@ -44,6 +50,18 @@ function formatAmount(value) {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     }).format(Number(value || 0));
+}
+
+function formatCompactAmount(value) {
+    const amount = Number(value || 0);
+    const absAmount = Math.abs(amount);
+    if (absAmount >= 1_000_000_000) {
+        return `${formatAmount(amount / 1_000_000_000)} Milliard`;
+    }
+    if (absAmount >= 1_000_000) {
+        return `${formatAmount(amount / 1_000_000)} M`;
+    }
+    return formatAmount(amount);
 }
 
 function formatDate(value) {
@@ -82,11 +100,11 @@ class RecouvrementDashboard extends Component {
         this.state.loading = true;
         const [
             totalFactures,
-            draftDossiers,
-            openDossiers,
-            lateDossiers,
-            blockedDossiers,
-            closedDossiers,
+            normalFactures,
+            precontentieuxFactures,
+            contentieuxFactures,
+            bloqueFactures,
+            recouvreFactures,
             facturesForTotal,
             encaissementsForTotal,
             recentFactures,
@@ -94,11 +112,11 @@ class RecouvrementDashboard extends Component {
             recentEncaissements,
         ] = await Promise.all([
             this.orm.searchCount("recouvrement.facture", []),
-            this.orm.searchCount("recouvrement.recouvrement", [["state", "=", "draft"]]),
-            this.orm.searchCount("recouvrement.recouvrement", [["state", "=", "open"]]),
-            this.orm.searchCount("recouvrement.recouvrement", [["state", "=", "late"]]),
-            this.orm.searchCount("recouvrement.recouvrement", [["state", "=", "blocked"]]),
-            this.orm.searchCount("recouvrement.recouvrement", [["state", "=", "closed"]]),
+            this.orm.searchCount("recouvrement.facture", ["|", ["recouvrement_status", "=", "normal"], ["recouvrement_status", "=", false]]),
+            this.orm.searchCount("recouvrement.facture", [["recouvrement_status", "=", "precontentieux"]]),
+            this.orm.searchCount("recouvrement.facture", [["recouvrement_status", "=", "contentieux"]]),
+            this.orm.searchCount("recouvrement.facture", [["recouvrement_status", "=", "bloque"]]),
+            this.orm.searchCount("recouvrement.facture", [["recouvrement_status", "=", "recouvre"]]),
             this.orm.searchRead("recouvrement.facture", [], ["montant_ttc"]),
             this.orm.searchRead("recouvrement.encaissement", [], ["montant"]),
             this.orm.searchRead(
@@ -133,19 +151,19 @@ class RecouvrementDashboard extends Component {
             },
             {
                 label: "Montant total TTC",
-                value: `${formatAmount(montantTotalFactures)} MAD`,
+                value: `${formatCompactAmount(montantTotalFactures)} MAD`,
                 icon: "fa-money",
                 actionXmlId: "recouvrement_contentieux.action_recouvrement_facture",
             },
             {
-                label: "Dossiers ouverts",
-                value: String(openDossiers),
+                label: "Précontentieux",
+                value: String(precontentieuxFactures),
                 icon: "fa-folder-open-o",
                 actionXmlId: "recouvrement_contentieux.action_recouvrement_recouvrement",
             },
             {
-                label: "Dossiers en retard",
-                value: String(lateDossiers + blockedDossiers),
+                label: "Contentieux / Bloqué",
+                value: String(contentieuxFactures + bloqueFactures),
                 icon: "fa-exclamation-triangle",
                 actionXmlId: "recouvrement_contentieux.action_recouvrement_recouvrement",
             },
@@ -158,11 +176,11 @@ class RecouvrementDashboard extends Component {
         ];
 
         this.state.statusBreakdown = [
-            { label: "Normal", value: String(draftDossiers), tone: "draft" },
-            { label: "Précontentieux", value: String(openDossiers), tone: "open" },
-            { label: "Contentieux", value: String(lateDossiers), tone: "late" },
-            { label: "Bloqué", value: String(blockedDossiers), tone: "blocked" },
-            { label: "Recouvré", value: String(closedDossiers), tone: "closed" },
+            { label: "Normal", value: String(normalFactures), tone: "draft" },
+            { label: "Précontentieux", value: String(precontentieuxFactures), tone: "open" },
+            { label: "Contentieux", value: String(contentieuxFactures), tone: "late" },
+            { label: "Bloqué", value: String(bloqueFactures), tone: "blocked" },
+            { label: "Recouvré", value: String(recouvreFactures), tone: "closed" },
         ];
 
         this.state.recentFactures = recentFactures.map((item) => ({
