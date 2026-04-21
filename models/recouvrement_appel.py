@@ -22,6 +22,18 @@ class RecouvrementAppel(models.Model):
         readonly=True,
         store=True
     )
+    procedure_id = fields.Many2one(
+        'recouvrement.procedure',
+        string='Procédure',
+        compute='_compute_procedure_id',
+        readonly=True,
+        store=True,
+    )
+    action_template_id = fields.Many2one(
+        'recouvrement.action.template',
+        string='Action de procédure',
+        domain="[('procedure_id', '=', procedure_id), ('action_type', 'in', ['appel', 'relance_1', 'relance_2', 'suivi'])]",
+    )
     date_appel = fields.Datetime(
         string='Date de l\'appel',
         default=fields.Datetime.now,
@@ -54,7 +66,6 @@ class RecouvrementAppel(models.Model):
     
     date_prochain_appel = fields.Datetime(string='Date prochain appel')
     planned_datetime = fields.Datetime(string='Date/heure planifiee')
-    planned_duration = fields.Integer(string='Duree planifiee (minutes)', default=30)
 
     outlook_event_id = fields.Char(string='Outlook Event ID', copy=False)
     outlook_web_link = fields.Char(string='Lien Outlook', copy=False)
@@ -70,7 +81,42 @@ class RecouvrementAppel(models.Model):
         for vals in vals_list:
             if vals.get('statut') == 'realise' and not vals.get('duree_minutes'):
                 vals['duree_minutes'] = 5
+            if vals.get('facture_id') and not vals.get('action_template_id'):
+                vals['action_template_id'] = self._suggest_action_template_id(vals['facture_id'])
         return super().create(vals_list)
+
+    @api.model
+    def _suggest_action_template_id(self, facture_id):
+        facture = self.env['recouvrement.facture'].browse(facture_id)
+        procedure = facture.client_id.client_type_id.procedure_id if facture.client_id and facture.client_id.client_type_id else False
+        if not procedure:
+            procedure = self.env.ref('recouvrement_contentieux.procedure_standard', raise_if_not_found=False)
+        if not procedure:
+            return False
+        action_template_model = self.env['recouvrement.action.template']
+
+        # Prefer telephone reminder actions for call relances.
+        for action_type in ['relance_1', 'relance_2', 'appel', 'suivi']:
+            template = action_template_model.search([
+                ('procedure_id', '=', procedure.id),
+                ('action_type', '=', action_type),
+            ], order='sequence, id', limit=1)
+            if template:
+                return template.id
+        return False
+
+    @api.depends('facture_id', 'facture_id.client_id', 'facture_id.client_id.client_type_id', 'facture_id.client_id.client_type_id.procedure_id')
+    def _compute_procedure_id(self):
+        standard_procedure = self.env.ref('recouvrement_contentieux.procedure_standard', raise_if_not_found=False)
+        for rec in self:
+            procedure = rec.facture_id.client_id.client_type_id.procedure_id if rec.facture_id and rec.facture_id.client_id and rec.facture_id.client_id.client_type_id else False
+            rec.procedure_id = procedure or standard_procedure
+
+    @api.onchange('facture_id')
+    def _onchange_facture_id_set_action_template(self):
+        for rec in self:
+            if rec.facture_id:
+                rec.action_template_id = rec._suggest_action_template_id(rec.facture_id.id)
 
     def action_marquer_realise(self):
         self.write({'statut': 'realise'})
@@ -96,7 +142,7 @@ class RecouvrementAppel(models.Model):
             raise UserError('Le responsable doit avoir un email pour la synchronisation Outlook.')
 
         start_dt = fields.Datetime.to_datetime(self.planned_datetime)
-        end_dt = start_dt + timedelta(minutes=self.planned_duration or 30)
+        end_dt = start_dt + timedelta(minutes=30)
         return {
             'subject': self.name or 'Relance client',
             'body': {
@@ -181,11 +227,13 @@ class RecouvrementAppel(models.Model):
         return True
 
     def write(self, vals):
+        if vals.get('facture_id') and not vals.get('action_template_id'):
+            vals['action_template_id'] = self._suggest_action_template_id(vals['facture_id'])
         res = super().write(vals)
         if self.env.context.get('skip_outlook_sync'):
             return res
 
-        watched_fields = {'name', 'planned_datetime', 'planned_duration', 'responsable_id', 'notes', 'statut'}
+        watched_fields = {'name', 'planned_datetime', 'responsable_id', 'notes', 'statut'}
         if watched_fields.intersection(vals):
             cancelled = self.filtered(lambda r: r.statut == 'refuse' and r.outlook_event_id)
             if cancelled:

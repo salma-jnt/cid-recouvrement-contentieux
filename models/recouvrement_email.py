@@ -28,6 +28,18 @@ class RecouvrementEmail(models.Model):
         readonly=True,
         store=True
     )
+    procedure_id = fields.Many2one(
+        'recouvrement.procedure',
+        string='Procédure',
+        compute='_compute_procedure_id',
+        readonly=True,
+        store=True,
+    )
+    action_template_id = fields.Many2one(
+        'recouvrement.action.template',
+        string='Action de procédure',
+        domain="[('procedure_id', '=', procedure_id), ('action_type', 'in', ['courrier', 'mise_en_demeure', 'contentieux'])]",
+    )
     destinataire_email = fields.Char(
         string='Email destinataire',
         required=True
@@ -59,7 +71,7 @@ class RecouvrementEmail(models.Model):
         ('mise_en_demeure', 'Mise en demeure'),
         ('plan_paiement', 'Proposition plan de paiement'),
         ('relance_urgent', 'Relance urgente'),
-    ], string='Modèle utilisé')
+    ], string='Modèle utilisé', default='rappel_standard')
     
     # Tracking
     date_lecture = fields.Datetime(string='Date de lecture')
@@ -73,7 +85,6 @@ class RecouvrementEmail(models.Model):
     )
 
     planned_datetime = fields.Datetime(string='Date/heure planifiee')
-    planned_duration = fields.Integer(string='Duree planifiee (minutes)', default=30)
 
     outlook_event_id = fields.Char(string='Outlook Event ID', copy=False)
     outlook_web_link = fields.Char(string='Lien Outlook', copy=False)
@@ -83,6 +94,33 @@ class RecouvrementEmail(models.Model):
         ('error', 'Erreur'),
     ], string='Statut synchronisation', default='not_synced', copy=False)
     outlook_sync_error = fields.Text(string='Erreur de synchronisation', copy=False)
+
+    @api.model
+    def _suggest_action_template_id(self, facture_id):
+        facture = self.env['recouvrement.facture'].browse(facture_id)
+        procedure = facture.client_id.client_type_id.procedure_id if facture.client_id and facture.client_id.client_type_id else False
+        if not procedure:
+            procedure = self.env.ref('recouvrement_contentieux.procedure_standard', raise_if_not_found=False)
+        if not procedure:
+            return False
+        template = self.env['recouvrement.action.template'].search([
+            ('procedure_id', '=', procedure.id),
+            ('action_type', 'in', ['courrier', 'mise_en_demeure', 'contentieux']),
+        ], order='sequence, id', limit=1)
+        return template.id or False
+
+    @api.depends('facture_id', 'facture_id.client_id', 'facture_id.client_id.client_type_id', 'facture_id.client_id.client_type_id.procedure_id')
+    def _compute_procedure_id(self):
+        standard_procedure = self.env.ref('recouvrement_contentieux.procedure_standard', raise_if_not_found=False)
+        for rec in self:
+            procedure = rec.facture_id.client_id.client_type_id.procedure_id if rec.facture_id and rec.facture_id.client_id and rec.facture_id.client_id.client_type_id else False
+            rec.procedure_id = procedure or standard_procedure
+
+    @api.onchange('facture_id')
+    def _onchange_facture_id_set_action_template(self):
+        for rec in self:
+            if rec.facture_id:
+                rec.action_template_id = rec._suggest_action_template_id(rec.facture_id.id)
 
     def _validate_email_address(self, email_address, label):
         address = (email_address or '').strip()
@@ -173,7 +211,7 @@ class RecouvrementEmail(models.Model):
             raise UserError('Le responsable doit avoir un email pour la synchronisation Outlook.')
 
         start_dt = fields.Datetime.to_datetime(self.planned_datetime)
-        end_dt = start_dt + timedelta(minutes=self.planned_duration or 30)
+        end_dt = start_dt + timedelta(minutes=30)
         return {
             'subject': self.name or 'Relance ecrite',
             'body': {
@@ -258,13 +296,24 @@ class RecouvrementEmail(models.Model):
         return True
 
     def write(self, vals):
+        if vals.get('facture_id') and not vals.get('action_template_id'):
+            vals['action_template_id'] = self._suggest_action_template_id(vals['facture_id'])
         res = super().write(vals)
         if self.env.context.get('skip_outlook_sync'):
             return res
 
-        watched_fields = {'name', 'planned_datetime', 'planned_duration', 'responsable_id', 'corps_email'}
+        watched_fields = {'name', 'planned_datetime', 'responsable_id', 'corps_email'}
         if watched_fields.intersection(vals):
             to_update = self.filtered(lambda r: r.outlook_event_id and r.planned_datetime)
             if to_update:
                 to_update._sync_with_outlook(auto=True)
         return res
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('facture_id') and not vals.get('action_template_id'):
+                vals['action_template_id'] = self._suggest_action_template_id(vals['facture_id'])
+            if not vals.get('modele_utilise'):
+                vals['modele_utilise'] = 'rappel_standard'
+        return super().create(vals_list)
