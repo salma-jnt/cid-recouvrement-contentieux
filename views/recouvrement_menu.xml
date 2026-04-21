@@ -248,9 +248,10 @@
         <!-- MENU RELANCES -->
         <record id="recouvrement_menu_relances_section" model="ir.ui.menu">
             <field name="name">Relances</field>
-            <field name="parent_id" ref="recouvrement_menu_root"/>
-            <field name="sequence">27</field>
-            <field name="active">False</field>
+            <field name="parent_id" ref="recouvrement_menu_encaissement_section"/>
+            <field name="sequence">15</field>
+            <field name="action" ref="action_recouvrement_appel"/>
+            <field name="active">True</field>
         </record>
 
         <record id="recouvrement_menu_appels" model="ir.ui.menu">
@@ -258,6 +259,7 @@
             <field name="parent_id" ref="recouvrement_menu_relances_section"/>
             <field name="action" ref="action_recouvrement_appel"/>
             <field name="sequence">10</field>
+            <field name="active">False</field>
         </record>
 
         <record id="recouvrement_menu_emails" model="ir.ui.menu">
@@ -265,6 +267,7 @@
             <field name="parent_id" ref="recouvrement_menu_relances_section"/>
             <field name="action" ref="action_recouvrement_email"/>
             <field name="sequence">20</field>
+            <field name="active">False</field>
         </record>
     </data>
 </odoo>

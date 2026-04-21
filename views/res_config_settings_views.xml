@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_recouvrement_outlook" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.recouvrement.outlook</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app name="recouvrement_contentieux" string="Recouvrement" groups="base.group_system">
+                    <block title="Configuration Outlook Graph">
+                        <setting string="Recouvrement Tenant ID" help="Identifiant du tenant Azure AD utilise pour Microsoft Graph.">
+                            <field name="recouvrement_outlook_tenant_id"/>
+                        </setting>
+                        <setting string="Recouvrement Client ID" help="Identifiant de l'application Azure enregistree pour la synchronisation Outlook.">
+                            <field name="recouvrement_outlook_client_id"/>
+                        </setting>
+                        <setting string="Recouvrement Client Secret" help="Secret de l'application Azure utilise pour l'authentification Graph.">
+                            <field name="recouvrement_outlook_client_secret" password="True"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

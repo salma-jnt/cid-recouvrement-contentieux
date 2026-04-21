@@ -36,6 +36,14 @@ const SIDEBAR_SECTIONS = [
         ],
     },
     {
+        title: "Relances",
+        items: [
+            { label: "Appels", icon: "fa-phone", actionXmlId: "recouvrement_contentieux.action_recouvrement_appel" },
+            { label: "Emails", icon: "fa-envelope-o", actionXmlId: "recouvrement_contentieux.action_recouvrement_email" },
+            { label: "Calendrier", icon: "fa-calendar", actionXmlId: "recouvrement_contentieux.action_recouvrement_appel_calendar" },
+        ],
+    },
+    {
         title: "Paramétrage",
         items: [
             { label: "Procédures de recouvrement", icon: "fa-sitemap", actionXmlId: "recouvrement_contentieux.action_recouvrement_procedure" },

@@ -7,3 +7,5 @@ from . import recouvrement_procedure
 from . import recouvrement_client_type
 from . import recouvrement_appel
 from . import recouvrement_email
+from . import outlook_graph_service
+from . import res_config_settings

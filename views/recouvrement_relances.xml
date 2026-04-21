@@ -26,21 +26,36 @@
                         <button name="action_marquer_realise" string="Marquer comme réalisé" type="object" class="oe_highlight" invisible="statut != 'brouillon'"/>
                         <button name="action_marquer_non_joignable" string="Non joignable" type="object" invisible="statut != 'brouillon'"/>
                         <button name="action_planifier_rappel" string="Planifier rappel" type="object" invisible="not ((statut == 'non_joignable') or (statut == 'rappel_needed'))"/>
+                        <button name="action_planifier_outlook" string="Planifier dans Outlook" type="object" class="btn-primary"/>
+                        <button name="action_annuler_outlook" string="Annuler Outlook" type="object" invisible="not outlook_event_id"/>
+                        <button name="action_ouvrir_outlook" string="Ouvrir dans Outlook" type="object" invisible="not outlook_web_link"/>
                         <field name="statut" widget="statusbar" options="{'clickable': False}"/>
                     </header>
                     <sheet>
                         <group>
                             <group>
                                 <field name="name"/>
-                                <field name="recouvrement_id"/>
+                                <field name="facture_id"/>
                                 <field name="client_id" readonly="1"/>
                                 <field name="date_appel"/>
+                                <field name="planned_datetime"/>
                             </group>
                             <group>
                                 <field name="responsable_id"/>
                                 <field name="duree_minutes"/>
+                                <field name="planned_duration"/>
                                 <field name="action_prise"/>
                                 <field name="date_prochain_appel"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="outlook_sync_state" readonly="1"/>
+                                <field name="outlook_event_id" readonly="1"/>
+                                <field name="outlook_web_link" readonly="1" widget="url"/>
+                            </group>
+                            <group>
+                                <field name="outlook_sync_error" readonly="1" invisible="outlook_sync_state != 'error'"/>
                             </group>
                         </group>
                         <group>
@@ -67,11 +82,31 @@
             </field>
         </record>
 
+        <record id="view_recouvrement_appel_calendar" model="ir.ui.view">
+            <field name="name">recouvrement.appel.calendar</field>
+            <field name="model">recouvrement.appel</field>
+            <field name="arch" type="xml">
+                <calendar string="Calendrier des relances" date_start="date_appel" color="responsable_id" mode="week">
+                    <field name="name"/>
+                    <field name="client_id"/>
+                    <field name="statut"/>
+                    <field name="responsable_id"/>
+                </calendar>
+            </field>
+        </record>
+
         <record id="action_recouvrement_appel" model="ir.actions.act_window">
             <field name="name">Appels de relance</field>
             <field name="res_model">recouvrement.appel</field>
             <field name="view_mode">list,form</field>
             <field name="help">Gérez les appels de relance auprès des clients.</field>
+        </record>
+
+        <record id="action_recouvrement_appel_calendar" model="ir.actions.act_window">
+            <field name="name">Calendrier des relances</field>
+            <field name="res_model">recouvrement.appel</field>
+            <field name="view_mode">calendar,list,form</field>
+            <field name="help">Planifiez et suivez les appels de relance dans un calendrier.</field>
         </record>
 
         <!-- EMAILS DE RELANCE -->
@@ -99,22 +134,37 @@
                         <button name="action_envoyer_brouillon" string="Envoyer l'email" type="object" class="oe_highlight" invisible="statut != 'brouillon'"/>
                         <button name="action_marquer_lu" string="Marquer comme lu" type="object" invisible="statut != 'envoye'"/>
                         <button name="action_ajouter_reponse" string="Ajouter réponse" type="object" invisible="not ((statut == 'lu') or (statut == 'reponse'))"/>
+                        <button name="action_planifier_outlook" string="Planifier dans Outlook" type="object" class="btn-primary"/>
+                        <button name="action_annuler_outlook" string="Annuler Outlook" type="object" invisible="not outlook_event_id"/>
+                        <button name="action_ouvrir_outlook" string="Ouvrir dans Outlook" type="object" invisible="not outlook_web_link"/>
                         <field name="statut" widget="statusbar" options="{'clickable': False}"/>
                     </header>
                     <sheet>
                         <group>
                             <group>
                                 <field name="name"/>
-                                <field name="recouvrement_id"/>
+                                <field name="facture_id"/>
                                 <field name="client_id" readonly="1"/>
                                 <field name="destinataire_email"/>
                                 <field name="date_email"/>
+                                <field name="planned_datetime"/>
                             </group>
                             <group>
                                 <field name="responsable_id"/>
+                                <field name="planned_duration"/>
                                 <field name="modele_utilise"/>
                                 <field name="date_lecture"/>
                                 <field name="date_reponse"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="outlook_sync_state" readonly="1"/>
+                                <field name="outlook_event_id" readonly="1"/>
+                                <field name="outlook_web_link" readonly="1" widget="url"/>
+                            </group>
+                            <group>
+                                <field name="outlook_sync_error" readonly="1" invisible="outlook_sync_state != 'error'"/>
                             </group>
                         </group>
                         <group>
