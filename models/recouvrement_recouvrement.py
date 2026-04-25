@@ -109,8 +109,17 @@ class Recouvrement(models.Model):
 
     def _update_state_from_actions(self):
         today = fields.Date.context_today(self)
+        facture_status_map = {
+            'draft': 'normal',
+            'open': 'precontentieux',
+            'late': 'contentieux',
+            'blocked': 'bloque',
+            'closed': 'recouvre',
+        }
         for record in self:
             if record.state == 'blocked':
+                if record.facture_id:
+                    record.facture_id.recouvrement_status = facture_status_map.get(record.state, 'normal')
                 continue
             pending = record.action_ids.filtered(lambda a: a.state == 'todo')
             overdue = pending.filtered(lambda a: a.mandatory_date and a.mandatory_date < today)
@@ -126,6 +135,9 @@ class Recouvrement(models.Model):
                 record.state = 'closed'
             else:
                 record.state = 'draft'
+
+            if record.facture_id:
+                record.facture_id.recouvrement_status = facture_status_map.get(record.state, 'normal')
 
     def action_generate_actions(self):
         action_obj = self.env['recouvrement.action']
@@ -152,3 +164,5 @@ class Recouvrement(models.Model):
     def action_mark_closed(self):
         for record in self:
             record.state = 'closed'
+            if record.facture_id:
+                record.facture_id.recouvrement_status = 'recouvre'

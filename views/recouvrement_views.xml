@@ -10,6 +10,7 @@
                         <button name="%(recouvrement_contentieux.action_recouvrement_import_factures)d" type="action" string="Importer Excel" class="btn-primary" display="always"/>
                     </header>
                     <field name="name"/>
+                    <field name="facture_type"/>
                     <field name="client_id"/>
                     <field name="code_affaire"/>
                     <field name="recouvrement_status"/>
@@ -325,6 +326,7 @@
                 <search>
                     <field name="name"/>
                     <field name="client_id"/>
+                    <field name="facture_type"/>
                     <field name="source_sheet"/>
                     <field name="recouvrement_status"/>
                     <filter name="factures_standard" string="Standard" domain="[('facture_type','=','standard')]"/>

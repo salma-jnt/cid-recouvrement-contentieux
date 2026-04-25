@@ -5,6 +5,8 @@
             <field name="name">Factures</field>
             <field name="res_model">recouvrement.facture</field>
             <field name="view_mode">list,form</field>
+            <field name="view_id" ref="recouvrement_contentieux.view_recouvrement_facture_tree"/>
+            <field name="search_view_id" ref="recouvrement_contentieux.search_recouvrement_facture"/>
             <field name="help">Importez puis suivez les factures dans le parcours de recouvrement.</field>
         </record>
 
@@ -158,6 +160,7 @@
             <field name="parent_id" ref="recouvrement_menu_facturation_section"/>
             <field name="action" ref="action_recouvrement_facture_standard"/>
             <field name="sequence">20</field>
+            <field name="active">False</field>
         </record>
 
         <record id="recouvrement_menu_factures_groupement" model="ir.ui.menu">
@@ -165,6 +168,7 @@
             <field name="parent_id" ref="recouvrement_menu_facturation_section"/>
             <field name="action" ref="action_recouvrement_facture_groupement"/>
             <field name="sequence">30</field>
+            <field name="active">False</field>
         </record>
 
         <record id="recouvrement_menu_factures_proforma" model="ir.ui.menu">
@@ -172,6 +176,7 @@
             <field name="parent_id" ref="recouvrement_menu_facturation_section"/>
             <field name="action" ref="action_recouvrement_facture_proforma"/>
             <field name="sequence">40</field>
+            <field name="active">False</field>
         </record>
 
         <record id="recouvrement_menu_factures_avance" model="ir.ui.menu">
@@ -179,6 +184,7 @@
             <field name="parent_id" ref="recouvrement_menu_facturation_section"/>
             <field name="action" ref="action_recouvrement_facture_avance"/>
             <field name="sequence">50</field>
+            <field name="active">False</field>
         </record>
 
         <record id="recouvrement_menu_factures_import" model="ir.ui.menu">
