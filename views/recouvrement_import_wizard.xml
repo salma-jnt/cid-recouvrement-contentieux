@@ -5,19 +5,19 @@
             <field name="name">recouvrement.facture.import.wizard.form</field>
             <field name="model">recouvrement.facture.import.wizard</field>
             <field name="arch" type="xml">
-                <form string="Importer des factures">
-                    <sheet>
+                <form string="Importer des factures" class="o_rcv_import_wizard">
+                    <sheet class="o_rcv_import_sheet">
                         <group>
                             <field name="file" filename="file_name"/>
-                            <field name="file_name"/>
-                            <field name="sheet_name"/>
+                            <field name="file_name" invisible="1"/>
+                            <field name="sheet_name" invisible="1"/>
                         </group>
                         <group>
                             <field name="imported_count" readonly="1"/>
                             <field name="updated_count" readonly="1"/>
                         </group>
                         <group>
-                            <field name="note" readonly="1" nolabel="1"/>
+                            <field name="note" readonly="1" nolabel="1" placeholder="Le resume d'import s'affichera ici."/>
                         </group>
                         <footer>
                             <button name="action_import" type="object" string="Importer" class="btn-primary"/>
@@ -32,18 +32,18 @@
             <field name="name">recouvrement.encaissement.import.wizard.form</field>
             <field name="model">recouvrement.encaissement.import.wizard</field>
             <field name="arch" type="xml">
-                <form string="Importer des encaissements">
-                    <sheet>
+                <form string="Importer des encaissements" class="o_rcv_import_wizard">
+                    <sheet class="o_rcv_import_sheet">
                         <group>
                             <field name="file" filename="file_name"/>
-                            <field name="file_name"/>
+                            <field name="file_name" invisible="1"/>
                         </group>
                         <group>
                             <field name="imported_count" readonly="1"/>
                             <field name="updated_count" readonly="1"/>
                         </group>
                         <group>
-                            <field name="note" readonly="1" nolabel="1"/>
+                            <field name="note" readonly="1" nolabel="1" placeholder="Le resume d'import s'affichera ici."/>
                         </group>
                         <footer>
                             <button name="action_import" type="object" string="Importer" class="btn-primary"/>

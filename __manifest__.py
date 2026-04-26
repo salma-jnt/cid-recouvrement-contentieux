@@ -1,6 +1,6 @@
 {
     'name': 'Recouvrement, litiges et contentieux',
-    'version': '19.0.1.0.3',
+    'version': '19.0.2.0.0',
     'summary': 'Gestion des factures, recouvrements, actions et procédures',
     'description': 'Module de gestion des recouvrements, litiges et contentieux pour CID Développement.',
     'category': 'Accounting',
@@ -15,8 +15,8 @@
         'views/res_partner_views.xml',
         'views/res_config_settings_views.xml',
         'views/recouvrement_relances.xml',
-        'views/recouvrement_menu.xml',
         'views/recouvrement_views.xml',
+        'views/recouvrement_menu.xml',
         'views/recouvrement_import_wizard.xml',
     ],
     'assets': {

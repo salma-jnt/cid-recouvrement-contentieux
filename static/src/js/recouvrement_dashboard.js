@@ -257,7 +257,7 @@ class RecouvrementDashboard extends Component {
             this.orm.searchRead(
                 "recouvrement.recouvrement",
                 [...dossierDomain, ["state", "in", ["late", "blocked"]]],
-                ["facture_id", "client_id", "prochaine_echeance", "reste_a_recouvrer"],
+                ["name", "facture_ids", "client_id", "prochaine_echeance", "reste_a_recouvrer"],
                 { limit: 8, order: "prochaine_echeance asc" }
             ),
             this.orm.searchRead(
@@ -374,7 +374,7 @@ class RecouvrementDashboard extends Component {
 
         this.state.lateRecouvrements = lateRecouvrements.map((item) => ({
             id: item.id,
-            name: item.facture_id?.[1] || "-",
+            name: item.name || item.facture_ids?.[0]?.[1] || "-",
             client: item.client_id?.[1] || "-",
             nextAction: formatDate(item.prochaine_echeance),
             montant: `${formatAmount(item.reste_a_recouvrer)} MAD`,
