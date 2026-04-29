@@ -15,8 +15,9 @@
         'views/res_partner_views.xml',
         'views/res_config_settings_views.xml',
         'views/recouvrement_relances.xml',
-        'views/recouvrement_views.xml',
+        # Menu and actions must be loaded before views that reference their xmlids
         'views/recouvrement_menu.xml',
+        'views/recouvrement_views.xml',
         'views/recouvrement_import_wizard.xml',
     ],
     'assets': {

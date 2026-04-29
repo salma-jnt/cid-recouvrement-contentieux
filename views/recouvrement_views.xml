@@ -6,14 +6,11 @@
             <field name="model">recouvrement.facture</field>
             <field name="arch" type="xml">
                 <list string="Factures" class="o_rcv_facture_list" decoration-info="recouvrement_status == 'precontentieux'" decoration-danger="recouvrement_status in ('contentieux', 'bloque')" decoration-success="recouvrement_status == 'recouvre'">
-                    <header>
-                        <button name="%(recouvrement_contentieux.action_recouvrement_import_factures)d" type="action" string="Importer Excel" class="btn-primary" display="always"/>
-                    </header>
                     <field name="name"/>
                     <field name="code_affaire"/>
-                    <field name="recouvrement_status" widget="badge"/>
-                    <field name="date_facture"/>
-                    <field name="depot_display" string="Dépôt client"/>
+                    <field name="client_id"/>
+                    <field name="division_id"/>
+                    <field name="date_depot_client"/>
                     <field name="montant_ttc"/>
                 </list>
             </field>
@@ -26,43 +23,70 @@
                 <form string="Facture" class="o_rcv_facture_form">
                     <sheet>
                         <div class="o_facture_header">
-                            <h2><field name="name" readonly="1" class="o_facture_number"/></h2>
+                            <div class="o_facture_identity">
+                                <h2><field name="name" class="o_facture_number" placeholder="N° facture" readonly="1"/></h2>
+                                <div class="o_facture_meta_line">
+                                    <span class="o_facture_meta_label">Client :</span>
+                                    <field name="client_id" readonly="1" class="o_facture_meta_value"/>
+                                    <span class="o_facture_meta_sep">|</span>
+                                    <span class="o_facture_meta_label">Code affaire :</span>
+                                    <field name="code_affaire" readonly="1" class="o_facture_meta_value"/>
+                                </div>
+                            </div>
                         </div>
-                        
+
+                        <div class="o_facture_tracker_card">
+                            <div class="o_rcv_timeline">
+                                <div class="o_rcv_tl_step o_active">
+                                    <div class="o_rcv_tl_icon"><i class="fa fa-dot-circle-o" title="Normal"/></div>
+                                    <div class="o_rcv_tl_title">NORMAL</div>
+                                </div>
+                                <div class="o_rcv_tl_line"/>
+                                <div class="o_rcv_tl_step">
+                                    <div class="o_rcv_tl_icon"><i class="fa fa-balance-scale" title="Précontentieux"/></div>
+                                    <div class="o_rcv_tl_title">PRÉCONTENTIEUX</div>
+                                </div>
+                                <div class="o_rcv_tl_line"/>
+                                <div class="o_rcv_tl_step">
+                                    <div class="o_rcv_tl_icon"><i class="fa fa-gavel" title="Contentieux"/></div>
+                                    <div class="o_rcv_tl_title">CONTENTIEUX</div>
+                                </div>
+                                <div class="o_rcv_tl_line"/>
+                                <div class="o_rcv_tl_step">
+                                    <div class="o_rcv_tl_icon"><i class="fa fa-check-circle-o" title="Clôturée"/></div>
+                                    <div class="o_rcv_tl_title">RECOUVRÉE</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <group>
-                            <group string="Informations générales">
-                                <field name="client_id"/>
-                                <field name="code_affaire"/>
-                                <field name="numero_enreg"/>
+                            <group string="Informations générales" class="o_rcv_card_box">
+                                <field name="client_id" readonly="1"/>
+                                <field name="code_affaire" readonly="1"/>
+                                <field name="numero_enreg" readonly="1"/>
+                                <field name="date_reception_ordre" readonly="1"/>
+                                <field name="date_signature" readonly="1"/>
+                                <field name="date_depot_client" readonly="1"/>
+                                <field name="date_echeance" readonly="1"/>
                             </group>
-                            <group string="Dates">
-                                <field name="date_reception_ordre"/>
-                                <field name="date_signature"/>
-                                <field name="date_depot_client"/>
+                            <group string="Informations financières" class="o_rcv_card_box">
+                                <field name="montant_ht" readonly="1"/>
+                                <field name="montant_ttc" readonly="1"/>
                             </group>
                         </group>
                         
                         <group>
-                            <group string="Informations financières">
-                                <field name="montant_ttc"/>
-                                <field name="montant_ht"/>
+                            <group string="Informations internes" class="o_rcv_card_box">
+                                <field name="division_id" readonly="1"/>
+                                <field name="pole_id" readonly="1"/>
+                                <field name="ice" readonly="1"/>
+                                <field name="numero_marche" readonly="1"/>
                             </group>
-                            <group string="Informations internes">
-                                <field name="division_id"/>
-                                <field name="pole_id"/>
-                                <field name="ice"/>
-                                <field name="numero_marche"/>
-                            </group>
-                        </group>
-                        
-                        <group>
-                            <group string="Informations administratives">
-                                <field name="reference_justificatif"/>
-                                <field name="depot_comment"/>
-                            </group>
-                            <group string="Recouvrement">
-                                <field name="recouvrement_status"/>
-                                <field name="recouvrement_id"/>
+                            <group string="Informations administratives" class="o_rcv_card_box">
+                                <field name="reference_justificatif" readonly="1"/>
+                                <field name="depot_comment" readonly="1"/>
+                                <field name="recouvrement_status" widget="badge" readonly="1"/>
+                                <field name="recouvrement_id" readonly="1"/>
                             </group>
                         </group>
                     </sheet>

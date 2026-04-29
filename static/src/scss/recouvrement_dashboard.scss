@@ -878,48 +878,195 @@ body .o_recouvrement_dashboard .btn-link {
 /* Facture Form View Styling - CID Design */
 .o_rcv_facture_form {
     .o_facture_header {
-        margin-bottom: 16px;
-        padding-bottom: 12px;
-        border-bottom: 2px solid #0a3767;
+        margin-bottom: 10px;
+        padding: 2px 2px 10px;
+        border-bottom: 1px solid #dfe8f4;
+    }
+
+    .o_facture_identity {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
     }
 
     .o_facture_number {
         color: #0a3767;
-        font-size: 28px !important;
+        font-size: 44px !important;
         font-weight: 800 !important;
         margin: 0 !important;
+        letter-spacing: 0.2px;
+    }
+
+    .o_facture_meta_line {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        color: #3b5b7d;
+        font-size: 16px;
+    }
+
+    .o_facture_meta_label {
+        color: #6a85a1;
+        font-weight: 600;
+    }
+
+    .o_facture_meta_sep {
+        color: #99aec4;
+        margin: 0 2px;
+    }
+
+    .o_facture_meta_value {
+        color: #1b3e66;
+        font-weight: 700;
+    }
+
+    .o_facture_tracker_card {
+        border: 1px solid #dce5f2;
+        border-radius: 12px;
+        background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+        box-shadow: 0 3px 10px rgba(10, 55, 103, 0.07);
+        padding: 14px 16px;
+        margin-bottom: 14px;
+    }
+
+    .o_rcv_timeline {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0;
+        padding-bottom: 2px;
+        width: 100%;
+    }
+
+    .o_rcv_tl_step {
+        min-width: 0;
+        text-align: center;
+        color: #6f849b;
+        flex: 1;
+        padding: 0 8px;
+    }
+
+    .o_rcv_tl_line {
+        display: flex;
+        align-items: center;
+        width: 16px;
+        height: 2px;
+        background: #d5deea;
+        flex-shrink: 0;
+    }
+
+    .o_rcv_tl_icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 999px;
+        margin: 0 auto 6px;
+        border: 2px solid #d5deea;
+        color: #8ea0b4;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+    }
+
+    .o_rcv_tl_step.o_done .o_rcv_tl_icon {
+        border-color: #2ab44a;
+        color: #2ab44a;
+        box-shadow: 0 0 0 3px rgba(42, 180, 74, 0.12);
+    }
+
+    .o_rcv_tl_step.o_active .o_rcv_tl_icon {
+        border-color: #1c64c3;
+        color: #1c64c3;
+        box-shadow: 0 0 0 3px rgba(28, 100, 195, 0.14);
+    }
+
+    .o_rcv_tl_step.o_done .o_rcv_tl_title {
+        color: #2ab44a;
+    }
+
+    .o_rcv_tl_step.o_active .o_rcv_tl_title {
+        color: #1c64c3;
+    }
+
+    .o_rcv_tl_title {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        line-height: 1.2;
+    }
+
+    .o_rcv_tl_sub {
+        margin-top: 3px;
+        color: #5f7995;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .o_facture_tracker_extra {
+        margin-top: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        border-top: 1px solid #e5edf7;
+        padding-top: 10px;
+    }
+
+    .o_facture_tracker_item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #2a4d72;
+        font-size: 12px;
+    }
+
+    .o_facture_tracker_label {
+        font-weight: 700;
+        color: #577695;
+        text-transform: uppercase;
+        letter-spacing: 0.2px;
+        font-size: 10px;
+    }
+
+    .o_facture_tracker_extra_bottom {
+        margin-top: 12px;
     }
 
     /* Style all inner groups (field containers) */
-    .o_form_sheet .o_inner_group {
-        padding: 14px 0 !important;
-        border-bottom: 1px solid #eef3fa;
-    }
-
-    .o_form_sheet .o_inner_group:first-of-type {
-        border-top: 1px solid #dbe5f1;
-        padding-top: 14px !important;
-        margin-top: 0;
-    }
-
     .o_form_sheet > .o_inner_group {
         border: 1px solid #dbe5f1;
         border-radius: 10px;
-        padding: 16px !important;
+        padding: 12px 14px !important;
         margin-bottom: 12px;
         background: #ffffff;
         box-shadow: 0 1px 2px rgba(10, 55, 103, 0.04);
     }
 
-    .o_form_sheet > .o_inner_group:nth-of-type(1) {
-        border-top: 3px solid #0a3767;
+    .o_form_sheet .o_group .o_group {
+        border: 1px solid #dbe5f1;
+        border-radius: 10px;
+        padding: 12px 14px !important;
+        margin-bottom: 10px !important;
+        background: #ffffff;
     }
 
     /* Form labels */
     .o_form_label {
         color: #395876;
         font-weight: 600;
-        font-size: 12px;
+        font-size: 13px;
+    }
+
+    .o_group .o_form_label.o_td_label {
+        color: #69819b;
+        font-weight: 600;
+    }
+
+    .o_group .o_form_label.o_td_label + div .o_field_widget.o_readonly_modifier,
+    .o_group .o_field_widget.o_readonly_modifier {
+        color: #213f63;
+        font-weight: 700;
     }
 
     /* Form cell styling */
@@ -1005,6 +1152,28 @@ body .o_recouvrement_dashboard .btn-link {
         color: #d77700;
         border: 1px solid #f5d5a6;
     }
+
+    .badge-primary {
+        background: #eaf2fb;
+        color: #0a3767;
+        border: 1px solid #c6d8ec;
+    }
+
+    .badge-secondary {
+        background: #eef3f9;
+        color: #4d6f91;
+        border: 1px solid #d2dfec;
+    }
+
+    .o_form_sheet .o_group > .o_horizontal_separator,
+    .o_form_sheet .o_group legend {
+        color: #145da8;
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+        text-transform: none;
+        margin-bottom: 10px;
+    }
 }
 
 @media (max-width: 1300px) {
@@ -1012,6 +1181,18 @@ body .o_recouvrement_dashboard .btn-link {
     .o_rcv_kpi_grid { grid-template-columns: repeat(2, minmax(190px, 1fr)); }
     .o_rcv_middle_grid { grid-template-columns: 1fr; }
     .o_rcv_bottom_grid { grid-template-columns: 1fr; }
+    .o_rcv_facture_form .o_facture_number {
+        font-size: 34px !important;
+    }
+
+    .o_rcv_facture_form .o_facture_meta_line {
+        font-size: 17px;
+    }
+
+    .o_rcv_facture_form .o_rcv_timeline {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        row-gap: 12px;
+    }
 }
 
 @media (max-width: 1100px) {
@@ -1029,5 +1210,17 @@ body .o_recouvrement_dashboard .btn-link {
 
     .o_recouvrement_dashboard {
         flex-direction: column;
+    }
+
+    .o_rcv_facture_form .o_facture_number {
+        font-size: 28px !important;
+    }
+
+    .o_rcv_facture_form .o_facture_meta_line {
+        font-size: 14px;
+    }
+
+    .o_rcv_facture_form .o_rcv_timeline {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }

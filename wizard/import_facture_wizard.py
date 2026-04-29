@@ -62,6 +62,9 @@ class RecouvrementFactureImportWizard(models.TransientModel):
             'date de depot client': 'date_depot_client',
             'date de depot client (3)': 'date_depot_client',
             'date depot': 'date_depot_client',
+            'date decheance': 'date_echeance',
+            'date de echeance': 'date_echeance',
+            'date echeance': 'date_echeance',
             'montant facture en ttc': 'montant_ttc',
             'montant de la facture en ttc': 'montant_ttc',
             'montant facture ttc': 'montant_ttc',
@@ -98,8 +101,10 @@ class RecouvrementFactureImportWizard(models.TransientModel):
             return 'montant_ttc'
         if 'montant' in header and 'ht' in header:
             return 'montant_ht'
-        if 'date' in header and 'depot' in header:
+        if 'depot' in header or 'depose' in header:
             return 'date_depot_client'
+        if 'date' in header and 'echeance' in header:
+            return 'date_echeance'
 
         return None
 
@@ -112,7 +117,6 @@ class RecouvrementFactureImportWizard(models.TransientModel):
             return False
 
         normalized = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('ascii').lower()
-        normalized = normalized.replace('.', '/').replace('-', '/')
         month_map = {
             'janvier': '01', 'janv': '01',
             'fevrier': '02', 'fevr': '02', 'fev': '02',
@@ -126,14 +130,31 @@ class RecouvrementFactureImportWizard(models.TransientModel):
             'octobre': '10', 'oct': '10',
             'novembre': '11', 'nov': '11',
             'decembre': '12', 'dec': '12',
+            'january': '01', 'jan': '01',
+            'february': '02', 'feb': '02',
+            'march': '03',
+            'april': '04', 'apr': '04',
+            'may': '05',
+            'june': '06', 'jun': '06',
+            'july': '07', 'jul': '07',
+            'august': '08', 'aug': '08',
+            'september': '09', 'sep': '09', 'sept': '09',
+            'october': '10', 'oct': '10',
+            'november': '11', 'nov': '11',
+            'december': '12', 'dec': '12',
         }
         for label, month in month_map.items():
-            normalized = re.sub(rf'\b{label}\b', f'/{month}/', normalized)
+            normalized = re.sub(rf'\b{label}\b', month, normalized)
 
-        normalized = re.sub(r'\s+', ' ', normalized)
+        # Normalize all separators to '/' so mixed formats like 04-Sep-25 parse.
+        normalized = re.sub(r'[^0-9]+', '/', normalized).strip('/')
+        normalized = re.sub(r'/+', '/', normalized)
+
         match = re.search(r'(?P<day>\d{1,2})\s*/\s*(?P<month>\d{1,2})\s*/\s*(?P<year>\d{2,4})', normalized)
         if not match:
             match = re.search(r'(?P<day>\d{1,2})\s*/\s*(?P<month>\d{1,2})(?!\s*/)', normalized)
+        if not match:
+            match = re.search(r'(?P<month>\d{1,2})\s*/\s*(?P<day>\d{1,2})\s*/\s*(?P<year>\d{2,4})', normalized)
         if not match:
             return False
 
@@ -203,7 +224,7 @@ class RecouvrementFactureImportWizard(models.TransientModel):
                 return str(int(value))
             return str(value).strip()
 
-        if field_name in ['date_reception_ordre', 'date_facture', 'date_signature', 'date_depot_client']:
+        if field_name in ['date_reception_ordre', 'date_facture', 'date_signature', 'date_depot_client', 'date_echeance']:
             if isinstance(value, datetime):
                 return value.date()
             if isinstance(value, date):
@@ -248,6 +269,29 @@ class RecouvrementFactureImportWizard(models.TransientModel):
 
         return value
 
+    def _convert_date_from_cell(self, cell, workbook):
+        """Convert a raw Excel cell to python date when possible.
+
+        Some spreadsheets keep dates as numeric serial values with a date format.
+        In that case, rely on openpyxl metadata (`cell.is_date`) and workbook epoch.
+        """
+        if not cell:
+            return False
+        value = cell.value
+        if value in [None, '']:
+            return False
+        if isinstance(value, datetime):
+            return value.date()
+        if isinstance(value, date):
+            return value
+        if getattr(cell, 'is_date', False) and isinstance(value, (int, float)) and not isinstance(value, bool) and from_excel:
+            try:
+                converted = from_excel(value, epoch=workbook.epoch)
+                return converted.date() if hasattr(converted, 'date') else converted
+            except Exception:
+                return False
+        return False
+
     def action_import(self):
         self.ensure_one()
         if openpyxl is None:
@@ -272,12 +316,12 @@ class RecouvrementFactureImportWizard(models.TransientModel):
                 errors.append(_('Feuille introuvable: %s') % sheet_name)
                 continue
             worksheet = workbook[sheet_name]
-            row_iterator = worksheet.iter_rows(values_only=True)
+            row_iterator = worksheet.iter_rows(values_only=False)
 
             headers = None
             header_row_index = 0
             for probe_index, probe_row in enumerate(row_iterator, start=1):
-                normalized_headers = [self._normalize_header(cell) for cell in probe_row]
+                normalized_headers = [self._normalize_header(cell.value) for cell in probe_row]
                 mapped_fields = [self._get_field_mapping(header) for header in normalized_headers if self._get_field_mapping(header)]
                 if mapped_fields and ('name' in mapped_fields or len(mapped_fields) >= 4):
                     headers = normalized_headers
@@ -291,41 +335,44 @@ class RecouvrementFactureImportWizard(models.TransientModel):
                 continue
 
             for row_index, row in enumerate(row_iterator, start=header_row_index + 1):
-                if not any([cell is not None and str(cell).strip() for cell in row]):
+                if not any([cell.value is not None and str(cell.value).strip() for cell in row]):
                     continue
                 values = {}
                 for header, cell in zip(headers, row):
                     field_name = self._get_field_mapping(header)
                     if not field_name:
                         continue
+                    cell_value = cell.value
                     if field_name == 'client_id':
-                        client = self._find_or_create_client(cell)
+                        client = self._find_or_create_client(cell_value)
                         if client:
                             values['client_id'] = client.id
                         continue
                     if field_name == 'division_id':
-                        division = self._find_or_create_division(cell)
+                        division = self._find_or_create_division(cell_value)
                         if division:
                             values['division_id'] = division.id
                         continue
                     if field_name == 'pole_id':
-                        pole = self._find_or_create_pole(cell)
+                        pole = self._find_or_create_pole(cell_value)
                         if pole:
                             values['pole_id'] = pole.id
                         continue
-                    if field_name == 'currency_id' and cell:
-                        currency = self.env['res.currency'].search([('name', '=ilike', str(cell).strip())], limit=1)
+                    if field_name == 'currency_id' and cell_value:
+                        currency = self.env['res.currency'].search([('name', '=ilike', str(cell_value).strip())], limit=1)
                         if currency:
                             values['currency_id'] = currency.id
                         continue
                     if field_name == 'facture_type':
-                        type_value = self._normalize_type(cell)
+                        type_value = self._normalize_type(cell_value)
                         if type_value:
                             values['facture_type'] = type_value
                         continue
-                    converted_value = self._convert_value(field_name, cell)
-                    if field_name == 'date_depot_client' and cell not in [None, '']:
-                        cell_text = str(cell).strip()
+                    converted_value = self._convert_value(field_name, cell_value)
+                    if field_name in ['date_reception_ordre', 'date_facture', 'date_signature', 'date_depot_client', 'date_echeance'] and not converted_value:
+                        converted_value = self._convert_date_from_cell(cell, workbook)
+                    if field_name == 'date_depot_client' and cell_value not in [None, '']:
+                        cell_text = str(cell_value).strip()
                         if converted_value:
                             values['date_depot_client'] = converted_value
                         elif cell_text:

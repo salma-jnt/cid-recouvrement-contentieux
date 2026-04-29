@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
@@ -6,6 +8,16 @@ class RecouvrementFacture(models.Model):
     _name = 'recouvrement.facture'
     _description = 'Facture de recouvrement'
     _order = 'date_facture desc, id desc'
+
+    def init(self):
+        self.env.cr.execute(
+            """
+            UPDATE recouvrement_facture
+               SET date_echeance = date_depot_client + INTERVAL '60 days'
+             WHERE date_echeance IS NULL
+               AND date_depot_client IS NOT NULL
+            """
+        )
 
     @api.model
     def _infer_facture_type_from_sheet(self, source_sheet):
@@ -35,6 +47,7 @@ class RecouvrementFacture(models.Model):
     date_facture = fields.Date(string='Date de la facture')
     date_signature = fields.Date(string='Date de signature')
     date_depot_client = fields.Date(string='Date de dépôt chez le client')
+    date_echeance = fields.Date(string="Date d'échéance")
     depot_comment = fields.Text(string='Statut / commentaire de dépôt')
     depot_display = fields.Char(string='Dépôt client', compute='_compute_depot_display', store=True)
     montant_ttc = fields.Monetary(string='Montant TTC')
@@ -77,6 +90,8 @@ class RecouvrementFacture(models.Model):
             inferred_type = self._infer_facture_type_from_sheet(vals.get('source_sheet'))
             if inferred_type:
                 vals['facture_type'] = inferred_type
+            if not vals.get('date_echeance') and vals.get('date_depot_client'):
+                vals['date_echeance'] = fields.Date.to_date(vals['date_depot_client']) + timedelta(days=60)
         return super().create(vals_list)
 
     def write(self, vals):
@@ -85,4 +100,27 @@ class RecouvrementFacture(models.Model):
         inferred_type = self._infer_facture_type_from_sheet(vals.get('source_sheet'))
         if inferred_type:
             vals['facture_type'] = inferred_type
+        if not vals.get('date_echeance') and vals.get('date_depot_client'):
+            vals['date_echeance'] = fields.Date.to_date(vals['date_depot_client']) + timedelta(days=60)
         return super().write(vals)
+
+    def action_open_import(self):
+        """Open the import wizard for factures.
+
+        This returns an action dict at runtime so views don't need to resolve the
+        external id during XML parsing.
+        """
+        action = False
+        try:
+            action = self.env.ref('recouvrement_contentieux.action_recouvrement_import_factures')
+        except Exception:
+            action = False
+        if action:
+            return action.read()[0]
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Importer des factures',
+            'res_model': 'recouvrement.facture.import.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+        }
