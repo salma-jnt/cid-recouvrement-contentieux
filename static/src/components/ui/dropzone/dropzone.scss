@@ -1,0 +1,157 @@
+.cid-dropzone-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cid-space-3);
+}
+
+.cid-dropzone {
+    position: relative;
+    border: 2px dashed var(--cid-border-strong);
+    border-radius: var(--cid-radius-xl);
+    background: linear-gradient(180deg, var(--cid-surface) 0%, var(--cid-surface-alt) 100%);
+    padding: var(--cid-space-12) var(--cid-space-6);
+    cursor: pointer;
+    transition: all var(--cid-trans-base);
+    text-align: center;
+
+    &:hover {
+        border-color: var(--cid-primary-300);
+        background: var(--cid-primary-50);
+    }
+
+    &--over {
+        border-color: var(--cid-primary-500);
+        border-style: solid;
+        background: var(--cid-primary-50);
+        transform: scale(1.005);
+        box-shadow: var(--cid-shadow-md);
+    }
+
+    &--error {
+        border-color: var(--cid-danger);
+        background: var(--cid-rouge-soft);
+    }
+
+    &__inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--cid-space-2);
+    }
+
+    &__icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: var(--cid-primary-50);
+        color: var(--cid-primary-500);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        margin-bottom: var(--cid-space-3);
+        transition: all var(--cid-trans-base);
+    }
+    &--over &__icon {
+        background: var(--cid-primary-500);
+        color: #fff;
+        transform: scale(1.1);
+    }
+
+    &__title {
+        font-size: var(--cid-text-lg);
+        font-weight: var(--cid-weight-semibold);
+        color: var(--cid-text);
+    }
+
+    &__subtitle {
+        font-size: var(--cid-text-sm);
+        color: var(--cid-primary-500);
+        font-weight: var(--cid-weight-medium);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+
+    &__hint {
+        margin-top: var(--cid-space-3);
+        font-size: var(--cid-text-xs);
+        color: var(--cid-text-muted);
+    }
+    &__sep { margin: 0 6px; }
+
+    &__input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 1px;
+        height: 1px;
+    }
+
+    &__error-msg {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: var(--cid-rouge-soft);
+        color: var(--cid-rouge-fg);
+        border-radius: var(--cid-radius-md);
+        font-size: var(--cid-text-sm);
+    }
+
+    &__files {
+        display: flex;
+        flex-direction: column;
+        gap: var(--cid-space-2);
+    }
+
+    &__file {
+        display: flex;
+        align-items: center;
+        gap: var(--cid-space-3);
+        padding: var(--cid-space-3) var(--cid-space-4);
+        background: var(--cid-surface);
+        border: 1px solid var(--cid-border);
+        border-radius: var(--cid-radius-md);
+        animation: cid-fade-in 200ms ease;
+
+        &-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--cid-radius-sm);
+            background: var(--cid-primary-50);
+            color: var(--cid-primary-500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        &-meta { flex: 1; min-width: 0; }
+        &-name {
+            font-weight: var(--cid-weight-medium);
+            font-size: var(--cid-text-sm);
+            color: var(--cid-text);
+            @include cid-truncate(1);
+        }
+        &-size {
+            font-size: var(--cid-text-xs);
+            color: var(--cid-text-muted);
+            margin-top: 2px;
+        }
+        &-remove {
+            @include cid-reset-button;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--cid-text-faint);
+            border-radius: var(--cid-radius-sm);
+            transition: all var(--cid-trans-fast);
+            &:hover {
+                background: var(--cid-rouge-soft);
+                color: var(--cid-danger);
+            }
+        }
+    }
+}

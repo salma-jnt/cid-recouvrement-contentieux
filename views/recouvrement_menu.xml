@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- ================================================================
+             MENU PRINCIPAL : Recouvrement
+             Structure exacte demandée :
+               Vue d'ensemble       → Tableau de bord
+               Facturation          → Importer / Toutes les factures
+               Encaissement         → Importer / Encaissements
+               Suivi de recouvrement → Dossiers de recouvrements
+               Relances             → Calendrier / Appels / Emails
+               Paramétrage          → Modèles d'actions / Procédures /
+                                       Types de clients / Clients
+        ===================================================================== -->
+
+        <!-- ================================================================
+             ACTIONS WINDOW (référencées par les menus)
+        ===================================================================== -->
+        <record id="action_recouvrement_dashboard" model="ir.actions.client">
+            <field name="name">Tableau de bord Recouvrement</field>
+            <field name="tag">recouvrement_contentieux.dashboard</field>
+        </record>
+
+        <record id="action_recouvrement_facture" model="ir.actions.act_window">
+            <field name="name">Toutes les factures</field>
+            <field name="res_model">recouvrement.facture</field>
+            <field name="view_mode">list,kanban,form</field>
+        </record>
+
+        <record id="action_recouvrement_recouvrement" model="ir.actions.act_window">
+            <field name="name">Dossiers de recouvrement</field>
+            <field name="res_model">recouvrement.recouvrement</field>
+            <field name="view_mode">list,kanban</field>
+        </record>
+
+        <record id="action_recouvrement_encaissement" model="ir.actions.act_window">
+            <field name="name">Encaissements</field>
+            <field name="res_model">recouvrement.encaissement</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{'search_default_a_traiter': 1}</field>
+        </record>
+
+        <record id="action_recouvrement_action_calendar" model="ir.actions.act_window">
+            <field name="name">Calendrier des actions</field>
+            <field name="res_model">recouvrement.action</field>
+            <field name="view_mode">calendar,list,form</field>
+            <field name="domain">[('state','in',['todo','reporte'])]</field>
+        </record>
+
+        <record id="action_recouvrement_action_appels" model="ir.actions.act_window">
+            <field name="name">Appels</field>
+            <field name="res_model">recouvrement.action</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">[('action_type','=','appel')]</field>
+            <field name="context">{'default_action_type': 'appel'}</field>
+        </record>
+
+        <record id="action_recouvrement_action_emails" model="ir.actions.act_window">
+            <field name="name">Emails</field>
+            <field name="res_model">recouvrement.action</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">[('action_type','in',['email','courrier','mise_en_demeure'])]</field>
+            <field name="context">{'default_action_type': 'email'}</field>
+        </record>
+
+        <record id="action_recouvrement_action_template" model="ir.actions.act_window">
+            <field name="name">Modèles d'actions</field>
+            <field name="res_model">recouvrement.action.template</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="action_recouvrement_procedure" model="ir.actions.act_window">
+            <field name="name">Procédures de recouvrement</field>
+            <field name="res_model">recouvrement.procedure</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="action_recouvrement_client_type" model="ir.actions.act_window">
+            <field name="name">Types de clients</field>
+            <field name="res_model">recouvrement.client.type</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="action_recouvrement_clients" model="ir.actions.act_window">
+            <field name="name">Clients</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">list,kanban,form</field>
+            <field name="domain">[("customer_rank", ">", 0)]</field>
+        </record>
+
+        <!-- Actions imports modernes (pages OWL) -->
+        <record id="action_recouvrement_import_factures_modern" model="ir.actions.client">
+            <field name="name">Importer des factures</field>
+            <field name="tag">recouvrement_contentieux.import_factures_page</field>
+        </record>
+        <record id="action_recouvrement_import_encaissements_modern" model="ir.actions.client">
+            <field name="name">Importer des encaissements</field>
+            <field name="tag">recouvrement_contentieux.import_encaissements_page</field>
+        </record>
+
+        <!-- Page lettrage live d'un encaissement -->
+        <record id="action_recouvrement_encaissement_lettrage_page" model="ir.actions.client">
+            <field name="name">Lettrer cet encaissement</field>
+            <field name="tag">recouvrement_contentieux.encaissement_lettrage_page</field>
+        </record>
+
+        <!-- Page détail dossier OWL moderne -->
+        <record id="action_recouvrement_dossier_detail_page" model="ir.actions.client">
+            <field name="name">Détail dossier</field>
+            <field name="tag">recouvrement_contentieux.dossier_detail_page</field>
+        </record>
+
+        <!-- Page d'exécution d'action OWL -->
+        <record id="action_recouvrement_action_execution_page" model="ir.actions.client">
+            <field name="name">Exécution d'action</field>
+            <field name="tag">recouvrement_contentieux.action_execution_page</field>
+        </record>
+
+        <!-- Action : factures en blocage technique (pour le pôle) -->
+        <record id="action_recouvrement_factures_blocage_technique" model="ir.actions.act_window">
+            <field name="name">Factures en blocage technique</field>
+            <field name="res_model">recouvrement.facture</field>
+            <field name="view_mode">list,kanban,form</field>
+            <field name="domain">[("recouvrement_status", "=", "bloque_technique")]</field>
+            <field name="context">{"search_default_couleur_orange": 1}</field>
+            <field name="help">Liste des factures qui ont déclenché un blocage technique
+suite à une action de relance, et qui attendent une résolution
+côté pôle technique avant que la procédure puisse continuer.</field>
+        </record>
+
+        <!-- ROOT -->
+        <record id="recouvrement_menu_root" model="ir.ui.menu">
+            <field name="name">Recouvrement</field>
+            <field name="sequence">10</field>
+            <field name="action" ref="action_recouvrement_dashboard"/>
+            <field name="web_icon">recouvrement_contentieux,static/src/img/cid_logo.png</field>
+        </record>
+
+        <!-- ============================================================
+             SECTION 1 : VUE D'ENSEMBLE
+        =============================================================== -->
+        <record id="recouvrement_menu_vue_ensemble" model="ir.ui.menu">
+            <field name="name">Vue d'ensemble</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="recouvrement_menu_dashboard" model="ir.ui.menu">
+            <field name="name">Tableau de bord</field>
+            <field name="parent_id" ref="recouvrement_menu_vue_ensemble"/>
+            <field name="action" ref="action_recouvrement_dashboard"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- ============================================================
+             SECTION 2 : FACTURATION
+        =============================================================== -->
+        <record id="recouvrement_menu_facturation_section" model="ir.ui.menu">
+            <field name="name">Facturation</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">20</field>
+        </record>
+        <record id="recouvrement_menu_factures_import" model="ir.ui.menu">
+            <field name="name">Importer des factures</field>
+            <field name="parent_id" ref="recouvrement_menu_facturation_section"/>
+            <field name="action" ref="action_recouvrement_import_factures_modern"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="recouvrement_menu_factures" model="ir.ui.menu">
+            <field name="name">Toutes les factures</field>
+            <field name="parent_id" ref="recouvrement_menu_facturation_section"/>
+            <field name="action" ref="action_recouvrement_facture"/>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- ============================================================
+             SECTION 3 : ENCAISSEMENT
+        =============================================================== -->
+        <record id="recouvrement_menu_encaissement_section" model="ir.ui.menu">
+            <field name="name">Encaissement</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">30</field>
+        </record>
+        <record id="recouvrement_menu_import_encaissements" model="ir.ui.menu">
+            <field name="name">Importer des encaissements</field>
+            <field name="parent_id" ref="recouvrement_menu_encaissement_section"/>
+            <field name="action" ref="action_recouvrement_import_encaissements_modern"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="recouvrement_menu_encaissements" model="ir.ui.menu">
+            <field name="name">Encaissements</field>
+            <field name="parent_id" ref="recouvrement_menu_encaissement_section"/>
+            <field name="action" ref="action_recouvrement_encaissement"/>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- ============================================================
+             SECTION 4 : SUIVI DE RECOUVREMENT
+        =============================================================== -->
+        <record id="recouvrement_menu_suivi_section" model="ir.ui.menu">
+            <field name="name">Suivi de recouvrement</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">40</field>
+        </record>
+        <record id="recouvrement_menu_dossiers" model="ir.ui.menu">
+            <field name="name">Dossiers de recouvrements</field>
+            <field name="parent_id" ref="recouvrement_menu_suivi_section"/>
+            <field name="action" ref="action_recouvrement_recouvrement"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="recouvrement_menu_blocage_technique" model="ir.ui.menu">
+            <field name="name">Blocages techniques</field>
+            <field name="parent_id" ref="recouvrement_menu_suivi_section"/>
+            <field name="action" ref="action_recouvrement_factures_blocage_technique"/>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- ============================================================
+             SECTION 5 : RELANCES
+        =============================================================== -->
+        <record id="recouvrement_menu_relances_section" model="ir.ui.menu">
+            <field name="name">Relances</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">50</field>
+        </record>
+        <record id="recouvrement_menu_calendar" model="ir.ui.menu">
+            <field name="name">Calendrier</field>
+            <field name="parent_id" ref="recouvrement_menu_relances_section"/>
+            <field name="action" ref="action_recouvrement_action_calendar"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="recouvrement_menu_appels" model="ir.ui.menu">
+            <field name="name">Appels</field>
+            <field name="parent_id" ref="recouvrement_menu_relances_section"/>
+            <field name="action" ref="action_recouvrement_action_appels"/>
+            <field name="sequence">20</field>
+        </record>
+        <record id="recouvrement_menu_emails" model="ir.ui.menu">
+            <field name="name">Emails</field>
+            <field name="parent_id" ref="recouvrement_menu_relances_section"/>
+            <field name="action" ref="action_recouvrement_action_emails"/>
+            <field name="sequence">30</field>
+        </record>
+
+        <!-- ============================================================
+             SECTION 6 : PARAMÉTRAGE
+        =============================================================== -->
+        <record id="recouvrement_menu_parametrage" model="ir.ui.menu">
+            <field name="name">Paramétrage</field>
+            <field name="parent_id" ref="recouvrement_menu_root"/>
+            <field name="sequence">60</field>
+        </record>
+        <record id="recouvrement_menu_parametrage_action_templates" model="ir.ui.menu">
+            <field name="name">Modèles d'actions</field>
+            <field name="parent_id" ref="recouvrement_menu_parametrage"/>
+            <field name="action" ref="action_recouvrement_action_template"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="recouvrement_menu_parametrage_procedures" model="ir.ui.menu">
+            <field name="name">Procédures de recouvrement</field>
+            <field name="parent_id" ref="recouvrement_menu_parametrage"/>
+            <field name="action" ref="action_recouvrement_procedure"/>
+            <field name="sequence">20</field>
+        </record>
+        <record id="recouvrement_menu_parametrage_client_types" model="ir.ui.menu">
+            <field name="name">Types de clients</field>
+            <field name="parent_id" ref="recouvrement_menu_parametrage"/>
+            <field name="action" ref="action_recouvrement_client_type"/>
+            <field name="sequence">30</field>
+        </record>
+        <record id="recouvrement_menu_parametrage_clients" model="ir.ui.menu">
+            <field name="name">Clients</field>
+            <field name="parent_id" ref="recouvrement_menu_parametrage"/>
+            <field name="action" ref="action_recouvrement_clients"/>
+            <field name="sequence">40</field>
+        </record>
+
+    </data>
+</odoo>

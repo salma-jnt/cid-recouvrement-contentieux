@@ -1,0 +1,85 @@
+.cid-dialog__overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--cid-overlay);
+    backdrop-filter: blur(2px);
+    z-index: var(--cid-z-dialog);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--cid-space-4);
+    animation: cid-fade-in 160ms ease;
+}
+
+.cid-dialog {
+    background: var(--cid-surface);
+    border-radius: var(--cid-radius-xl);
+    box-shadow: var(--cid-shadow-xl);
+    width: 100%;
+    max-height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    animation: cid-slide-in-up 220ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    &--sm { max-width: 420px; }
+    &--md { max-width: 560px; }
+    &--lg { max-width: 760px; }
+    &--xl { max-width: 1040px; }
+
+    &__header {
+        padding: var(--cid-space-5) var(--cid-space-6);
+        border-bottom: 1px solid var(--cid-divider);
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: var(--cid-space-4);
+    }
+
+    &__title {
+        margin: 0;
+        font-size: var(--cid-text-xl);
+        font-weight: var(--cid-weight-semibold);
+        color: var(--cid-text);
+        line-height: var(--cid-leading-tight);
+    }
+
+    &__desc {
+        margin: 6px 0 0 0;
+        font-size: var(--cid-text-sm);
+        color: var(--cid-text-muted);
+    }
+
+    &__close {
+        @include cid-reset-button;
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: var(--cid-radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--cid-text-muted);
+        font-size: 16px;
+        transition: all var(--cid-trans-fast);
+        &:hover {
+            background: var(--cid-surface-alt);
+            color: var(--cid-text);
+        }
+    }
+
+    &__body {
+        padding: var(--cid-space-6);
+        overflow-y: auto;
+        @include cid-scrollbar;
+    }
+
+    &__footer {
+        padding: var(--cid-space-4) var(--cid-space-6);
+        border-top: 1px solid var(--cid-divider);
+        background: var(--cid-surface-alt);
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: var(--cid-space-2);
+    }
+}

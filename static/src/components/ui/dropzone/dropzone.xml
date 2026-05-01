@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.CidDropzone">
+        <div class="cid-dropzone-wrapper">
+            <div t-att-class="'cid-dropzone' + (state.dragOver ? ' cid-dropzone--over' : '') + (state.error ? ' cid-dropzone--error' : '')"
+                 t-on-click="onClick"
+                 t-on-dragover="onDragOver"
+                 t-on-dragleave="onDragLeave"
+                 t-on-drop="onDrop"
+                 role="button"
+                 tabindex="0">
+                <div class="cid-dropzone__inner">
+                    <div class="cid-dropzone__icon">
+                        <i class="fa fa-cloud-upload"/>
+                    </div>
+                    <div class="cid-dropzone__title" t-esc="props.title"/>
+                    <div class="cid-dropzone__subtitle" t-esc="props.subtitle"/>
+                    <div t-if="props.accept" class="cid-dropzone__hint">
+                        Formats acceptés : <strong t-esc="props.accept"/>
+                        <span class="cid-dropzone__sep">·</span>
+                        Max <strong t-esc="props.maxSizeMB"/> Mo
+                    </div>
+                </div>
+                <input t-ref="input"
+                       type="file"
+                       class="cid-dropzone__input"
+                       t-att-accept="props.accept"
+                       t-att-multiple="props.multiple"
+                       t-on-change="onInputChange"/>
+            </div>
+
+            <div t-if="state.error" class="cid-dropzone__error-msg">
+                <i class="fa fa-exclamation-circle"/> <span t-esc="state.error"/>
+            </div>
+
+            <div t-if="props.files and props.files.length" class="cid-dropzone__files">
+                <t t-foreach="props.files" t-as="file" t-key="file_index">
+                    <div class="cid-dropzone__file">
+                        <div class="cid-dropzone__file-icon">
+                            <i t-att-class="'fa ' + iconFor(file)"/>
+                        </div>
+                        <div class="cid-dropzone__file-meta">
+                            <div class="cid-dropzone__file-name" t-esc="file.name"/>
+                            <div class="cid-dropzone__file-size" t-esc="formatSize(file.size)"/>
+                        </div>
+                        <button class="cid-dropzone__file-remove"
+                                t-on-click="(ev) => this.onRemove(file_index, ev)"
+                                aria-label="Retirer">
+                            <i class="fa fa-times"/>
+                        </button>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+
+</templates>

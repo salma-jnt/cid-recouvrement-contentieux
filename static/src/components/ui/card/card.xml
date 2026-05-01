@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.CidCard">
+        <div t-att-class="classes" t-on-click="onClick">
+            <div t-if="props.slots.header" class="cid-card__header">
+                <t t-slot="header"/>
+            </div>
+            <div class="cid-card__body">
+                <t t-slot="default"/>
+            </div>
+            <div t-if="props.slots.footer" class="cid-card__footer">
+                <t t-slot="footer"/>
+            </div>
+        </div>
+    </t>
+
+</templates>

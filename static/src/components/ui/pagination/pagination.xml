@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.CidPagination">
+        <div class="cid-pagination">
+            <div class="cid-pagination__info">
+                <span t-if="props.total">
+                    <strong t-esc="rangeStart"/> – <strong t-esc="rangeEnd"/>
+                    sur <strong t-esc="props.total"/>
+                </span>
+                <span t-else="" class="text-muted">Aucun résultat</span>
+            </div>
+
+            <div t-if="props.onPageSizeChange" class="cid-pagination__size">
+                <label>Par page</label>
+                <select t-on-change="onSizeChange" t-att-value="props.pageSize">
+                    <t t-foreach="props.pageSizeOptions" t-as="opt" t-key="opt">
+                        <option t-att-value="opt" t-att-selected="opt === props.pageSize" t-esc="opt"/>
+                    </t>
+                </select>
+            </div>
+
+            <div class="cid-pagination__nav">
+                <button class="cid-pagination__btn"
+                        t-on-click="onPrev"
+                        t-att-disabled="props.page === 1"
+                        aria-label="Précédent">
+                    <i class="fa fa-chevron-left"/>
+                </button>
+                <t t-foreach="visiblePages" t-as="item" t-key="item.key">
+                    <span t-if="item.ellipsis" class="cid-pagination__ellipsis">…</span>
+                    <button t-else=""
+                            t-att-class="'cid-pagination__btn cid-pagination__btn--page' + (item.page === props.page ? ' is-active' : '')"
+                            t-on-click="() => this.onGo(item.page)"
+                            t-esc="item.page"/>
+                </t>
+                <button class="cid-pagination__btn"
+                        t-on-click="onNext"
+                        t-att-disabled="props.page === totalPages"
+                        aria-label="Suivant">
+                    <i class="fa fa-chevron-right"/>
+                </button>
+            </div>
+        </div>
+    </t>
+
+</templates>

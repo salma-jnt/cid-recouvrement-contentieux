@@ -1,0 +1,209 @@
+/* ============================================================
+   Generic page wrapper
+   ============================================================ */
+.cid-page {
+    background: var(--cid-bg);
+    min-height: 100%;
+    padding: var(--cid-space-6);
+    font-family: var(--cid-font-sans);
+    color: var(--cid-text);
+
+    &__header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: var(--cid-space-4);
+        margin-bottom: var(--cid-space-6);
+    }
+
+    &__title {
+        margin: 0;
+        font-size: var(--cid-text-3xl);
+        font-weight: var(--cid-weight-bold);
+        color: var(--cid-text);
+        line-height: 1.15;
+    }
+
+    &__subtitle {
+        margin: 6px 0 0 0;
+        font-size: var(--cid-text-base);
+        color: var(--cid-text-muted);
+        max-width: 720px;
+        line-height: var(--cid-leading-relaxed);
+    }
+}
+
+/* ============================================================
+   Form helpers
+   ============================================================ */
+.cid-form-group {
+    margin-top: var(--cid-space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cid-space-2);
+}
+
+.cid-form-label {
+    font-size: var(--cid-text-sm);
+    font-weight: var(--cid-weight-medium);
+    color: var(--cid-text);
+}
+
+.cid-form-input {
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid var(--cid-border-strong);
+    border-radius: var(--cid-radius-md);
+    background: var(--cid-surface);
+    font-family: var(--cid-font-sans);
+    font-size: var(--cid-text-base);
+    color: var(--cid-text);
+    transition: all var(--cid-trans-fast);
+
+    &:focus {
+        outline: 0;
+        border-color: var(--cid-primary-400);
+        @include cid-focus-ring;
+    }
+}
+
+/* ============================================================
+   Import page (simplified layout)
+   ============================================================ */
+.cid-import-page {
+
+    &__col-main {
+        display: flex;
+        flex-direction: column;
+        gap: var(--cid-space-4);
+
+        /* 👉 centré + largeur propre */
+        max-width: 900px;
+        margin: 0 auto;
+        width: 100%;
+    }
+}
+
+/* ============================================================
+   Import summary
+   ============================================================ */
+.cid-import-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--cid-space-4);
+
+    &__cell {
+        text-align: center;
+        padding: var(--cid-space-3);
+        background: var(--cid-surface-alt);
+        border-radius: var(--cid-radius-md);
+    }
+
+    &__label {
+        font-size: var(--cid-text-xs);
+        text-transform: uppercase;
+        font-weight: var(--cid-weight-medium);
+        color: var(--cid-text-muted);
+        letter-spacing: 0.04em;
+    }
+
+    &__value {
+        font-size: var(--cid-text-3xl);
+        font-weight: var(--cid-weight-bold);
+        color: var(--cid-text);
+        margin-top: 4px;
+
+        &--success { color: var(--cid-success); }
+        &--info    { color: var(--cid-primary-500); }
+        &--danger  { color: var(--cid-danger); }
+    }
+
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ============================================================
+   Import errors
+   ============================================================ */
+.cid-import-errors {
+    margin-top: var(--cid-space-4);
+    padding: var(--cid-space-4);
+    background: var(--cid-rouge-soft);
+    border-radius: var(--cid-radius-md);
+    color: var(--cid-rouge-fg);
+
+    h4 {
+        margin: 0 0 var(--cid-space-2) 0;
+        font-size: var(--cid-text-sm);
+        font-weight: var(--cid-weight-semibold);
+    }
+
+    ul {
+        margin: 0;
+        padding-left: var(--cid-space-5);
+        font-size: var(--cid-text-sm);
+        line-height: var(--cid-leading-relaxed);
+    }
+}
+
+/* ============================================================
+   (Optionnel) Reusable rules & legend
+   👉 gardés pour d'autres pages si besoin
+   ============================================================ */
+.cid-rules {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+
+    li {
+        position: relative;
+        padding: var(--cid-space-3) 0;
+        padding-left: var(--cid-space-6);
+        font-size: var(--cid-text-sm);
+        line-height: var(--cid-leading-relaxed);
+        color: var(--cid-text-soft);
+        border-bottom: 1px solid var(--cid-divider);
+
+        &:last-child { border-bottom: 0; }
+
+        &::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            top: var(--cid-space-3);
+            color: var(--cid-primary-500);
+            font-weight: bold;
+        }
+
+        strong {
+            display: block;
+            color: var(--cid-text);
+            margin-bottom: 2px;
+            font-weight: var(--cid-weight-semibold);
+        }
+    }
+}
+
+.cid-color-legend {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cid-space-2);
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: var(--cid-space-2);
+        font-size: var(--cid-text-sm);
+        color: var(--cid-text-soft);
+
+        strong { color: var(--cid-text); }
+    }
+
+    &__dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+}

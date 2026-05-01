@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.CidButton">
+        <button
+            t-att-type="props.type"
+            t-att-class="classes"
+            t-att-disabled="props.disabled || props.loading"
+            t-on-click="onClick">
+            <span t-if="props.loading" class="cid-btn__spinner" aria-hidden="true">
+                <i class="fa fa-circle-o-notch fa-spin"/>
+            </span>
+            <i t-if="props.icon and props.iconPosition === 'left' and !props.loading"
+               t-att-class="'fa ' + props.icon + ' cid-btn__icon cid-btn__icon--left'"/>
+            <span class="cid-btn__label">
+                <t t-slot="default"/>
+            </span>
+            <i t-if="props.icon and props.iconPosition === 'right' and !props.loading"
+               t-att-class="'fa ' + props.icon + ' cid-btn__icon cid-btn__icon--right'"/>
+        </button>
+    </t>
+
+</templates>

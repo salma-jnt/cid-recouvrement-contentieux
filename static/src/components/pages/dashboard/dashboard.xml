@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.CidDashboard">
+        <div class="cid-page cid-dashboard">
+
+            <!-- Header -->
+            <header class="cid-page__header">
+                <div>
+                    <h1 class="cid-page__title">Tableau de bord</h1>
+                    <p class="cid-page__subtitle">
+                        Vue d'ensemble du recouvrement — Bonjour 👋, voici votre journée.
+                    </p>
+                </div>
+                <div style="display:flex; gap: 8px;">
+                    <CidButton variant="'secondary'" icon="'fa-folder-open-o'"
+                               onClick="() => this.onSeeDossiers()">
+                        Tous les dossiers
+                    </CidButton>
+                    <CidButton variant="'primary'" icon="'fa-upload'"
+                               onClick="() => this.onImportFactures()">
+                        Importer des factures
+                    </CidButton>
+                </div>
+            </header>
+
+            <!-- ==================== KPIs ==================== -->
+            <div class="cid-dashboard__kpis">
+                <CidKpiCard accent="'primary'" icon="'fa-money'"
+                            label="'Montant total facturé'"
+                            value="fmtCompact(state.kpis.montantTotal) + ' DH'"
+                            loading="state.loading"/>
+                <CidKpiCard accent="'danger'" icon="'fa-exclamation-circle'"
+                            label="'Reste à recouvrer'"
+                            value="fmtCompact(state.kpis.resteARecouvrer) + ' DH'"
+                            loading="state.loading"/>
+                <CidKpiCard accent="'success'" icon="'fa-check-circle'"
+                            label="'Encaissé (7 j)'"
+                            value="fmtCompact(state.kpis.encaisseSemaine) + ' DH'"
+                            loading="state.loading"/>
+                <CidKpiCard accent="'mauve'" icon="'fa-folder-open-o'"
+                            label="'Dossiers ouverts'"
+                            value="'' + state.kpis.dossiersOuverts"
+                            loading="state.loading"/>
+                <CidKpiCard accent="'accent'" icon="'fa-bolt'"
+                            label='"Actions aujourd hui"'
+                            value="'' + state.kpis.actionsAujourdhui"
+                            subtitle="'' + state.kpis.actionsEnRetard + ' en retard'"
+                            loading="state.loading"/>
+            </div>
+
+            <!-- ==================== ACTIONS DU JOUR ==================== -->
+            <div class="cid-dashboard__row">
+                <CidCard padded="false">
+                    <t t-set-slot="header">
+                        <span><i class="fa fa-calendar-check-o text-primary"/> Actions à faire aujourd'hui</span>
+                        <CidBadge variant="'primary'" subtle="true">
+                            <t t-esc="state.actionsAujourdhui.length"/>
+                        </CidBadge>
+                    </t>
+
+                    <t t-if="state.loading">
+                        <div style="padding: 20px;">
+                            <CidSkeleton width="'100%'" height="'48px'" lines="3"/>
+                        </div>
+                    </t>
+                    <t t-elif="state.actionsAujourdhui.length === 0">
+                        <CidEmptyState icon="'fa-coffee'"
+                                       title="'Rien au programme aujourd hui'"
+                                       description="'Profitez-en pour préparer la semaine.'"/>
+                    </t>
+                    <t t-else="">
+                        <div class="cid-action-list">
+                            <t t-foreach="state.actionsAujourdhui" t-as="a" t-key="a.id">
+                                <div class="cid-action-item"
+                                     t-on-click="() => this.onActionClick(a)">
+                                    <div t-att-class="'cid-action-item__icon cid-action-item__icon--' + a.action_type">
+                                        <i t-att-class="'fa ' + actionTypeIcon(a.action_type)"/>
+                                    </div>
+                                    <div class="cid-action-item__main">
+                                        <div class="cid-action-item__title" t-esc="a.name"/>
+                                        <div class="cid-action-item__sub">
+                                            <t t-if="a.client_id">
+                                                <i class="fa fa-user-o"/> <t t-esc="a.client_id[1]"/>
+                                                ·
+                                            </t>
+                                            <span t-esc="actionTypeLabel(a.action_type)"/>
+                                            <t t-if="a.responsible_id">
+                                                · <i class="fa fa-user-circle"/> <t t-esc="a.responsible_id[1]"/>
+                                            </t>
+                                        </div>
+                                    </div>
+                                    <i class="fa fa-chevron-right cid-action-item__arrow"/>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+
+                    <t t-set-slot="footer">
+                        <CidButton variant="'ghost'" size="'sm'"
+                                   icon="'fa-arrow-right'" iconPosition="'right'"
+                                   onClick="() => this.onSeeAllActions()">
+                            Voir toutes les actions
+                        </CidButton>
+                    </t>
+                </CidCard>
+
+                <CidCard padded="false">
+                    <t t-set-slot="header">
+                        <span><i class="fa fa-calendar text-primary"/> Cette semaine</span>
+                        <CidBadge variant="'info'" subtle="true">
+                            <t t-esc="state.actionsSemaine.length"/>
+                        </CidBadge>
+                    </t>
+
+                    <t t-if="state.loading">
+                        <div style="padding: 20px;">
+                            <CidSkeleton width="'100%'" height="'48px'" lines="3"/>
+                        </div>
+                    </t>
+                    <t t-elif="state.actionsSemaine.length === 0">
+                        <CidEmptyState icon="'fa-calendar-o'"
+                                       title="'Pas d actions cette semaine'"
+                                       description="'Aucune relance planifiée dans les 7 prochains jours.'"/>
+                    </t>
+                    <t t-else="">
+                        <div class="cid-action-list">
+                            <t t-foreach="state.actionsSemaine" t-as="a" t-key="a.id">
+                                <div class="cid-action-item"
+                                     t-on-click="() => this.onActionClick(a)">
+                                    <div t-att-class="'cid-action-item__icon cid-action-item__icon--' + a.action_type">
+                                        <i t-att-class="'fa ' + actionTypeIcon(a.action_type)"/>
+                                    </div>
+                                    <div class="cid-action-item__main">
+                                        <div class="cid-action-item__title" t-esc="a.name"/>
+                                        <div class="cid-action-item__sub">
+                                            <t t-if="a.client_id">
+                                                <i class="fa fa-user-o"/> <t t-esc="a.client_id[1]"/>
+                                                ·
+                                            </t>
+                                            <i class="fa fa-clock-o"/> <t t-esc="fmtDate(a.mandatory_date)"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </CidCard>
+            </div>
+
+            <!-- ==================== RÉPARTITION + TOP DOSSIERS ==================== -->
+            <div class="cid-dashboard__row">
+                <CidCard padded="true">
+                    <t t-set-slot="header">
+                        <span><i class="fa fa-pie-chart"/> Répartition par statut visuel</span>
+                    </t>
+
+                    <t t-if="state.loading">
+                        <CidSkeleton width="'100%'" height="'120px'"/>
+                    </t>
+                    <t t-elif="repartitionTotal === 0">
+                        <CidEmptyState icon="'fa-pie-chart'"
+                                       title="'Aucune facture non soldée'"
+                                       description="'Tout est à jour.'"/>
+                    </t>
+                    <t t-else="">
+                        <!-- Stacked bar -->
+                        <div class="cid-repart-bar">
+                            <t t-if="state.repartitionStatut.vert">
+                                <div class="cid-repart-bar__seg cid-repart-bar__seg--vert"
+                                     t-att-style="'width:' + repartitionPct('vert') + '%'"
+                                     t-att-title="state.repartitionStatut.vert + ' factures vertes'"/>
+                            </t>
+                            <t t-if="state.repartitionStatut.orange">
+                                <div class="cid-repart-bar__seg cid-repart-bar__seg--orange"
+                                     t-att-style="'width:' + repartitionPct('orange') + '%'"/>
+                            </t>
+                            <t t-if="state.repartitionStatut.mauve">
+                                <div class="cid-repart-bar__seg cid-repart-bar__seg--mauve"
+                                     t-att-style="'width:' + repartitionPct('mauve') + '%'"/>
+                            </t>
+                            <t t-if="state.repartitionStatut.rouge">
+                                <div class="cid-repart-bar__seg cid-repart-bar__seg--rouge"
+                                     t-att-style="'width:' + repartitionPct('rouge') + '%'"/>
+                            </t>
+                        </div>
+
+                        <div class="cid-repart-grid">
+                            <div class="cid-repart-cell" t-on-click="() => this.onSeeFactures('vert')">
+                                <CidStatusPill color="'vert'">Vert</CidStatusPill>
+                                <div class="cid-repart-cell__count" t-esc="state.repartitionStatut.vert"/>
+                                <div class="cid-repart-cell__pct"><t t-esc="Math.round(repartitionPct('vert'))"/>%</div>
+                            </div>
+                            <div class="cid-repart-cell" t-on-click="() => this.onSeeFactures('orange')">
+                                <CidStatusPill color="'orange'">Orange</CidStatusPill>
+                                <div class="cid-repart-cell__count" t-esc="state.repartitionStatut.orange"/>
+                                <div class="cid-repart-cell__pct"><t t-esc="Math.round(repartitionPct('orange'))"/>%</div>
+                            </div>
+                            <div class="cid-repart-cell" t-on-click="() => this.onSeeFactures('mauve')">
+                                <CidStatusPill color="'mauve'">Mauve</CidStatusPill>
+                                <div class="cid-repart-cell__count" t-esc="state.repartitionStatut.mauve"/>
+                                <div class="cid-repart-cell__pct"><t t-esc="Math.round(repartitionPct('mauve'))"/>%</div>
+                            </div>
+                            <div class="cid-repart-cell" t-on-click="() => this.onSeeFactures('rouge')">
+                                <CidStatusPill color="'rouge'">Rouge</CidStatusPill>
+                                <div class="cid-repart-cell__count" t-esc="state.repartitionStatut.rouge"/>
+                                <div class="cid-repart-cell__pct"><t t-esc="Math.round(repartitionPct('rouge'))"/>%</div>
+                            </div>
+                        </div>
+                    </t>
+                </CidCard>
+
+                <CidCard padded="false">
+                    <t t-set-slot="header">
+                        <span><i class="fa fa-warning text-danger"/> Top dossiers à risque</span>
+                    </t>
+                    <t t-if="state.loading">
+                        <div style="padding: 20px;">
+                            <CidSkeleton width="'100%'" height="'48px'" lines="3"/>
+                        </div>
+                    </t>
+                    <t t-elif="state.topDossiersRisque.length === 0">
+                        <CidEmptyState icon="'fa-thumbs-up'"
+                                       title="'Aucun dossier en retard'"
+                                       description="'Tout est sous contrôle 🎉'"/>
+                    </t>
+                    <t t-else="">
+                        <div class="cid-action-list">
+                            <t t-foreach="state.topDossiersRisque" t-as="d" t-key="d.id">
+                                <div class="cid-action-item" t-on-click="() => this.onDossierClick(d)">
+                                    <div class="cid-action-item__icon cid-action-item__icon--danger">
+                                        <i class="fa fa-folder-open"/>
+                                    </div>
+                                    <div class="cid-action-item__main">
+                                        <div class="cid-action-item__title" t-esc="d.name"/>
+                                        <div class="cid-action-item__sub">
+                                            <i class="fa fa-flag"/> <t t-esc="d.phase_courante"/>
+                                            · <t t-esc="d.nombre_factures"/> factures
+                                            · échéance <t t-esc="fmtDate(d.prochaine_echeance)"/>
+                                        </div>
+                                    </div>
+                                    <div class="cid-action-item__amount">
+                                        <t t-esc="fmtCompact(d.reste_a_recouvrer)"/>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </CidCard>
+            </div>
+
+        </div>
+    </t>
+
+</templates>

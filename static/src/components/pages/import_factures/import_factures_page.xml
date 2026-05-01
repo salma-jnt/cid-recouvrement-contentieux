@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- CORRECTION : owl="1" ajouté — obligatoire pour les templates de composants OWL -->
+    <t t-name="recouvrement_contentieux.ImportFacturesPage" owl="1">
+        <div class="cid-page cid-import-page">
+
+            <!-- ============ Page header ============ -->
+            <header class="cid-page__header">
+                <div>
+                    <h1 class="cid-page__title">Importer des factures</h1>
+                    <p class="cid-page__subtitle">
+                        Téléversez votre fichier Excel mensuel.
+                    </p>
+                </div>
+                <CidButton variant="'ghost'" icon="'fa-arrow-left'" onClick="() => this.onSeeFactures()">
+                    Toutes les factures
+                </CidButton>
+            </header>
+
+            <!-- ============ Main grid ============ -->
+            <div class="cid-import-page__grid">
+
+                <!-- Left column : drop + form -->
+                <div class="cid-import-page__col-main">
+                    <CidCard padded="true">
+                        <t t-set-slot="header">
+                            <span><i class="fa fa-cloud-upload"/> Fichier à importer</span>
+                            <CidBadge variant="'info'" subtle="true">.xlsx · .xls</CidBadge>
+                        </t>
+
+                        <CidDropzone
+                            accept="'.xlsx,.xls'"
+                            multiple="false"
+                            maxSizeMB="25"
+                            files="state.files"
+                            onFilesChanged="(f) => this.onFilesChanged(f)"
+                            title="'Glissez votre fichier Excel ici'"
+                            subtitle="'ou cliquez pour parcourir'"/>
+
+                        <div class="cid-form-group">
+                            <label for="mois_upload" class="cid-form-label">
+                                Mois d'upload
+                                <span class="cid-form-hint">— mois d'upload</span>
+                            </label>
+                            <input id="mois_upload"
+                                   class="cid-form-input"
+                                   type="month"
+                                   t-att-value="state.moisUpload"
+                                   t-on-change="onMoisChange"/>
+                        </div>
+
+                        <t t-set-slot="footer">
+                            <CidButton variant="'secondary'"
+                                       onClick="() => this.onReset()"
+                                       disabled="state.importing or state.files.length === 0">
+                                Réinitialiser
+                            </CidButton>
+                            <CidButton variant="'primary'"
+                                       icon="'fa-upload'"
+                                       loading="state.importing"
+                                       onClick="() => this.onImport()"
+                                       disabled="!canImport()">
+                                Importer
+                            </CidButton>
+                        </t>
+                    </CidCard>
+
+                    <!-- Result card -->
+                    <t t-if="state.result">
+                        <CidCard padded="true" accentBar="'success'">
+                            <t t-set-slot="header">
+                                <span><i class="fa fa-check-circle text-success"/> Importation terminée</span>
+                            </t>
+                            <div class="cid-import-summary">
+                                <div class="cid-import-summary__cell">
+                                    <div class="cid-import-summary__label">Créées</div>
+                                    <div class="cid-import-summary__value cid-import-summary__value--success">
+                                        <t t-esc="state.result.created || 0"/>
+                                    </div>
+                                </div>
+                                <div class="cid-import-summary__cell">
+                                    <div class="cid-import-summary__label">Mises à jour</div>
+                                    <div class="cid-import-summary__value cid-import-summary__value--info">
+                                        <t t-esc="state.result.updated || 0"/>
+                                    </div>
+                                </div>
+                                <div class="cid-import-summary__cell">
+                                    <div class="cid-import-summary__label">Verrouillées</div>
+                                    <div class="cid-import-summary__value cid-import-summary__value--danger">
+                                        <t t-esc="state.result.locked || 0"/>
+                                    </div>
+                                </div>
+                                <div class="cid-import-summary__cell">
+                                    <div class="cid-import-summary__label">Total traité</div>
+                                    <div class="cid-import-summary__value">
+                                        <t t-esc="state.result.total || 0"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <t t-if="state.result.errors and state.result.errors.length">
+                                <div class="cid-import-errors">
+                                    <h4>Erreurs détectées</h4>
+                                    <ul>
+                                        <t t-foreach="state.result.errors.slice(0, 10)" t-as="err" t-key="err_index">
+                                            <li t-esc="err"/>
+                                        </t>
+                                    </ul>
+                                </div>
+                            </t>
+                            <t t-set-slot="footer">
+                                <CidButton variant="'primary'" icon="'fa-list'"
+                                           onClick="() => this.onSeeFactures()">
+                                    Voir les factures
+                                </CidButton>
+                            </t>
+                        </CidCard>
+                    </t>
+                </div>
+
+            </div>
+        </div>
+    </t>
+
+</templates>

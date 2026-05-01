@@ -1,0 +1,96 @@
+/*
+ * ============================================================================
+ *  CID Recouvrement — feuille de styles principale
+ *  CORRECTION : tous les @import utilisent le chemin complet du module Odoo
+ *  (chemins relatifs avec "../" non supportés par le bundler Odoo 17+/19)
+ * ============================================================================
+ */
+
+@import "recouvrement_contentieux/static/src/scss/design_tokens";
+@import "recouvrement_contentieux/static/src/scss/mixins";
+
+/* ----- Composants UI ----- */
+@import "recouvrement_contentieux/static/src/components/ui/button/button";
+@import "recouvrement_contentieux/static/src/components/ui/badge/badge";
+@import "recouvrement_contentieux/static/src/components/ui/status_pill/status_pill";
+@import "recouvrement_contentieux/static/src/components/ui/card/card";
+@import "recouvrement_contentieux/static/src/components/ui/skeleton/skeleton";
+@import "recouvrement_contentieux/static/src/components/ui/empty_state/empty_state";
+@import "recouvrement_contentieux/static/src/components/ui/dialog/dialog";
+@import "recouvrement_contentieux/static/src/components/ui/toast/toast";
+@import "recouvrement_contentieux/static/src/components/ui/dropzone/dropzone";
+@import "recouvrement_contentieux/static/src/components/ui/stepper/stepper";
+@import "recouvrement_contentieux/static/src/components/ui/pagination/pagination";
+@import "recouvrement_contentieux/static/src/components/ui/kpi_card/kpi_card";
+
+/* ----- Chatbot ----- */
+@import "recouvrement_contentieux/static/src/components/chatbot/chatbot_fab";
+
+/* ----- Pages ----- */
+@import "recouvrement_contentieux/static/src/components/pages/import_factures/import_factures_page";
+@import "recouvrement_contentieux/static/src/components/pages/encaissement_lettrage/encaissement_lettrage_page";
+@import "recouvrement_contentieux/static/src/components/pages/dossier_detail/dossier_detail_page";
+@import "recouvrement_contentieux/static/src/components/pages/dashboard/dashboard";
+@import "recouvrement_contentieux/static/src/components/pages/action_execution/action_execution_page";
+
+/* ============================================================
+   FIX SCROLL — Pages OWL custom (Odoo 17)
+
+   Odoo 17 construit cette chaîne flex pour ses vues :
+
+   .o_action_manager (flex:1, min-height:0, overflow:hidden)
+     └── .o_action (flex col, height:100%)
+           └── .o_view_controller (flex:1, min-height:0)
+                 └── .o_content (overflow:hidden, height:100%)
+                       └── .cid-page  ← coupée ici
+
+   Problème : min-height:0 sur flex-child écrase la hauteur naturelle.
+   height:auto ne suffit pas — il faut casser le flex shrinking.
+   ============================================================ */
+
+.o_action_manager:has(.cid-page) {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    flex: 1 !important;
+}
+
+.o_action:has(.cid-page) {
+    display: block !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+}
+
+.o_view_controller:has(.cid-page),
+.o_action_container:has(.cid-page) {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+    flex: none !important;
+}
+
+.o_content:has(.cid-page) {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+    flex: none !important;
+}
+
+.cid-page {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+}
+
+.cid-lettrage__save-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+}
+
+/* Fallback Firefox < 121 */
+.o_client_action_container {
+    overflow-y: auto !important;
+    height: auto !important;
+    display: block !important;
+}

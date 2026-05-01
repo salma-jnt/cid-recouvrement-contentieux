@@ -1,0 +1,45 @@
+.cid-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: var(--cid-radius-full);
+    border: 1px solid transparent;
+    font-family: var(--cid-font-sans);
+    font-weight: var(--cid-weight-medium);
+    line-height: 1;
+    white-space: nowrap;
+
+    &--sm { padding: 4px 10px; font-size: var(--cid-text-xs); }
+    &--md { padding: 6px 14px; font-size: var(--cid-text-sm); }
+
+    &__dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    &--vert {
+        background: var(--cid-vert-soft);
+        color: var(--cid-vert-fg);
+        .cid-status-pill__dot { background: var(--cid-vert); }
+    }
+    &--orange {
+        background: var(--cid-orange-soft);
+        color: var(--cid-orange-fg);
+        .cid-status-pill__dot {
+            background: var(--cid-orange);
+            box-shadow: 0 0 0 0 currentColor;
+            animation: cid-pulse 2s infinite;
+        }
+    }
+    &--rouge {
+        background: var(--cid-rouge-soft);
+        color: var(--cid-rouge-fg);
+        .cid-status-pill__dot { background: var(--cid-rouge); }
+    }
+    &--mauve {
+        background: var(--cid-mauve-soft);
+        color: var(--cid-mauve-fg);
+        .cid-status-pill__dot { background: var(--cid-mauve); }
+    }
+}

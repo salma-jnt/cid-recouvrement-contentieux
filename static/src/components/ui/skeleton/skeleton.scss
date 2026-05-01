@@ -1,0 +1,24 @@
+.cid-skel {
+    background: linear-gradient(
+        90deg,
+        var(--cid-surface-alt) 0%,
+        #E8EDF3 50%,
+        var(--cid-surface-alt) 100%
+    );
+    background-size: 200% 100%;
+    animation: cid-shimmer 1.6s infinite linear;
+
+    &--circle             { border-radius: 50%; }
+    &--rounded-sm         { border-radius: var(--cid-radius-sm); }
+    &--rounded-md         { border-radius: var(--cid-radius-md); }
+    &--rounded-lg         { border-radius: var(--cid-radius-lg); }
+    &--rounded-full       { border-radius: var(--cid-radius-full); }
+}
+
+.cid-skel-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cid-space-2);
+
+    > .cid-skel:last-child { width: 70% !important; }
+}

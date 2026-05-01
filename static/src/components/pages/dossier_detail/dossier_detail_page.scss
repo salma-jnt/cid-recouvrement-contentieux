@@ -1,0 +1,189 @@
+.cid-dossier-page {
+    &__meta {
+        display: flex;
+        align-items: center;
+        gap: var(--cid-space-2);
+        margin-top: var(--cid-space-3);
+        font-size: var(--cid-text-sm);
+        color: var(--cid-text-muted);
+
+        i { color: var(--cid-primary-500); }
+    }
+
+    &__sep { color: var(--cid-text-faint); }
+
+    &__kpis {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: var(--cid-space-3);
+        margin-bottom: var(--cid-space-5);
+
+        @media (max-width: 1200px) {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        @media (max-width: 768px) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    &__phase-current {
+        font-size: var(--cid-text-sm);
+        color: var(--cid-text-muted);
+        strong { color: var(--cid-primary-600); font-weight: var(--cid-weight-semibold); }
+    }
+
+    &__client-groups {
+        display: flex;
+        flex-direction: column;
+        gap: var(--cid-space-4);
+    }
+}
+
+/* ============================================================
+   Shared : Tabs
+   ============================================================ */
+.cid-tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--cid-border);
+    margin: var(--cid-space-5) 0 var(--cid-space-4);
+    padding-bottom: 0;
+
+    &__item {
+        @include cid-reset-button;
+        padding: 10px 16px;
+        font-size: var(--cid-text-sm);
+        font-weight: var(--cid-weight-medium);
+        color: var(--cid-text-muted);
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+        transition: all var(--cid-trans-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+
+        &:hover { color: var(--cid-text); }
+
+        &.is-active {
+            color: var(--cid-primary-600);
+            border-bottom-color: var(--cid-primary-500);
+            font-weight: var(--cid-weight-semibold);
+        }
+    }
+
+    &__count {
+        background: var(--cid-surface-alt);
+        color: var(--cid-text-muted);
+        font-size: var(--cid-text-xs);
+        padding: 2px 8px;
+        border-radius: var(--cid-radius-full);
+        font-weight: var(--cid-weight-medium);
+    }
+
+    &__item.is-active &__count {
+        background: var(--cid-primary-500);
+        color: #fff;
+    }
+}
+
+/* ============================================================
+   Shared : table style SaaS
+   ============================================================ */
+.cid-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--cid-text-sm);
+    font-feature-settings: "tnum";
+
+    thead {
+        background: var(--cid-surface-alt);
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    th {
+        text-align: left;
+        padding: 10px 16px;
+        font-size: var(--cid-text-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-weight: var(--cid-weight-semibold);
+        color: var(--cid-text-muted);
+        border-bottom: 1px solid var(--cid-border);
+    }
+
+    td {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--cid-divider);
+        color: var(--cid-text-soft);
+        vertical-align: middle;
+    }
+
+    tbody tr {
+        transition: background var(--cid-trans-fast);
+        &:hover { background: var(--cid-surface-alt); }
+    }
+
+    tbody tr:last-child td { border-bottom: 0; }
+
+    &__num { text-align: right; }
+    &__actions {
+        text-align: right;
+        white-space: nowrap;
+
+        .cid-btn { margin-left: 4px; }
+    }
+
+    .cid-row-overdue {
+        background: var(--cid-rouge-soft);
+        &:hover { background: #FECACA; }
+    }
+}
+
+/* Client group header (inside cid-card __header) */
+.cid-client-group__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: var(--cid-space-4);
+
+    > div:first-child {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        i { color: var(--cid-primary-500); font-size: 20px; }
+        strong { color: var(--cid-text); }
+    }
+}
+
+.cid-client-group__totals {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--cid-text-sm);
+    color: var(--cid-text-muted);
+    font-weight: var(--cid-weight-normal);
+
+    strong { color: var(--cid-text); font-weight: var(--cid-weight-semibold); }
+    .text-danger { color: var(--cid-danger) !important; }
+    .text-success { color: var(--cid-success) !important; }
+}
+
+.cid-type-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    i {
+        width: 28px; height: 28px;
+        border-radius: var(--cid-radius-sm);
+        background: var(--cid-primary-50);
+        color: var(--cid-primary-500);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+    }
+}

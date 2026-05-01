@@ -1,0 +1,91 @@
+.cid-btn {
+    @include cid-reset-button;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cid-space-2);
+    font-family: var(--cid-font-sans);
+    font-weight: var(--cid-weight-medium);
+    line-height: 1;
+    border-radius: var(--cid-radius-md);
+    border: 1px solid transparent;
+    transition: all var(--cid-trans-fast);
+    user-select: none;
+    white-space: nowrap;
+
+    &:focus-visible { @include cid-focus-ring; }
+
+    &[disabled],
+    &--loading {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+    &--block {
+        display: flex;
+        width: 100%;
+    }
+
+    &__spinner i { font-size: 1em; }
+    &__icon { font-size: 0.95em; }
+
+    /* ----- Sizes ----- */
+    &--sm {
+        height: 30px;
+        padding: 0 12px;
+        font-size: var(--cid-text-sm);
+    }
+    &--md {
+        height: 38px;
+        padding: 0 16px;
+        font-size: var(--cid-text-base);
+    }
+    &--lg {
+        height: 46px;
+        padding: 0 22px;
+        font-size: var(--cid-text-md);
+        font-weight: var(--cid-weight-semibold);
+    }
+
+    /* ----- Variants ----- */
+    &--primary {
+        background: var(--cid-primary-500);
+        color: var(--cid-text-on-primary);
+        &:hover:not([disabled]) { background: var(--cid-primary-600); }
+        &:active:not([disabled]) { background: var(--cid-primary-700); }
+    }
+    &--accent {
+        background: var(--cid-accent-500);
+        color: var(--cid-text-on-primary);
+        &:hover:not([disabled]) { background: var(--cid-accent-600); }
+        &:active:not([disabled]) { background: var(--cid-accent-700); }
+        &:focus-visible { @include cid-focus-ring(var(--cid-focus-ring-accent)); }
+    }
+    &--secondary {
+        background: var(--cid-surface);
+        color: var(--cid-text);
+        border-color: var(--cid-border-strong);
+        &:hover:not([disabled]) {
+            background: var(--cid-surface-alt);
+            border-color: var(--cid-text-faint);
+        }
+    }
+    &--ghost {
+        background: transparent;
+        color: var(--cid-text-soft);
+        &:hover:not([disabled]) {
+            background: var(--cid-surface-alt);
+            color: var(--cid-text);
+        }
+    }
+    &--danger {
+        background: var(--cid-danger);
+        color: var(--cid-text-on-primary);
+        &:hover:not([disabled]) { filter: brightness(0.92); }
+    }
+    &--success {
+        background: var(--cid-success);
+        color: var(--cid-text-on-primary);
+        &:hover:not([disabled]) { filter: brightness(0.92); }
+    }
+}

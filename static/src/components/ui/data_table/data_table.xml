@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.CidDataTable">
+        <div class="cid-dt-wrapper">
+
+            <!-- ── Slot toolbar (filtres, boutons d'action, recherche) ── -->
+            <t t-if="props.slots and props.slots.toolbar">
+                <div class="cid-dt-toolbar">
+                    <t t-slot="toolbar"/>
+                </div>
+            </t>
+
+            <!-- ── Slot header-actions (actions de sélection, etc.) ── -->
+            <t t-if="someSelected and props.slots and props.slots.selection_actions">
+                <div class="cid-dt-selection-bar">
+                    <span class="cid-dt-selection-bar__count">
+                        <i class="fa fa-check-square-o"/> <t t-esc="selection.keys.size"/> sélectionné(s)
+                    </span>
+                    <div class="cid-dt-selection-bar__actions">
+                        <t t-slot="selection_actions"/>
+                    </div>
+                </div>
+            </t>
+
+            <!-- ── Tableau ── -->
+            <div class="cid-dt-scroll">
+                <table t-att-class="tableClasses">
+
+                    <!-- THEAD -->
+                    <thead class="cid-dt__head">
+                        <tr>
+                            <!-- Colonne checkbox -->
+                            <th t-if="props.selectable" class="cid-dt__th cid-dt__th--checkbox">
+                                <label class="cid-dt__checkbox">
+                                    <input type="checkbox"
+                                           t-att-checked="allSelected"
+                                           t-att-indeterminate="someSelected"
+                                           t-on-change="toggleAll"/>
+                                    <span class="cid-dt__checkbox-box"/>
+                                </label>
+                            </th>
+
+                            <!-- Colonnes de données -->
+                            <t t-foreach="props.columns" t-as="col" t-key="col.key or col_index">
+                                <th t-att-class="colHeaderClass(col)"
+                                    t-att-style="colStyle(col)"
+                                    t-on-click="() => this.onHeaderClick(col)">
+                                    <span class="cid-dt__th-inner">
+                                        <span class="cid-dt__th-label" t-esc="col.label"/>
+                                        <i t-if="(props.sortable or col.sortable) and col.key"
+                                           t-att-class="'fa cid-dt__sort-icon ' + sortIcon(col)"/>
+                                    </span>
+                                </th>
+                            </t>
+
+                            <!-- Colonne actions (optionnelle via slot) -->
+                            <th t-if="props.slots and props.slots.row_actions"
+                                class="cid-dt__th cid-dt__th--actions">
+                                <span class="cid-dt__th-label">Actions</span>
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <!-- TBODY — état chargement -->
+                    <tbody t-if="props.loading" class="cid-dt__body">
+                        <t t-foreach="skeletonRows" t-as="skel" t-key="skel_index">
+                            <tr class="cid-dt__row cid-dt__row--skeleton">
+                                <td t-if="props.selectable" class="cid-dt__td cid-dt__td--checkbox">
+                                    <div class="cid-dt__skel-cell"/>
+                                </td>
+                                <t t-foreach="props.columns" t-as="col" t-key="col.key or col_index">
+                                    <td class="cid-dt__td">
+                                        <CidSkeleton height="'14px'"
+                                                     t-att-width="col_index % 2 === 0 ? '80%' : '60%'"/>
+                                    </td>
+                                </t>
+                                <td t-if="props.slots and props.slots.row_actions"
+                                    class="cid-dt__td cid-dt__td--actions">
+                                    <CidSkeleton width="'60px'" height="'28px'"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+
+                    <!-- TBODY — état vide -->
+                    <tbody t-elif="isEmpty" class="cid-dt__body">
+                        <tr>
+                            <td t-att-colspan="props.columns.length
+                                               + (props.selectable ? 1 : 0)
+                                               + (props.slots and props.slots.row_actions ? 1 : 0)"
+                                class="cid-dt__td cid-dt__td--empty">
+                                <CidEmptyState
+                                    t-att-icon="props.emptyIcon"
+                                    t-att-title="props.emptyTitle"
+                                    t-att-description="props.emptyDescription"/>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <!-- TBODY — données -->
+                    <tbody t-else="" class="cid-dt__body">
+                        <t t-foreach="props.rows" t-as="row" t-key="row[props.rowKey] or row_index">
+                            <tr t-att-class="'cid-dt__row' + (isSelected(row) ? ' is-selected' : '')"
+                                t-on-click="(ev) => this.onRowClick(row, ev)">
+
+                                <!-- Checkbox -->
+                                <td t-if="props.selectable" class="cid-dt__td cid-dt__td--checkbox">
+                                    <label class="cid-dt__checkbox" t-on-click.stop="">
+                                        <input type="checkbox"
+                                               t-att-checked="isSelected(row)"
+                                               t-on-change="() => this.toggleRow(row)"/>
+                                        <span class="cid-dt__checkbox-box"/>
+                                    </label>
+                                </td>
+
+                                <!-- Cellules de données -->
+                                <t t-foreach="props.columns" t-as="col" t-key="col.key or col_index">
+                                    <td t-att-class="colCellClass(col)" t-att-style="colStyle(col)">
+                                        <!-- Rendu via slot nommé (ex: slot "cell_status") -->
+                                        <t t-if="col.render and props.slots and props.slots[col.render]">
+                                            <t t-slot="t-att-name=\"col.render\"" row="row" col="col"
+                                               value="row[col.key]"/>
+                                        </t>
+                                        <!-- Rendu texte par défaut -->
+                                        <t t-else="">
+                                            <span class="cid-dt__cell-text"
+                                                  t-esc="cellValue(row, col)"/>
+                                        </t>
+                                    </td>
+                                </t>
+
+                                <!-- Colonne actions -->
+                                <td t-if="props.slots and props.slots.row_actions"
+                                    class="cid-dt__td cid-dt__td--actions"
+                                    t-on-click.stop="">
+                                    <t t-slot="row_actions" row="row"/>
+                                </td>
+
+                            </tr>
+                        </t>
+                    </tbody>
+
+                </table>
+            </div>
+
+            <!-- ── Pagination ── -->
+            <t t-if="props.paginated and !isEmpty">
+                <CidPagination
+                    t-att-total="props.total or props.rows.length"
+                    t-att-page="props.page"
+                    t-att-pageSize="props.pageSize"
+                    t-att-pageSizeOptions="props.pageSizeOptions"
+                    onPageChange.bind="onPageChange"
+                    onPageSizeChange.bind="onPageSizeChange"/>
+            </t>
+
+        </div>
+    </t>
+
+</templates>

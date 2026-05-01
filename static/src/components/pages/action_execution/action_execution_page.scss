@@ -1,0 +1,222 @@
+.cid-action-page {
+    &__title-row {
+        display: flex;
+        align-items: center;
+        gap: var(--cid-space-3);
+        margin-top: var(--cid-space-3);
+    }
+
+    &__type-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--cid-radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: var(--cid-space-4);
+
+        @media (max-width: 1024px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    &__main {
+        display: flex;
+        flex-direction: column;
+        gap: var(--cid-space-4);
+    }
+
+    &__side {
+        display: flex;
+        flex-direction: column;
+        gap: var(--cid-space-4);
+    }
+
+    /* Contact card */
+    &__contact {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--cid-space-4);
+
+        @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+        }
+    }
+    &__contact-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    &__contact-label {
+        font-size: var(--cid-text-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--cid-text-muted);
+        font-weight: var(--cid-weight-medium);
+    }
+    &__contact-value {
+        font-size: var(--cid-text-md);
+        font-weight: var(--cid-weight-semibold);
+        color: var(--cid-primary-600);
+        text-decoration: none;
+        transition: color var(--cid-trans-fast);
+        &:hover { color: var(--cid-primary-500); text-decoration: underline; }
+    }
+
+    /* Script */
+    &__script {
+        font-size: var(--cid-text-base);
+        line-height: var(--cid-leading-relaxed);
+        color: var(--cid-text-soft);
+        background: var(--cid-surface-alt);
+        border-left: 3px solid var(--cid-primary-500);
+        padding: var(--cid-space-4) var(--cid-space-5);
+        border-radius: var(--cid-radius-md);
+
+        p { margin: 0 0 var(--cid-space-3); }
+        p:last-child { margin-bottom: 0; }
+
+        ul {
+            margin: 0 0 var(--cid-space-3);
+            padding-left: var(--cid-space-6);
+            li { margin-bottom: 4px; }
+        }
+    }
+
+    /* Qualify buttons */
+    &__qualify-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--cid-space-3);
+
+        @media (max-width: 600px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Side : factures */
+    &__factures {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__facture {
+        display: flex;
+        align-items: center;
+        gap: var(--cid-space-2);
+        padding: var(--cid-space-3) var(--cid-space-4);
+        border-bottom: 1px solid var(--cid-divider);
+        &:last-child { border-bottom: 0; }
+    }
+    &__facture-main {
+        flex: 1;
+        min-width: 0;
+        strong { font-size: var(--cid-text-sm); display: block; @include cid-truncate(1); }
+    }
+    &__facture-sub {
+        font-size: var(--cid-text-xs);
+        color: var(--cid-text-muted);
+        margin-top: 2px;
+    }
+    &__facture-amount {
+        font-weight: var(--cid-weight-semibold);
+        color: var(--cid-danger);
+        font-feature-settings: "tnum";
+        font-size: var(--cid-text-sm);
+        &.is-paid { color: var(--cid-text-faint); text-decoration: line-through; }
+    }
+
+    /* Side : history */
+    &__history { display: flex; flex-direction: column; }
+    &__history-item {
+        display: flex;
+        gap: var(--cid-space-3);
+        padding: var(--cid-space-3) var(--cid-space-4);
+        border-bottom: 1px solid var(--cid-divider);
+        &:last-child { border-bottom: 0; }
+    }
+    &__history-main { flex: 1; min-width: 0; }
+    &__history-title {
+        font-size: var(--cid-text-sm);
+        font-weight: var(--cid-weight-medium);
+        color: var(--cid-text);
+        @include cid-truncate(1);
+    }
+    &__history-sub {
+        font-size: var(--cid-text-xs);
+        color: var(--cid-text-muted);
+        margin-top: 2px;
+    }
+}
+
+/* Qualify button — style commun */
+.cid-qualify-btn {
+    @include cid-reset-button;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: var(--cid-space-4) var(--cid-space-4);
+    border-radius: var(--cid-radius-lg);
+    border: 2px solid transparent;
+    text-align: left;
+    transition: all var(--cid-trans-base);
+    cursor: pointer;
+
+    i {
+        font-size: 22px;
+        margin-bottom: 4px;
+    }
+    strong {
+        font-size: var(--cid-text-md);
+        font-weight: var(--cid-weight-semibold);
+    }
+    span {
+        font-size: var(--cid-text-xs);
+        color: inherit;
+        opacity: 0.85;
+    }
+
+    &:hover:not([disabled]) {
+        transform: translateY(-1px);
+        box-shadow: var(--cid-shadow-md);
+    }
+    &[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+    &--success {
+        background: var(--cid-vert-soft);
+        color: var(--cid-vert-fg);
+        &:hover:not([disabled]) { border-color: var(--cid-success); background: #BBF7D0; }
+    }
+    &--info {
+        background: var(--cid-primary-50);
+        color: var(--cid-primary-700);
+        &:hover:not([disabled]) { border-color: var(--cid-primary-500); background: var(--cid-primary-100); }
+    }
+    &--warning {
+        background: var(--cid-orange-soft);
+        color: var(--cid-orange-fg);
+        &:hover:not([disabled]) { border-color: var(--cid-warning); background: #FDE68A; }
+    }
+    &--danger {
+        background: var(--cid-rouge-soft);
+        color: var(--cid-rouge-fg);
+        &:hover:not([disabled]) { border-color: var(--cid-danger); background: #FECACA; }
+    }
+}
+
+.cid-form-input--textarea {
+    height: auto;
+    padding: var(--cid-space-3);
+    resize: vertical;
+    min-height: 90px;
+    line-height: var(--cid-leading-relaxed);
+    font-family: var(--cid-font-sans);
+}

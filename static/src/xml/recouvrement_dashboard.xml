@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="recouvrement_contentieux.RecouvrementSidebar">
+        <t t-if="isVisible">
+            <aside class="o_recouvrement_floating_sidebar">
+                <div class="o_recouvrement_sidebar_brand">
+                    <div class="o_recouvrement_brand_title">Recouvrement</div>
+                    <div class="o_recouvrement_brand_subtitle">Navigation rapide</div>
+                </div>
+
+                <t t-foreach="sections" t-as="section" t-key="section.title">
+                    <div class="o_recouvrement_sidebar_section">
+                        <div class="o_recouvrement_sidebar_section_title" t-esc="section.title"/>
+                        <t t-foreach="section.items" t-as="item" t-key="item.actionXmlId">
+                            <button type="button" class="o_recouvrement_nav_item" t-on-click="() => this.openAction(item.actionXmlId)">
+                                <i t-att-class="`fa ${item.icon}`"/>
+                                <span t-esc="item.label"/>
+                            </button>
+                        </t>
+                    </div>
+                </t>
+            </aside>
+        </t>
+    </t>
+
+    <t t-name="recouvrement_contentieux.RecouvrementDashboard">
+        <div class="o_recouvrement_dashboard">
+            <section class="o_recouvrement_dashboard_content">
+                <div class="o_rcv_filter_row">
+                    <div class="o_rcv_filter_item">
+                        <label>Période</label>
+                        <input type="date" class="o_rcv_filter_input" t-att-value="state.dateFrom || ''" t-on-change="onDateFromChange"/>
+                    </div>
+                    <div class="o_rcv_filter_item">
+                        <label>Période fin</label>
+                        <input type="date" class="o_rcv_filter_input" t-att-value="state.dateTo || ''" t-on-change="onDateToChange"/>
+                    </div>
+                    <div class="o_rcv_filter_item">
+                        <label>Filtrer par</label>
+                        <select class="o_rcv_filter_input" t-att-value="state.selectedScope" t-on-change="onScopeChange">
+                            <option value="dossiers">Dossiers</option>
+                            <option value="factures">Factures</option>
+                        </select>
+                    </div>
+                    <div class="o_rcv_filter_item">
+                        <label>Statut</label>
+                        <select class="o_rcv_filter_input" t-att-value="state.selectedStatus" t-on-change="onStatusChange">
+                            <option value="all">Tous</option>
+                            <option value="draft">Normal</option>
+                            <option value="open">En retard</option>
+                            <option value="late">Contentieux</option>
+                            <option value="blocked">Bloqué</option>
+                            <option value="closed">Payé</option>
+                        </select>
+                    </div>
+                    <div class="o_rcv_filter_item">
+                        <label>Commercial</label>
+                        <select class="o_rcv_filter_input" t-att-value="state.selectedCommercial" t-on-change="onCommercialChange">
+                            <t t-foreach="state.commercialOptions" t-as="option" t-key="option.id">
+                                <option t-att-value="option.id" t-esc="option.name"/>
+                            </t>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-primary o_rcv_refresh_btn" t-on-click="() => this.loadDashboard()">Actualiser</button>
+                </div>
+
+                <div class="o_rcv_kpi_grid">
+                    <t t-if="state.loading">
+                        <div class="o_rcv_kpi_card">Chargement...</div>
+                    </t>
+                    <t t-else="" t-foreach="state.kpis" t-as="kpi" t-key="kpi.label">
+                        <button type="button" class="o_rcv_kpi_card" t-on-click="() => this.openAction(kpi.actionXmlId)">
+                            <div class="o_rcv_kpi_icon">
+                                <i t-att-class="`fa ${kpi.icon}`"/>
+                            </div>
+                            <div class="o_rcv_kpi_text">
+                                <div class="o_rcv_kpi_label" t-esc="kpi.label"/>
+                                <div class="o_rcv_kpi_value" t-esc="kpi.value"/>
+                                <div class="o_rcv_kpi_sub" t-esc="kpi.subLabel"/>
+                            </div>
+                        </button>
+                    </t>
+                </div>
+
+                <div class="o_rcv_middle_grid">
+                    <div class="o_rcv_panel o_rcv_agenda_panel">
+                        <div class="o_rcv_panel_title">Aujourd'hui</div>
+                        <t t-if="state.todayAgenda.length">
+                            <t t-foreach="state.todayAgenda" t-as="item" t-key="item.id">
+                                <div class="o_rcv_agenda_row">
+                                    <div class="o_rcv_agenda_time" t-esc="item.time"/>
+                                    <div class="o_rcv_agenda_content">
+                                        <div class="o_rcv_agenda_title" t-esc="item.title"/>
+                                        <div class="o_rcv_agenda_note" t-esc="item.note"/>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                        <div t-else="" class="o_recouvrement_empty">Aucune action planifiee aujourd'hui.</div>
+                    </div>
+
+                    <div class="o_rcv_panel o_rcv_week_panel">
+                        <div class="o_rcv_panel_title">Cette semaine</div>
+                        <t t-if="state.weekAgenda.length">
+                            <t t-foreach="state.weekAgenda" t-as="item" t-key="item.id">
+                                <div class="o_rcv_week_row">
+                                    <span t-esc="item.day"/>
+                                    <strong t-esc="item.count"/>
+                                </div>
+                            </t>
+                        </t>
+                        <div t-else="" class="o_recouvrement_empty">Aucune action cette semaine.</div>
+                    </div>
+
+                    <div class="o_rcv_panel o_rcv_status_panel">
+                        <div class="o_rcv_panel_title">Répartition par statut</div>
+                        <div class="o_rcv_status_wrap">
+                            <div class="o_rcv_donut" t-att-style="state.donutStyle">
+                                <div>
+                                    <small>Total</small>
+                                    <strong t-esc="state.totalStatus"/>
+                                </div>
+                            </div>
+                            <div class="o_rcv_status_legend">
+                                <t t-if="state.loading">
+                                    <div>Chargement...</div>
+                                </t>
+                                <t t-else="" t-foreach="state.statusBreakdown" t-as="item" t-key="item.label">
+                                    <div class="o_rcv_legend_row">
+                                        <span t-att-class="`o_rcv_dot o_rcv_dot_${item.tone}`"/>
+                                        <span t-esc="item.label"/>
+                                        <strong t-esc="item.value"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="o_rcv_bottom_grid">
+                    <div class="o_rcv_panel o_rcv_table_panel">
+                        <div class="o_rcv_panel_title">Derniers dossiers</div>
+                        <div class="o_rcv_table_wrap">
+                            <table class="o_rcv_table">
+                                <thead>
+                                    <tr>
+                                        <th>N° Dossier</th>
+                                        <th>Client</th>
+                                        <th>Montant</th>
+                                        <th>Échéance</th>
+                                        <th>Statut</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-if="state.dossierRows.length">
+                                        <t t-foreach="state.dossierRows" t-as="item" t-key="item.id">
+                                            <tr>
+                                                <td t-esc="item.name"/>
+                                                <td t-esc="item.client"/>
+                                                <td t-esc="item.montant"/>
+                                                <td t-esc="item.date"/>
+                                                <td>
+                                                    <span t-att-class="`o_rcv_status_badge o_rcv_status_badge_${item.tone}`" t-esc="item.status"/>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-light btn-sm" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_recouvrement')">Voir</button>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </tbody>
+                            </table>
+                            <div t-if="!state.dossierRows.length" class="o_recouvrement_empty">Aucun dossier disponible.</div>
+                        </div>
+                    </div>
+
+                    <div class="o_rcv_panel o_rcv_actions_panel">
+                        <div class="o_rcv_panel_title">Actions rapides</div>
+                        <div class="o_rcv_actions_grid">
+                            <button type="button" class="btn o_rcv_btn_primary" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_facture')">Nouvelle facture</button>
+                            <button type="button" class="btn o_rcv_btn_orange" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_email')">Lancer relance</button>
+                            <button type="button" class="btn o_rcv_btn_primary" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_recouvrement')">Créer dossier</button>
+                            <button type="button" class="btn o_rcv_btn_outline" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_appel')">Journal des appels</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="o_recouvrement_status_panel" style="display:none;">
+                    <div class="o_recouvrement_panel_header">
+                        <h3>Répartition par statut</h3>
+                        <button type="button" class="btn btn-link" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_recouvrement')">Voir les dossiers</button>
+                    </div>
+                    <div class="o_recouvrement_status_grid">
+                        <t t-if="state.loading">
+                            <div class="o_recouvrement_status_card">Chargement...</div>
+                        </t>
+                        <t t-else="" t-foreach="state.statusBreakdown" t-as="item" t-key="item.label">
+                            <button type="button" t-att-class="`o_recouvrement_status_card o_recouvrement_status_${item.tone}`" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_recouvrement')">
+                                <span class="o_recouvrement_status_value" t-esc="item.value"/>
+                                <span class="o_recouvrement_status_label" t-esc="item.label"/>
+                            </button>
+                        </t>
+                    </div>
+                </div>
+
+                <div class="o_recouvrement_shortcuts" style="display:none;">
+                    <button type="button" class="o_recouvrement_shortcut" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_recouvrement')">
+                        <i class="fa fa-folder-open-o"/>
+                        <span>Dossiers de recouvrement</span>
+                    </button>
+                    <button type="button" class="o_recouvrement_shortcut" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_import_factures')">
+                        <i class="fa fa-upload"/>
+                        <span>Importer des factures</span>
+                    </button>
+                </div>
+
+                <div class="o_recouvrement_panels" style="display:none;">
+                    <div class="o_recouvrement_panel">
+                        <div class="o_recouvrement_panel_header">
+                            <h3>Factures récentes</h3>
+                            <button type="button" class="btn btn-link" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_facture')">Voir tout</button>
+                        </div>
+                        <t t-if="state.recentFactures.length">
+                            <t t-foreach="state.recentFactures" t-as="item" t-key="item.id">
+                                <div class="o_recouvrement_panel_row">
+                                    <div>
+                                        <strong t-esc="item.name"/>
+                                        <div class="text-muted" t-esc="item.client"/>
+                                    </div>
+                                    <div class="text-end">
+                                        <div t-esc="item.montant"/>
+                                        <div class="text-muted" t-esc="item.depot"/>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                        <div t-else="" class="o_recouvrement_empty">Aucune facture à afficher.</div>
+                    </div>
+
+                    <div class="o_recouvrement_panel">
+                        <div class="o_recouvrement_panel_header">
+                            <h3>Dossiers en retard</h3>
+                            <button type="button" class="btn btn-link" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_recouvrement')">Voir tout</button>
+                        </div>
+                        <t t-if="state.lateRecouvrements.length">
+                            <t t-foreach="state.lateRecouvrements" t-as="item" t-key="item.id">
+                                <div class="o_recouvrement_panel_row">
+                                    <div>
+                                        <strong t-esc="item.name"/>
+                                        <div class="text-muted" t-esc="item.client"/>
+                                    </div>
+                                    <div class="text-end">
+                                        <div t-esc="item.montant"/>
+                                        <div class="text-danger">Échéance : <t t-esc="item.nextAction"/></div>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                        <div t-else="" class="o_recouvrement_empty">Aucun dossier en retard.</div>
+                    </div>
+
+
+                    <div class="o_recouvrement_panel">
+                        <div class="o_recouvrement_panel_header">
+                            <h3>Encaissements récents</h3>
+                            <button type="button" class="btn btn-link" t-on-click="() => this.openAction('recouvrement_contentieux.action_recouvrement_encaissement')">Voir tout</button>
+                        </div>
+                        <t t-if="state.recentEncaissements.length">
+                            <t t-foreach="state.recentEncaissements" t-as="item" t-key="item.id">
+                                <div class="o_recouvrement_panel_row">
+                                    <div>
+                                        <strong t-esc="item.name"/>
+                                        <div class="text-muted" t-esc="item.facture"/>
+                                    </div>
+                                    <div class="text-end">
+                                        <div t-esc="item.montant"/>
+                                        <div class="text-muted" t-esc="item.date"/>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                        <div t-else="" class="o_recouvrement_empty">Aucun encaissement récent.</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </t>
+</templates>

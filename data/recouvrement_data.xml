@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- ================================================================
+             PROCÉDURES DE RECOUVREMENT (stratégies)
+        ===================================================================== -->
+        <record id="procedure_standard" model="recouvrement.procedure">
+            <field name="name">Procédure Standard</field>
+            <field name="code">STANDARD</field>
+            <field name="description">Procédure standard reprenant l'exemple du cahier de charge : contact initial, suivi avant échéance, relances téléphoniques (1 puis 2), relances écrites (1 puis 2), mise en demeure.</field>
+        </record>
+
+        <record id="procedure_grands_comptes" model="recouvrement.procedure">
+            <field name="name">Procédure Grands Comptes</field>
+            <field name="code">GRANDS_COMPTES</field>
+            <field name="description">Délais plus longs adaptés aux grands comptes.</field>
+        </record>
+
+        <record id="procedure_contentieux" model="recouvrement.procedure">
+            <field name="name">Procédure Contentieux</field>
+            <field name="code">CONTENTIEUX</field>
+            <field name="description">Procédure renforcée pour cas difficiles, accélérée vers la mise en demeure.</field>
+        </record>
+
+        <!-- ================================================================
+             TYPES DE CLIENTS
+        ===================================================================== -->
+        <record id="type_client_standard" model="recouvrement.client.type">
+            <field name="name">Client standard</field>
+            <field name="code">STANDARD</field>
+            <field name="procedure_id" ref="procedure_standard"/>
+        </record>
+
+        <record id="type_client_grands_comptes" model="recouvrement.client.type">
+            <field name="name">Grands comptes</field>
+            <field name="code">GRANDS_COMPTES</field>
+            <field name="procedure_id" ref="procedure_grands_comptes"/>
+        </record>
+
+        <record id="type_client_contentieux" model="recouvrement.client.type">
+            <field name="name">Contentieux</field>
+            <field name="code">CONTENTIEUX</field>
+            <field name="procedure_id" ref="procedure_contentieux"/>
+        </record>
+
+        <!-- ================================================================
+             MODÈLES D'ACTIONS — STRATÉGIE STANDARD (exemple du cahier de charge)
+             Séquence | Nom                                  | Type      | Délai | Statut
+             1        | Premier contact avec le client       | appel     | 7     | vert
+             2        | Deuxième contact avant échéance      | appel     | 14    | vert
+             3        | Premier appel de relance             | appel     | 30    | mauve
+             4        | Deuxième appel de relance            | appel     | 45    | (rouge)
+             5        | Première relance par écrit           | courrier  | 75    | (rouge)
+             6        | Deuxième relance par écrit           | courrier  | 165   | (rouge)
+             7        | Décision sur l'action / MED          | mise_en_demeure | 345 | (rouge)
+        ===================================================================== -->
+        <record id="template_phase_1_standard" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_standard"/>
+            <field name="sequence">10</field>
+            <field name="name">Premier contact avec le client</field>
+            <field name="action_type">appel</field>
+            <field name="delay">7</field>
+            <field name="statut_interface_cible">vert</field>
+            <field name="description">Par téléphone, 1 semaine après la réception, pour confirmer la bonne réception et l'approbation de la facture.</field>
+        </record>
+
+        <record id="template_phase_2_standard" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_standard"/>
+            <field name="sequence">20</field>
+            <field name="name">Deuxième contact avant échéance</field>
+            <field name="action_type">appel</field>
+            <field name="delay">14</field>
+            <field name="statut_interface_cible">vert</field>
+            <field name="description">Suivi régulier avant l'échéance pour obtenir le service fait ou lever les blocages techniques côté client.</field>
+        </record>
+
+        <record id="template_phase_3_standard" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_standard"/>
+            <field name="sequence">30</field>
+            <field name="name">Premier appel de relance</field>
+            <field name="action_type">appel</field>
+            <field name="delay">30</field>
+            <field name="statut_interface_cible">mauve</field>
+            <field name="description">Par téléphone, à la fin du mois de l'échéance si le virement n'est pas reçu.</field>
+        </record>
+
+        <record id="template_phase_4_standard" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_standard"/>
+            <field name="sequence">40</field>
+            <field name="name">Deuxième appel de relance</field>
+            <field name="action_type">appel</field>
+            <field name="delay">45</field>
+            <field name="statut_interface_cible">rouge</field>
+            <field name="description">Par téléphone, 15 jours après la première relance si aucun virement n'est constaté.</field>
+        </record>
+
+        <record id="template_phase_5_standard" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_standard"/>
+            <field name="sequence">50</field>
+            <field name="name">Première relance par écrit</field>
+            <field name="action_type">courrier</field>
+            <field name="delay">75</field>
+            <field name="statut_interface_cible">rouge</field>
+            <field name="description">Lettre envoyée par email et courrier papier, 1 mois après le dernier appel de relance.</field>
+            <field name="email_subject_template">Relance écrite — Facture en attente</field>
+            <field name="email_body_template"><![CDATA[
+<p>Bonjour,</p>
+<p>Sauf erreur de notre part, votre règlement reste en attente concernant la (les) facture(s) dont les références figurent ci-dessous.</p>
+<p>Nous vous remercions de bien vouloir procéder au règlement dans les meilleurs délais.</p>
+<p>Cordialement,<br/>Service Recouvrement — CID Développement</p>
+]]></field>
+        </record>
+
+        <record id="template_phase_6_standard" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_standard"/>
+            <field name="sequence">60</field>
+            <field name="name">Deuxième relance par écrit</field>
+            <field name="action_type">courrier</field>
+            <field name="delay">165</field>
+            <field name="statut_interface_cible">rouge</field>
+            <field name="description">Deuxième courrier de relance, 3 mois après la première lettre.</field>
+        </record>
+
+        <record id="template_phase_7_standard" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_standard"/>
+            <field name="sequence">70</field>
+            <field name="name">Décision sur l'action à prendre / mise en demeure</field>
+            <field name="action_type">mise_en_demeure</field>
+            <field name="delay">345</field>
+            <field name="statut_interface_cible">rouge</field>
+            <field name="description">Décider de poursuivre les relances ou d'envoyer une mise en demeure, 6 mois après la dernière lettre.</field>
+            <field name="email_subject_template">MISE EN DEMEURE — Règlement de facture</field>
+        </record>
+
+        <!-- ================================================================
+             MODÈLES D'ACTIONS — GRANDS COMPTES
+        ===================================================================== -->
+        <record id="template_phase_1_gc" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_grands_comptes"/>
+            <field name="sequence">10</field>
+            <field name="name">Contact initial Grand Compte</field>
+            <field name="action_type">appel</field>
+            <field name="delay">14</field>
+            <field name="statut_interface_cible">vert</field>
+        </record>
+        <record id="template_phase_2_gc" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_grands_comptes"/>
+            <field name="sequence">20</field>
+            <field name="name">Relance Grand Compte 1</field>
+            <field name="action_type">appel</field>
+            <field name="delay">30</field>
+            <field name="statut_interface_cible">mauve</field>
+        </record>
+        <record id="template_phase_3_gc" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_grands_comptes"/>
+            <field name="sequence">30</field>
+            <field name="name">Courrier formel</field>
+            <field name="action_type">courrier</field>
+            <field name="delay">60</field>
+            <field name="statut_interface_cible">rouge</field>
+        </record>
+
+        <!-- ================================================================
+             MODÈLES D'ACTIONS — CONTENTIEUX
+        ===================================================================== -->
+        <record id="template_phase_1_ctx" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_contentieux"/>
+            <field name="sequence">10</field>
+            <field name="name">Premier appel ferme</field>
+            <field name="action_type">appel</field>
+            <field name="delay">7</field>
+            <field name="statut_interface_cible">mauve</field>
+        </record>
+        <record id="template_phase_2_ctx" model="recouvrement.action.template">
+            <field name="procedure_id" ref="procedure_contentieux"/>
+            <field name="sequence">20</field>
+            <field name="name">Mise en demeure rapide</field>
+            <field name="action_type">mise_en_demeure</field>
+            <field name="delay">15</field>
+            <field name="statut_interface_cible">rouge</field>
+        </record>
+    </data>
+</odoo>

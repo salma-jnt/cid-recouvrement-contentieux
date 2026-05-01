@@ -1,0 +1,38 @@
+.cid-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--cid-font-sans);
+    font-weight: var(--cid-weight-medium);
+    line-height: 1;
+    border-radius: var(--cid-radius-full);
+    border: 1px solid transparent;
+    white-space: nowrap;
+
+    &--sm { padding: 3px 9px; font-size: var(--cid-text-xs); }
+    &--md { padding: 5px 12px; font-size: var(--cid-text-sm); }
+
+    /* Solid variants */
+    &--solid {
+        &.cid-badge--primary { background: var(--cid-primary-500); color: #fff; }
+        &.cid-badge--accent  { background: var(--cid-accent-500); color: #fff; }
+        &.cid-badge--success { background: var(--cid-success); color: #fff; }
+        &.cid-badge--warning { background: var(--cid-warning); color: #fff; }
+        &.cid-badge--danger  { background: var(--cid-danger); color: #fff; }
+        &.cid-badge--info    { background: var(--cid-info); color: #fff; }
+        &.cid-badge--mauve   { background: var(--cid-mauve); color: #fff; }
+        &.cid-badge--neutral { background: var(--cid-text); color: #fff; }
+    }
+
+    /* Subtle variants (soft pastel background, dark text) */
+    &--subtle {
+        &.cid-badge--primary { background: var(--cid-primary-50); color: var(--cid-primary-700); border-color: var(--cid-primary-100); }
+        &.cid-badge--accent  { background: var(--cid-accent-50); color: var(--cid-accent-700); border-color: var(--cid-accent-100); }
+        &.cid-badge--success { background: var(--cid-vert-soft); color: var(--cid-vert-fg); }
+        &.cid-badge--warning { background: var(--cid-orange-soft); color: var(--cid-orange-fg); }
+        &.cid-badge--danger  { background: var(--cid-rouge-soft); color: var(--cid-rouge-fg); }
+        &.cid-badge--info    { background: var(--cid-primary-50); color: var(--cid-primary-700); }
+        &.cid-badge--mauve   { background: var(--cid-mauve-soft); color: var(--cid-mauve-fg); }
+        &.cid-badge--neutral { background: var(--cid-surface-alt); color: var(--cid-text-soft); }
+    }
+}

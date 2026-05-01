@@ -1,0 +1,283 @@
+/* ============================================================
+   Floating Action Button
+   ============================================================ */
+.cid-chatbot-fab {
+    @include cid-reset-button;
+    position: fixed;
+    bottom: var(--cid-space-6);
+    right: var(--cid-space-6);
+    z-index: var(--cid-z-fab);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cid-primary-500) 0%, var(--cid-primary-600) 100%);
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(30, 77, 140, 0.32),
+                0 4px 8px rgba(30, 77, 140, 0.20);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--cid-trans-base);
+
+    &__icon {
+        font-size: 22px;
+        transition: transform var(--cid-trans-base);
+    }
+
+    &__pulse {
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        border: 2px solid var(--cid-accent-500);
+        animation: cid-fab-pulse 2.4s ease-out infinite;
+        pointer-events: none;
+    }
+
+    &:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 12px 32px rgba(30, 77, 140, 0.40),
+                    0 6px 12px rgba(30, 77, 140, 0.24);
+    }
+
+    &.is-open {
+        background: var(--cid-text);
+        .cid-chatbot-fab__icon { transform: rotate(90deg); }
+    }
+}
+
+@keyframes cid-fab-pulse {
+    0%   { opacity: 0.8; transform: scale(1); }
+    100% { opacity: 0;   transform: scale(1.6); }
+}
+
+/* ============================================================
+   Chat panel
+   ============================================================ */
+.cid-chatbot-panel {
+    position: fixed;
+    bottom: calc(var(--cid-space-6) + 76px);
+    right: var(--cid-space-6);
+    z-index: var(--cid-z-fab);
+    width: 400px;
+    max-width: calc(100vw - 32px);
+    height: 580px;
+    max-height: calc(100vh - 140px);
+    background: var(--cid-surface);
+    border: 1px solid var(--cid-border);
+    border-radius: var(--cid-radius-2xl);
+    box-shadow: var(--cid-shadow-xl);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: cid-slide-in-up 240ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    &__header {
+        padding: var(--cid-space-4);
+        background: linear-gradient(135deg, var(--cid-primary-500) 0%, var(--cid-primary-600) 100%);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &__brand {
+        display: flex;
+        align-items: center;
+        gap: var(--cid-space-3);
+    }
+
+    &__avatar {
+        width: 38px; height: 38px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.18);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 16px;
+    }
+
+    &__title {
+        font-size: var(--cid-text-md);
+        font-weight: var(--cid-weight-semibold);
+        line-height: 1.2;
+    }
+    &__subtitle {
+        font-size: var(--cid-text-xs);
+        opacity: 0.85;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    &__dot {
+        width: 7px; height: 7px;
+        background: var(--cid-vert);
+        border-radius: 50%;
+        box-shadow: 0 0 0 0 var(--cid-vert);
+        animation: cid-fab-pulse-dot 1.8s infinite;
+    }
+
+    &__close {
+        @include cid-reset-button;
+        color: #fff;
+        opacity: 0.85;
+        width: 32px; height: 32px;
+        border-radius: var(--cid-radius-md);
+        display: flex; align-items: center; justify-content: center;
+        transition: background var(--cid-trans-fast);
+        &:hover { background: rgba(255, 255, 255, 0.15); opacity: 1; }
+    }
+
+    &__messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: var(--cid-space-4);
+        display: flex;
+        flex-direction: column;
+        gap: var(--cid-space-3);
+        background: var(--cid-bg);
+        @include cid-scrollbar;
+    }
+
+    &__suggestions {
+        padding: 0 var(--cid-space-4) var(--cid-space-3);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        background: var(--cid-bg);
+        border-bottom: 1px solid var(--cid-divider);
+    }
+
+    &__input {
+        padding: var(--cid-space-3) var(--cid-space-4);
+        background: var(--cid-surface);
+        border-top: 1px solid var(--cid-divider);
+        display: flex;
+        align-items: flex-end;
+        gap: var(--cid-space-2);
+
+        textarea {
+            flex: 1;
+            resize: none;
+            border: 1px solid var(--cid-border);
+            border-radius: var(--cid-radius-md);
+            padding: 9px 12px;
+            font-family: var(--cid-font-sans);
+            font-size: var(--cid-text-sm);
+            color: var(--cid-text);
+            background: var(--cid-surface-alt);
+            min-height: 38px;
+            max-height: 120px;
+            outline: none;
+            transition: border-color var(--cid-trans-fast), box-shadow var(--cid-trans-fast);
+            &:focus {
+                border-color: var(--cid-primary-400);
+                background: var(--cid-surface);
+                @include cid-focus-ring;
+            }
+        }
+    }
+
+    &__send {
+        @include cid-reset-button;
+        width: 38px; height: 38px;
+        border-radius: var(--cid-radius-md);
+        background: var(--cid-primary-500);
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        transition: all var(--cid-trans-fast);
+        &:hover:not([disabled]) { background: var(--cid-primary-600); }
+        &[disabled] { opacity: 0.4; cursor: not-allowed; }
+    }
+}
+
+@keyframes cid-fab-pulse-dot {
+    0%   { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70%  { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* ============================================================
+   Chat messages
+   ============================================================ */
+.cid-chat-msg {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    animation: cid-fade-in 200ms ease;
+
+    &--user {
+        flex-direction: row-reverse;
+    }
+
+    &__avatar {
+        width: 28px; height: 28px;
+        border-radius: 50%;
+        background: var(--cid-primary-500);
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+
+    &__bubble {
+        max-width: 80%;
+        padding: 10px 14px;
+        border-radius: var(--cid-radius-lg);
+        font-size: var(--cid-text-sm);
+        line-height: var(--cid-leading-normal);
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    &--user &__bubble {
+        background: var(--cid-primary-500);
+        color: #fff;
+        border-bottom-right-radius: 4px;
+    }
+    &--assistant &__bubble {
+        background: var(--cid-surface);
+        color: var(--cid-text);
+        border: 1px solid var(--cid-border);
+        border-bottom-left-radius: 4px;
+    }
+    &--error &__bubble {
+        background: var(--cid-rouge-soft);
+        border-color: var(--cid-rouge);
+        color: var(--cid-rouge-fg);
+    }
+
+    /* Typing animation */
+    &__bubble--typing {
+        display: inline-flex;
+        gap: 4px;
+        padding: 14px 16px;
+        span {
+            display: inline-block;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--cid-text-faint);
+            animation: cid-typing 1.2s infinite;
+        }
+        span:nth-child(2) { animation-delay: 0.15s; }
+        span:nth-child(3) { animation-delay: 0.30s; }
+    }
+}
+
+@keyframes cid-typing {
+    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+    30%           { opacity: 1; transform: translateY(-3px); }
+}
+
+.cid-chat-suggestion {
+    @include cid-reset-button;
+    padding: 6px 12px;
+    font-size: var(--cid-text-xs);
+    color: var(--cid-primary-600);
+    background: var(--cid-primary-50);
+    border: 1px solid var(--cid-primary-100);
+    border-radius: var(--cid-radius-full);
+    transition: all var(--cid-trans-fast);
+    &:hover {
+        background: var(--cid-primary-500);
+        color: #fff;
+        border-color: var(--cid-primary-500);
+    }
+}

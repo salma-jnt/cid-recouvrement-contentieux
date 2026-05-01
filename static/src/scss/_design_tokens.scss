@@ -1,0 +1,139 @@
+/*
+ * ============================================================================
+ *  CID DESIGN TOKENS
+ *  Palette extraite du logo CID Développement (bleu + orange)
+ *  Tous les composants OWL custom du module utilisent ces variables.
+ * ============================================================================
+ */
+
+:root {
+    /* ----- Couleurs de marque CID (logo) ----- */
+    --cid-primary-50:  #EBF2FB;
+    --cid-primary-100: #D2E0F4;
+    --cid-primary-200: #A5C2EA;
+    --cid-primary-300: #6E9CDA;
+    --cid-primary-400: #3B82E0;     /* bleu clair logo */
+    --cid-primary-500: #1E4D8C;     /* BLEU CID PRINCIPAL */
+    --cid-primary-600: #1A4279;
+    --cid-primary-700: #15376A;
+    --cid-primary-800: #0F2851;
+    --cid-primary-900: #081A37;
+
+    --cid-accent-50:   #FFF6E5;
+    --cid-accent-100:  #FFE7BF;
+    --cid-accent-200:  #FFD08C;
+    --cid-accent-300:  #FFB347;     /* orange clair */
+    --cid-accent-400:  #FFA21F;
+    --cid-accent-500:  #F39200;     /* ORANGE CID PRINCIPAL */
+    --cid-accent-600:  #D67E00;
+    --cid-accent-700:  #B36800;
+    --cid-accent-800:  #804B00;
+    --cid-accent-900:  #4D2D00;
+
+    /* ----- Couleurs sémantiques (cahier de charge : vert/orange/rouge/mauve) ----- */
+    --cid-vert:        #10B981;
+    --cid-vert-soft:   #D1FAE5;
+    --cid-vert-fg:     #065F46;
+
+    --cid-orange:      #F59E0B;
+    --cid-orange-soft: #FEF3C7;
+    --cid-orange-fg:   #92400E;
+
+    --cid-rouge:       #EF4444;
+    --cid-rouge-soft:  #FEE2E2;
+    --cid-rouge-fg:    #991B1B;
+
+    --cid-mauve:       #A855F7;
+    --cid-mauve-soft:  #F3E8FF;
+    --cid-mauve-fg:    #6B21A8;
+
+    /* Alias sémantiques */
+    --cid-success:     var(--cid-vert);
+    --cid-warning:     var(--cid-orange);
+    --cid-danger:      var(--cid-rouge);
+    --cid-info:        var(--cid-primary-400);
+
+    /* ----- Surfaces & neutres (style SaaS clair) ----- */
+    --cid-bg:           #F8FAFC;
+    --cid-surface:      #FFFFFF;
+    --cid-surface-alt:  #F1F5F9;
+    --cid-overlay:      rgba(15, 23, 42, 0.55);
+
+    --cid-border:       #E2E8F0;
+    --cid-border-strong:#CBD5E1;
+    --cid-divider:      #F1F5F9;
+
+    --cid-text:         #0F172A;
+    --cid-text-soft:    #334155;
+    --cid-text-muted:   #64748B;
+    --cid-text-faint:   #94A3B8;
+    --cid-text-on-primary: #FFFFFF;
+
+    /* ----- Spacing system (4px base) ----- */
+    --cid-space-0: 0;
+    --cid-space-1: 4px;
+    --cid-space-2: 8px;
+    --cid-space-3: 12px;
+    --cid-space-4: 16px;
+    --cid-space-5: 20px;
+    --cid-space-6: 24px;
+    --cid-space-8: 32px;
+    --cid-space-10: 40px;
+    --cid-space-12: 48px;
+    --cid-space-16: 64px;
+
+    /* ----- Radius ----- */
+    --cid-radius-sm: 6px;
+    --cid-radius-md: 8px;
+    --cid-radius-lg: 12px;
+    --cid-radius-xl: 16px;
+    --cid-radius-2xl: 24px;
+    --cid-radius-full: 9999px;
+
+    /* ----- Shadows ----- */
+    --cid-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+    --cid-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+    --cid-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
+    --cid-shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.10), 0 4px 8px rgba(15, 23, 42, 0.06);
+    --cid-shadow-xl: 0 24px 64px rgba(15, 23, 42, 0.14), 0 8px 16px rgba(15, 23, 42, 0.08);
+
+    /* ----- Focus ring ----- */
+    --cid-focus-ring: 0 0 0 3px rgba(30, 77, 140, 0.18);
+    --cid-focus-ring-accent: 0 0 0 3px rgba(243, 146, 0, 0.22);
+
+    /* ----- Transitions ----- */
+    --cid-trans-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+    --cid-trans-base: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+    --cid-trans-slow: 320ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* ----- Typo ----- */
+    --cid-font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                     Roboto, "Helvetica Neue", Arial, sans-serif;
+    --cid-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --cid-text-xs: 11px;
+    --cid-text-sm: 13px;
+    --cid-text-base: 14px;
+    --cid-text-md: 15px;
+    --cid-text-lg: 17px;
+    --cid-text-xl: 20px;
+    --cid-text-2xl: 24px;
+    --cid-text-3xl: 30px;
+
+    --cid-leading-tight: 1.25;
+    --cid-leading-normal: 1.5;
+    --cid-leading-relaxed: 1.65;
+
+    --cid-weight-normal: 400;
+    --cid-weight-medium: 500;
+    --cid-weight-semibold: 600;
+    --cid-weight-bold: 700;
+
+    /* ----- Z-index scale ----- */
+    --cid-z-dropdown: 1000;
+    --cid-z-sticky:   1020;
+    --cid-z-overlay:  1040;
+    --cid-z-dialog:   1050;
+    --cid-z-toast:    1060;
+    --cid-z-fab:      1070;
+}

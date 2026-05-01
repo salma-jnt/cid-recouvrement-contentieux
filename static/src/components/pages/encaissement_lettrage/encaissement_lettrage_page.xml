@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.EncaissementLettragePage">
+        <div class="cid-page cid-lettrage-page">
+
+            <!-- Header -->
+            <header class="cid-page__header">
+                <div>
+                    <CidButton variant="'ghost'" icon="'fa-arrow-left'" onClick="() => this.onBack()" size="'sm'">
+                        Retour aux encaissements
+                    </CidButton>
+                    <h1 class="cid-page__title" style="margin-top: 12px;">
+                        Lettrage de l'encaissement
+                    </h1>
+                    <p t-if="state.encaissement" class="cid-page__subtitle">
+                        <t t-esc="state.encaissement.name"/> ·
+                        <t t-esc="state.encaissement.client_name"/> ·
+                        <t t-esc="fmtDate(state.encaissement.date_operation)"/>
+                    </p>
+                </div>
+            </header>
+
+            <!-- Loading state -->
+            <t t-if="state.loading">
+                <div class="cid-lettrage__skeleton">
+                    <CidSkeleton width="'100%'" height="'120px'"/>
+                    <CidSkeleton width="'100%'" height="'60px'"/>
+                    <CidSkeleton width="'100%'" height="'60px'"/>
+                </div>
+            </t>
+
+            <!-- Loaded state -->
+            <t t-elif="state.encaissement">
+
+                <!-- ======== HEADER COUNTERS (live) ======== -->
+                <div class="cid-lettrage__counters">
+                    <div class="cid-counter">
+                        <div class="cid-counter__label">Montant encaissement</div>
+                        <div class="cid-counter__value">
+                            <t t-esc="fmt(state.encaissement.montant)"/>
+                            <span class="cid-counter__currency"><t t-esc="state.encaissement.currency"/></span>
+                        </div>
+                    </div>
+                    <div class="cid-counter cid-counter--info">
+                        <div class="cid-counter__label">Déjà lettré (en base)</div>
+                        <div class="cid-counter__value">
+                            <t t-esc="fmt(state.encaissement.montant_alloue)"/>
+                        </div>
+                    </div>
+                    <div class="cid-counter cid-counter--accent">
+                        <div class="cid-counter__label">À allouer dans cette session</div>
+                        <div class="cid-counter__value">
+                            <span t-att-class="hasPendingAllocations ? 'cid-counter__pulse' : ''">
+                                <t t-esc="fmt(totalAlloueLive)"/>
+                            </span>
+                        </div>
+                    </div>
+                    <div t-att-class="'cid-counter cid-counter--' + (resteALlouerLive &gt; 0 ? 'success' : 'neutral') + (isOverflow ? ' cid-counter--danger' : '')">
+                        <div class="cid-counter__label">Reste à allouer (live)</div>
+                        <div class="cid-counter__value">
+                            <t t-esc="fmt(resteALlouerLive)"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress bar -->
+                <div class="cid-lettrage__progress-wrap">
+                    <div class="cid-lettrage__progress">
+                        <div class="cid-lettrage__progress-bar"
+                             t-att-style="'width:' + progressPct + '%;'"
+                             t-att-class="'cid-lettrage__progress-bar--' + (isOverflow ? 'overflow' : (progressPct &gt;= 100 ? 'full' : 'partial'))"/>
+                    </div>
+                    <div class="cid-lettrage__progress-info">
+                        <span><t t-esc="Math.round(progressPct)"/>% alloué</span>
+                        <span t-if="isOverflow" class="cid-lettrage__warning">
+                            <i class="fa fa-exclamation-triangle"/> Dépassement détecté
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Toolbar -->
+                <div class="cid-lettrage__toolbar">
+                    <div class="cid-lettrage__client-info">
+                        <i class="fa fa-user-circle"/>
+                        <span>Factures non soldées de </span>
+                        <strong t-esc="state.encaissement.client_name"/>
+                        <CidBadge variant="'neutral'" subtle="true">
+                            <t t-esc="state.factures.length"/>
+                        </CidBadge>
+                    </div>
+                    <div class="cid-lettrage__toolbar-actions">
+                        <CidButton variant="'secondary'" icon="'fa-magic'" size="'sm'"
+                                   onClick="() => this.onAutoAllouer()"
+                                   disabled="state.factures.length === 0 or resteALlouerLive === 0">
+                            Auto-allouer (FIFO)
+                        </CidButton>
+                        <CidButton variant="'ghost'" icon="'fa-undo'" size="'sm'"
+                                   onClick="() => this.onResetAll()"
+                                   disabled="!hasPendingAllocations">
+                            Tout effacer
+                        </CidButton>
+                    </div>
+                </div>
+
+                <!-- Factures list -->
+                <t t-if="state.factures.length === 0">
+                    <CidCard padded="true">
+                        <CidEmptyState
+                            icon="'fa-check-circle'"
+                            title="'Aucune facture non soldée'"
+                            description="'Toutes les factures de ce client sont déjà soldées. Cet encaissement peut être considéré comme un excédent.'"/>
+                    </CidCard>
+                </t>
+                <t t-else="">
+                    <div class="cid-lettrage__factures">
+                        <t t-foreach="state.factures" t-as="facture" t-key="facture.id">
+                            <div t-att-class="'cid-facture-row' + (state.allocations[facture.id] &gt; 0 ? ' cid-facture-row--active' : '')">
+                                <div class="cid-facture-row__color">
+                                    <CidStatusPill color="facture.statut_interface" withDot="false">
+                                        <t t-esc="facture.statut_interface"/>
+                                    </CidStatusPill>
+                                </div>
+                                <div class="cid-facture-row__main">
+                                    <div class="cid-facture-row__name">
+                                        <strong t-esc="facture.name"/>
+                                        <span t-if="facture.code_affaire" class="cid-facture-row__code">
+                                            · <t t-esc="facture.code_affaire"/>
+                                        </span>
+                                    </div>
+                                    <div class="cid-facture-row__meta">
+                                        <span><i class="fa fa-calendar-o"/> <t t-esc="fmtDate(facture.date_facture)"/></span>
+                                        <span class="cid-facture-row__sep">·</span>
+                                        <span><t t-esc="statutLabel(facture.recouvrement_status)"/></span>
+                                    </div>
+                                </div>
+                                <div class="cid-facture-row__amounts">
+                                    <div class="cid-facture-row__amount-block">
+                                        <span class="cid-facture-row__amount-label">TTC</span>
+                                        <span class="cid-facture-row__amount-val"><t t-esc="fmt(facture.montant_ttc)"/></span>
+                                    </div>
+                                    <div class="cid-facture-row__amount-block">
+                                        <span class="cid-facture-row__amount-label">Reste à payer</span>
+                                        <span class="cid-facture-row__amount-val cid-facture-row__amount-val--strong">
+                                            <t t-esc="fmt(facture.reste_a_payer)"/>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="cid-facture-row__alloc">
+                                    <input type="number"
+                                           class="cid-facture-row__input"
+                                           t-att-value="state.allocations[facture.id] || 0"
+                                           t-on-input="(ev) => this.onAllocChange(facture.id, ev)"
+                                           min="0"
+                                           t-att-max="facture.reste_a_payer"
+                                           step="0.01"
+                                           placeholder="0,00"/>
+                                    <button class="cid-facture-row__max-btn"
+                                            t-on-click="() => this.onMaxClick(facture.id)"
+                                            title="Allouer le maximum possible">
+                                        Max
+                                    </button>
+                                    <button t-if="state.allocations[facture.id] &gt; 0"
+                                            class="cid-facture-row__clear-btn"
+                                            t-on-click="() => this.onClearLine(facture.id)"
+                                            title="Effacer cette allocation">
+                                        <i class="fa fa-times"/>
+                                    </button>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+
+                <!-- Sticky save bar -->
+                <div t-if="state.factures.length &gt; 0" class="cid-lettrage__save-bar">
+                    <div class="cid-lettrage__save-info">
+                        <span t-if="hasPendingAllocations">
+                            <strong t-esc="fmt(totalAlloueLive)"/> à enregistrer
+                        </span>
+                        <span t-else="" class="text-muted">
+                            Saisissez des montants pour enregistrer un lettrage
+                        </span>
+                    </div>
+                    <CidButton variant="'primary'" size="'lg'"
+                               icon="'fa-save'"
+                               loading="state.saving"
+                               disabled="!hasPendingAllocations or isOverflow"
+                               onClick="() => this.onSave()">
+                        Enregistrer le lettrage
+                    </CidButton>
+                </div>
+            </t>
+        </div>
+    </t>
+
+</templates>

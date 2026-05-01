@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.CidStepper">
+        <div t-att-class="wrapperClass">
+            <t t-foreach="props.steps" t-as="step" t-key="step.id || step_index">
+                <div t-att-class="classFor(step, step_index)"
+                     t-on-click="() => this.onStepClick(step, step_index)">
+                    <div class="cid-stepper__node">
+                        <div class="cid-stepper__bullet">
+                            <i t-if="iconFor(step)" t-att-class="'fa ' + iconFor(step)"/>
+                            <span t-else="" t-esc="step_index + 1"/>
+                        </div>
+                        <div t-if="step_index &lt; props.steps.length - 1" class="cid-stepper__connector"/>
+                    </div>
+                    <div class="cid-stepper__content">
+                        <div class="cid-stepper__label" t-esc="step.label"/>
+                        <div t-if="step.subtitle" class="cid-stepper__subtitle" t-esc="step.subtitle"/>
+                        <div t-if="step.date" class="cid-stepper__date">
+                            <i class="fa fa-calendar-o"/> <span t-esc="step.date"/>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+
+</templates>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Vues admin/debug pour le lettrage. Les utilisateurs interagissent
+             normalement via les formulaires Encaissement et Facture. -->
+
+        <record id="view_recouvrement_lettrage_list" model="ir.ui.view">
+            <field name="name">recouvrement.lettrage.list</field>
+            <field name="model">recouvrement.lettrage</field>
+            <field name="arch" type="xml">
+                <list string="Lettrages" create="false">
+                    <field name="date_lettrage"/>
+                    <field name="encaissement_id"/>
+                    <field name="facture_id"/>
+                    <field name="client_id"/>
+                    <field name="montant_affecte" sum="Total affecté"/>
+                </list>
+            </field>
+        </record>
+    </data>
+</odoo>

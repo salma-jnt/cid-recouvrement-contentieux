@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- ================================================================
+             ENCAISSEMENT — version intermédiaire (vues Odoo standard)
+             La vraie expérience de lettrage live se fera en OWL (Phase 3),
+             ces vues XML servent de fallback fonctionnel et debug admin.
+        ===================================================================== -->
+
+        <record id="view_recouvrement_encaissement_list" model="ir.ui.view">
+            <field name="name">recouvrement.encaissement.list</field>
+            <field name="model">recouvrement.encaissement</field>
+            <field name="arch" type="xml">
+                <list string="Encaissements"
+                      decoration-success="etat_lettrage=='solde'"
+                      decoration-warning="etat_lettrage=='en_cours'">
+                    <field name="name"/>
+                    <field name="date_operation"/>
+                    <field name="client_id"/>
+                    <field name="code_affaire" optional="show"/>
+                    <field name="banque" optional="hide"/>
+                    <field name="mode_paiement" optional="show"/>
+                    <field name="montant" sum="Total montant"/>
+                    <field name="montant_alloue" sum="Total alloué"/>
+                    <field name="reste_a_allouer" sum="Reste à allouer"/>
+                    <field name="etat_lettrage" widget="badge"
+                           decoration-success="etat_lettrage=='solde'"
+                           decoration-warning="etat_lettrage=='en_cours'"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_recouvrement_encaissement_form" model="ir.ui.view">
+            <field name="name">recouvrement.encaissement.form</field>
+            <field name="model">recouvrement.encaissement</field>
+            <field name="arch" type="xml">
+                <form string="Encaissement">
+                    <header>
+                        <button name="action_open_lettrage_page" type="object"
+                                string="🪄 Lettrage moderne" class="btn-primary"
+                                invisible="reste_a_allouer == 0"/>
+                        <button name="auto_allouer_fifo" type="object"
+                                string="Auto-allouer (FIFO)" class="btn-secondary"
+                                invisible="reste_a_allouer == 0"/>
+                        <field name="etat_lettrage" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+                        <group>
+                            <group string="Identification">
+                                <field name="client_id"/>
+                                <field name="code_affaire"/>
+                                <field name="pole_id"/>
+                                <field name="banque"/>
+                                <field name="mode_paiement"/>
+                            </group>
+                            <group string="Montant et lettrage">
+                                <field name="montant"/>
+                                <field name="penalite"/>
+                                <field name="montant_alloue" readonly="1"/>
+                                <field name="reste_a_allouer" readonly="1"/>
+                                <field name="date_operation"/>
+                                <field name="currency_id" groups="base.group_multi_currency"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Lettrages" name="lettrages">
+                                <p class="text-muted">
+                                    <i class="fa fa-info-circle"/>
+                                    Sélectionnez des factures non soldées du client pour les lettrer.
+                                    Le système empêche tout dépassement (montant facture / reste à allouer).
+                                </p>
+                                <field name="lettrage_ids">
+                                    <list editable="bottom">
+                                        <field name="facture_id"
+                                               domain="[('client_id','=', parent.client_id),
+                                                        ('reste_a_payer','&gt;', 0)]"/>
+                                        <field name="facture_montant_ttc" readonly="1" optional="show"/>
+                                        <field name="facture_reste_a_payer" readonly="1"/>
+                                        <field name="montant_affecte"/>
+                                        <field name="date_lettrage"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Observation" name="observation">
+                                <field name="observation"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_recouvrement_encaissement_search" model="ir.ui.view">
+            <field name="name">recouvrement.encaissement.search</field>
+            <field name="model">recouvrement.encaissement</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="client_id"/>
+                    <field name="code_affaire"/>
+                    <field name="banque"/>
+                    <separator/>
+                    <filter name="a_traiter" string="À traiter (reste à allouer)"
+                            domain="[('etat_lettrage', '!=', 'solde')]"/>
+                    <filter name="soldes" string="Soldés"
+                            domain="[('etat_lettrage', '=', 'solde')]"/>
+                    <separator/>
+                    <filter name="virement" string="Virement"
+                            domain="[('mode_paiement', '=', 'virement')]"/>
+                    <filter name="cheque" string="Chèque"
+                            domain="[('mode_paiement', '=', 'cheque')]"/>
+                    <separator/>
+                    <filter name="group_by_client" string="Client"
+                            context="{'group_by': 'client_id'}"/>
+                    <filter name="group_by_etat" string="État"
+                            context="{'group_by': 'etat_lettrage'}"/>
+                    <filter name="group_by_mode" string="Mode de paiement"
+                            context="{'group_by': 'mode_paiement'}"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_recouvrement_encaissement" model="ir.actions.act_window">
+            <field name="search_view_id" ref="view_recouvrement_encaissement_search"/>
+        </record>
+    </data>
+</odoo>

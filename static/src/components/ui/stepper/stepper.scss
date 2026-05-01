@@ -1,0 +1,138 @@
+.cid-stepper {
+    display: flex;
+
+    &--horizontal {
+        flex-direction: row;
+        align-items: flex-start;
+        overflow-x: auto;
+        padding-bottom: var(--cid-space-3);
+
+        .cid-stepper__step { flex: 1 1 0; min-width: 140px; }
+        .cid-stepper__node { flex-direction: row; }
+        .cid-stepper__connector {
+            position: absolute;
+            top: 16px;
+            left: 32px;
+            right: 0;
+            height: 2px;
+            background: var(--cid-border);
+            z-index: 0;
+        }
+        .cid-stepper__content { margin-top: var(--cid-space-3); padding: 0 var(--cid-space-2); }
+    }
+
+    &--vertical {
+        flex-direction: column;
+        gap: var(--cid-space-1);
+
+        .cid-stepper__step { display: flex; gap: var(--cid-space-3); }
+        .cid-stepper__node {
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .cid-stepper__connector {
+            width: 2px;
+            flex: 1;
+            min-height: 24px;
+            background: var(--cid-border);
+        }
+        .cid-stepper__content {
+            padding-bottom: var(--cid-space-4);
+            flex: 1;
+        }
+    }
+
+    &__step {
+        position: relative;
+        cursor: default;
+
+        &--clickable { cursor: pointer; }
+    }
+
+    &__node {
+        position: relative;
+        display: flex;
+        z-index: 1;
+    }
+
+    &__bullet {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--cid-surface);
+        border: 2px solid var(--cid-border-strong);
+        color: var(--cid-text-muted);
+        font-weight: var(--cid-weight-semibold);
+        font-size: var(--cid-text-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--cid-trans-base);
+        z-index: 1;
+    }
+
+    &__content { min-width: 0; }
+
+    &__label {
+        font-size: var(--cid-text-sm);
+        font-weight: var(--cid-weight-medium);
+        color: var(--cid-text);
+        line-height: 1.3;
+    }
+
+    &__subtitle {
+        font-size: var(--cid-text-xs);
+        color: var(--cid-text-muted);
+        margin-top: 2px;
+    }
+
+    &__date {
+        margin-top: 6px;
+        font-size: var(--cid-text-xs);
+        color: var(--cid-text-faint);
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* ----- States ----- */
+    &__step--done {
+        .cid-stepper__bullet {
+            background: var(--cid-success);
+            border-color: var(--cid-success);
+            color: #fff;
+        }
+        .cid-stepper__connector { background: var(--cid-success); }
+    }
+
+    &__step--current {
+        .cid-stepper__bullet {
+            background: var(--cid-primary-500);
+            border-color: var(--cid-primary-500);
+            color: #fff;
+            box-shadow: 0 0 0 4px var(--cid-primary-100);
+        }
+        .cid-stepper__label { font-weight: var(--cid-weight-semibold); color: var(--cid-primary-600); }
+    }
+
+    &__step--reporte {
+        .cid-stepper__bullet {
+            background: var(--cid-orange-soft);
+            border-color: var(--cid-orange);
+            color: var(--cid-orange-fg);
+        }
+    }
+
+    /* ----- Color overrides per cahier statut_interface_cible ----- */
+    &__step--color-vert .cid-stepper__bullet   { border-color: var(--cid-vert); }
+    &__step--color-orange .cid-stepper__bullet { border-color: var(--cid-orange); }
+    &__step--color-rouge .cid-stepper__bullet  { border-color: var(--cid-rouge); }
+    &__step--color-mauve .cid-stepper__bullet  { border-color: var(--cid-mauve); }
+
+    &__step--current.cid-stepper__step--color-vert .cid-stepper__bullet   { background: var(--cid-vert); }
+    &__step--current.cid-stepper__step--color-orange .cid-stepper__bullet { background: var(--cid-orange); }
+    &__step--current.cid-stepper__step--color-rouge .cid-stepper__bullet  { background: var(--cid-rouge); }
+    &__step--current.cid-stepper__step--color-mauve .cid-stepper__bullet  { background: var(--cid-mauve); }
+}

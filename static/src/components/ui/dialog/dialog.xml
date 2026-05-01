@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.CidDialog">
+        <t t-if="props.open">
+            <div class="cid-dialog__overlay" t-on-click="onOverlayClick">
+                <div t-att-class="'cid-dialog cid-dialog--' + props.size"
+                     role="dialog"
+                     aria-modal="true"
+                     t-on-click.stop="">
+                    <header class="cid-dialog__header">
+                        <div>
+                            <h2 t-if="props.title" class="cid-dialog__title" t-esc="props.title"/>
+                            <p t-if="props.description" class="cid-dialog__desc" t-esc="props.description"/>
+                        </div>
+                        <button class="cid-dialog__close" t-on-click="onCloseClick" aria-label="Fermer">
+                            <i class="fa fa-times"/>
+                        </button>
+                    </header>
+                    <div class="cid-dialog__body">
+                        <t t-slot="default"/>
+                    </div>
+                    <footer t-if="props.slots.footer" class="cid-dialog__footer">
+                        <t t-slot="footer"/>
+                    </footer>
+                </div>
+            </div>
+        </t>
+    </t>
+
+</templates>

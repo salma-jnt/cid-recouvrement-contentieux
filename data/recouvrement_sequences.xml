@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_recouvrement_recouvrement" model="ir.sequence">
+            <field name="name">Dossier de recouvrement</field>
+            <field name="code">recouvrement.recouvrement</field>
+            <field name="prefix">DR/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_recouvrement_encaissement" model="ir.sequence">
+            <field name="name">Encaissement de recouvrement</field>
+            <field name="code">recouvrement.encaissement</field>
+            <field name="prefix">ENC/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

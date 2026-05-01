@@ -1,0 +1,333 @@
+/*
+ * ============================================================================
+ *  CidDataTable — composant tableau générique (style shadcn/ui DataTable)
+ *  Tokens CID requis : _design_tokens.scss + _mixins.scss
+ * ============================================================================
+ */
+
+/* ── Wrapper global ─────────────────────────────────────────────────────── */
+.cid-dt-wrapper {
+    display: flex;
+    flex-direction: column;
+    background: var(--cid-surface);
+    border: 1px solid var(--cid-border);
+    border-radius: var(--cid-radius-lg);
+    box-shadow: var(--cid-shadow-sm);
+    overflow: hidden;
+}
+
+/* ── Toolbar (slot) ─────────────────────────────────────────────────────── */
+.cid-dt-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--cid-space-3);
+    padding: var(--cid-space-3) var(--cid-space-4);
+    border-bottom: 1px solid var(--cid-border);
+    flex-wrap: wrap;
+}
+
+/* ── Barre de sélection ─────────────────────────────────────────────────── */
+.cid-dt-selection-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--cid-space-3);
+    padding: var(--cid-space-2) var(--cid-space-4);
+    background: var(--cid-primary-50);
+    border-bottom: 1px solid var(--cid-primary-200);
+    animation: cid-fade-in var(--cid-trans-fast);
+
+    &__count {
+        font-size: var(--cid-text-sm);
+        font-weight: var(--cid-weight-semibold);
+        color: var(--cid-primary-700);
+
+        .fa { margin-right: var(--cid-space-1); }
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: var(--cid-space-2);
+    }
+}
+
+/* ── Zone scrollable ────────────────────────────────────────────────────── */
+.cid-dt-scroll {
+    overflow-x: auto;
+    @include cid-scrollbar;
+}
+
+/* ── Table ──────────────────────────────────────────────────────────────── */
+.cid-dt {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--cid-text-sm);
+    color: var(--cid-text);
+    font-family: var(--cid-font-sans);
+    table-layout: auto;
+
+    /* ── THEAD ── */
+    &__head {
+        background: var(--cid-surface-alt);
+        border-bottom: 1px solid var(--cid-border-strong);
+    }
+
+    &__th {
+        padding: var(--cid-space-3) var(--cid-space-4);
+        font-size: var(--cid-text-xs);
+        font-weight: var(--cid-weight-semibold);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--cid-text-muted);
+        white-space: nowrap;
+        user-select: none;
+        position: relative;
+        border-right: 1px solid transparent;
+
+        &:last-child { border-right: 0; }
+
+        /* Alignements */
+        &--left   { text-align: left; }
+        &--center { text-align: center; }
+        &--right  { text-align: right; }
+
+        /* Colonne checkbox */
+        &--checkbox {
+            width: 44px;
+            padding: var(--cid-space-2) var(--cid-space-3);
+            text-align: center;
+        }
+
+        /* Colonne actions */
+        &--actions {
+            width: 80px;
+            text-align: right;
+            padding-right: var(--cid-space-4);
+        }
+
+        /* Triable */
+        &--sortable {
+            cursor: pointer;
+            transition: background var(--cid-trans-fast),
+                        color var(--cid-trans-fast);
+
+            &:hover {
+                background: var(--cid-primary-50);
+                color: var(--cid-primary-600);
+
+                .cid-dt__sort-icon { opacity: 1; color: var(--cid-primary-400); }
+            }
+        }
+
+        /* Colonne actuellement triée */
+        &--sorted {
+            color: var(--cid-primary-600);
+            background: var(--cid-primary-50);
+
+            .cid-dt__sort-icon {
+                opacity: 1;
+                color: var(--cid-primary-500);
+            }
+        }
+    }
+
+    &__th-inner {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--cid-space-1);
+    }
+
+    &__th-label { flex: 1; }
+
+    &__sort-icon {
+        font-size: 11px;
+        opacity: 0.4;
+        transition: opacity var(--cid-trans-fast), color var(--cid-trans-fast);
+        flex-shrink: 0;
+    }
+
+    /* ── TBODY ── */
+    &__body {}
+
+    &__row {
+        border-bottom: 1px solid var(--cid-divider);
+        transition: background var(--cid-trans-fast);
+
+        &:last-child { border-bottom: 0; }
+
+        &.is-selected {
+            background: var(--cid-primary-50) !important;
+
+            .cid-dt__td { color: var(--cid-primary-800); }
+        }
+    }
+
+    /* ── CELLULES ── */
+    &__td {
+        padding: var(--cid-space-3) var(--cid-space-4);
+        vertical-align: middle;
+        color: var(--cid-text-soft);
+        line-height: var(--cid-leading-normal);
+
+        /* Alignements */
+        &--left   { text-align: left; }
+        &--center { text-align: center; }
+        &--right  { text-align: right; }
+
+        &--checkbox {
+            width: 44px;
+            padding: var(--cid-space-2) var(--cid-space-3);
+            text-align: center;
+        }
+
+        &--actions {
+            width: 80px;
+            text-align: right;
+            padding-right: var(--cid-space-3);
+            white-space: nowrap;
+        }
+
+        &--empty {
+            padding: 0;
+            border: 0;
+        }
+    }
+
+    &__cell-text {
+        display: block;
+        @include cid-truncate(2);
+    }
+
+    /* ── Squelette de chargement ── */
+    &__row--skeleton {
+        .cid-dt__td { padding: var(--cid-space-3) var(--cid-space-4); }
+    }
+
+    &__skel-cell {
+        width: 18px;
+        height: 18px;
+        border-radius: var(--cid-radius-sm);
+        background: var(--cid-surface-alt);
+        background: linear-gradient(
+            90deg,
+            var(--cid-surface-alt) 25%,
+            var(--cid-border) 50%,
+            var(--cid-surface-alt) 75%
+        );
+        background-size: 200% 100%;
+        animation: cid-shimmer 1.4s ease-in-out infinite;
+        margin: 0 auto;
+    }
+
+    /* ── Checkbox ── */
+    &__checkbox {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+
+        input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        &-box {
+            width: 16px;
+            height: 16px;
+            border: 1.5px solid var(--cid-border-strong);
+            border-radius: 4px;
+            background: var(--cid-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--cid-trans-fast);
+            flex-shrink: 0;
+
+            &::after {
+                content: "";
+                display: none;
+                width: 4px;
+                height: 8px;
+                border: 2px solid #fff;
+                border-top: 0;
+                border-left: 0;
+                transform: rotate(45deg) translate(-1px, -1px);
+            }
+        }
+
+        input:checked ~ .cid-dt__checkbox-box {
+            background: var(--cid-primary-500);
+            border-color: var(--cid-primary-500);
+            &::after { display: block; }
+        }
+
+        input:indeterminate ~ .cid-dt__checkbox-box {
+            background: var(--cid-primary-500);
+            border-color: var(--cid-primary-500);
+            &::after {
+                display: block;
+                width: 8px;
+                height: 2px;
+                border: 0;
+                background: #fff;
+                border-radius: 1px;
+                transform: none;
+            }
+        }
+
+        &:hover .cid-dt__checkbox-box {
+            border-color: var(--cid-primary-400);
+            box-shadow: var(--cid-focus-ring);
+        }
+    }
+
+    /* ════════════════════════════════════════════════════════════
+     *  VARIANTES
+     * ════════════════════════════════════════════════════════════ */
+
+    /* Rayures alternées */
+    &--striped .cid-dt__body .cid-dt__row:nth-child(even):not(.is-selected) {
+        background: var(--cid-surface-alt);
+    }
+
+    /* Compact (moins de padding) */
+    &--compact {
+        .cid-dt__th { padding: var(--cid-space-2) var(--cid-space-3); }
+        .cid-dt__td { padding: var(--cid-space-2) var(--cid-space-3); }
+    }
+
+    /* Bordé (grille complète) */
+    &--bordered {
+        .cid-dt__th,
+        .cid-dt__td {
+            border-right: 1px solid var(--cid-border);
+            &:last-child { border-right: 0; }
+        }
+        .cid-dt__row { border-bottom: 1px solid var(--cid-border); }
+    }
+
+    /* Ligne hover */
+    &--hoverable .cid-dt__body .cid-dt__row:not(.is-selected):hover {
+        background: var(--cid-surface-alt);
+    }
+
+    /* En-tête sticky */
+    &--sticky-header {
+        .cid-dt__head .cid-dt__th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: var(--cid-surface-alt);
+            box-shadow: 0 1px 0 var(--cid-border-strong);
+        }
+    }
+
+    /* Ligne cliquable */
+    &--clickable .cid-dt__body .cid-dt__row {
+        cursor: pointer;
+    }
+}

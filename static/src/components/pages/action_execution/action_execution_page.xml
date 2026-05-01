@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.ActionExecutionPage">
+        <div class="cid-page cid-action-page">
+
+            <t t-if="state.loading">
+                <CidSkeleton width="'100%'" height="80px"/>
+                <div style="height:16px;"/>
+                <CidSkeleton width="'100%'" height="200px"/>
+            </t>
+
+            <t t-elif="state.action">
+
+                <!-- ============ Header ============ -->
+                <header class="cid-page__header">
+                    <div>
+                        <CidButton variant="'ghost'" icon="'fa-arrow-left'"
+                                   onClick="() => this.onBackToDossier()" size="'sm'">
+                            Retour au dossier
+                        </CidButton>
+                        <div class="cid-action-page__title-row">
+                            <div t-att-class="'cid-action-page__type-icon cid-action-item__icon--' + state.action.action_type">
+                                <i t-att-class="'fa ' + actionTypeIcon(state.action.action_type)"/>
+                            </div>
+                            <div>
+                                <h1 class="cid-page__title" t-esc="state.action.name"/>
+                                <p class="cid-page__subtitle">
+                                    <t t-esc="actionTypeLabel(state.action.action_type)"/>
+                                    <t t-if="state.client">
+                                        · <i class="fa fa-user-circle"/>
+                                        <t t-esc="state.client.name"/>
+                                    </t>
+                                    <t t-if="state.dossier">
+                                        · <i class="fa fa-folder-open-o"/>
+                                        <t t-esc="state.dossier.name"/>
+                                    </t>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <t t-if="isDone">
+                            <CidBadge variant="'success'" subtle="false" icon="'fa-check'">
+                                Réalisée
+                            </CidBadge>
+                        </t>
+                        <t t-elif="state.action.is_overdue">
+                            <CidBadge variant="'danger'" subtle="false" icon="'fa-exclamation-triangle'">
+                                En retard
+                            </CidBadge>
+                        </t>
+                        <t t-else="">
+                            <CidBadge variant="'info'" subtle="true">À faire</CidBadge>
+                        </t>
+                    </div>
+                </header>
+
+                <div class="cid-action-page__grid">
+
+                    <!-- ============ COL MAIN — formulaire selon type ============ -->
+                    <div class="cid-action-page__main">
+
+                        <!-- ===== TYPE APPEL : script + qualification ===== -->
+                        <t t-if="isCallLike">
+                            <CidCard padded="true" accentBar="'primary'">
+                                <t t-set-slot="header">
+                                    <span><i class="fa fa-phone"/> Coordonnées du client</span>
+                                </t>
+                                <div class="cid-action-page__contact">
+                                    <div class="cid-action-page__contact-item">
+                                        <span class="cid-action-page__contact-label">Téléphone</span>
+                                        <a t-if="state.client and state.client.phone"
+                                           t-att-href="'tel:' + state.client.phone"
+                                           class="cid-action-page__contact-value">
+                                            <t t-esc="state.client.phone"/>
+                                        </a>
+                                        <span t-else="" class="text-muted">Non renseigné</span>
+                                    </div>
+                                    <div t-if="state.client and state.client.mobile" class="cid-action-page__contact-item">
+                                        <span class="cid-action-page__contact-label">Mobile</span>
+                                        <a t-att-href="'tel:' + state.client.mobile"
+                                           class="cid-action-page__contact-value">
+                                            <t t-esc="state.client.mobile"/>
+                                        </a>
+                                    </div>
+                                    <div t-if="state.client and state.client.email" class="cid-action-page__contact-item">
+                                        <span class="cid-action-page__contact-label">Email</span>
+                                        <a t-att-href="'mailto:' + state.client.email"
+                                           class="cid-action-page__contact-value">
+                                            <t t-esc="state.client.email"/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </CidCard>
+
+                            <CidCard padded="true">
+                                <t t-set-slot="header">
+                                    <span><i class="fa fa-list-alt"/> Script d'appel</span>
+                                </t>
+                                <div class="cid-action-page__script">
+                                    <p>Bonjour, je suis <strong>[votre nom]</strong> du service Recouvrement de CID Développement.</p>
+                                    <p>Je vous appelle au sujet de la (les) facture(s) suivante(s) pour laquelle (lesquelles) nous attendons votre règlement :</p>
+                                    <ul>
+                                        <t t-foreach="state.factures.filter((f) => f.reste_a_payer &gt; 0)" t-as="f" t-key="f.id">
+                                            <li>
+                                                <strong t-esc="f.name"/>
+                                                <t t-if="f.code_affaire">(<t t-esc="f.code_affaire"/>)</t>
+                                                — Reste à payer : <strong><t t-esc="fmt(f.reste_a_payer)"/> DH</strong>
+                                            </li>
+                                        </t>
+                                    </ul>
+                                    <p>Pourriez-vous nous indiquer la date prévue de règlement ?</p>
+                                </div>
+                            </CidCard>
+
+                            <CidCard padded="true">
+                                <t t-set-slot="header">
+                                    <span><i class="fa fa-pencil"/> Notes de l'appel</span>
+                                </t>
+                                <div class="cid-form-group" style="margin: 0;">
+                                    <label class="cid-form-label">Durée (minutes)</label>
+                                    <input type="number" class="cid-form-input" min="0"
+                                           style="max-width: 120px;"
+                                           t-att-value="state.duree_minutes"
+                                           t-on-input="(ev) => state.duree_minutes = Number(ev.target.value)"/>
+                                </div>
+                                <div class="cid-form-group">
+                                    <label class="cid-form-label">Compte-rendu / notes</label>
+                                    <textarea class="cid-form-input cid-form-input--textarea"
+                                              rows="6"
+                                              placeholder="Notez ici ce qui s'est dit pendant l'appel..."
+                                              t-on-input="(ev) => state.notes_appel = ev.target.value"
+                                              t-esc="state.notes_appel"/>
+                                </div>
+                            </CidCard>
+
+                            <!-- Qualification buttons (les 3 boutons du cahier) -->
+                            <CidCard padded="true">
+                                <t t-set-slot="header">
+                                    <span><i class="fa fa-flag"/> Qualifier le compte-rendu</span>
+                                </t>
+                                <div class="cid-action-page__qualify-grid">
+                                    <button class="cid-qualify-btn cid-qualify-btn--success"
+                                            t-on-click="() => this.onQualifyAction('paiement')"
+                                            t-att-disabled="isDone or state.saving">
+                                        <i class="fa fa-check-circle"/>
+                                        <strong>Promesse de paiement</strong>
+                                        <span>Le client s'engage à régler</span>
+                                    </button>
+                                    <button class="cid-qualify-btn cid-qualify-btn--info"
+                                            t-on-click="() => this.onQualifyAction('plan_paiement')"
+                                            t-att-disabled="isDone or state.saving">
+                                        <i class="fa fa-handshake-o"/>
+                                        <strong>Plan de paiement</strong>
+                                        <span>Échelonnement convenu</span>
+                                    </button>
+                                    <button class="cid-qualify-btn cid-qualify-btn--warning"
+                                            t-on-click="() => this.onQualifyAction('non_joignable')"
+                                            t-att-disabled="isDone or state.saving">
+                                        <i class="fa fa-clock-o"/>
+                                        <strong>Non joignable</strong>
+                                        <span>Report automatique J+1</span>
+                                    </button>
+                                    <button class="cid-qualify-btn cid-qualify-btn--danger"
+                                            t-on-click="() => this.onQualifyAction('litige')"
+                                            t-att-disabled="isDone or state.saving">
+                                        <i class="fa fa-exclamation-triangle"/>
+                                        <strong>Litige</strong>
+                                        <span>Le client conteste</span>
+                                    </button>
+                                </div>
+                            </CidCard>
+                        </t>
+
+                        <!-- ===== TYPE EMAIL/COURRIER : éditeur ===== -->
+                        <t t-elif="isEmailLike">
+                            <CidCard padded="true" accentBar="'accent'">
+                                <t t-set-slot="header">
+                                    <span><i class="fa fa-envelope-o"/> Email à envoyer</span>
+                                    <CidBadge t-if="state.action.email_status === 'envoye'"
+                                              variant="'success'" subtle="true">
+                                        Envoyé
+                                    </CidBadge>
+                                </t>
+                                <div class="cid-form-group" style="margin: 0;">
+                                    <label class="cid-form-label">Destinataire</label>
+                                    <input type="email" class="cid-form-input"
+                                           t-att-value="state.destinataire"
+                                           t-on-input="(ev) => state.destinataire = ev.target.value"/>
+                                </div>
+                                <div class="cid-form-group">
+                                    <label class="cid-form-label">Objet</label>
+                                    <input type="text" class="cid-form-input"
+                                           t-att-value="state.sujet"
+                                           t-on-input="(ev) => state.sujet = ev.target.value"/>
+                                </div>
+                                <div class="cid-form-group">
+                                    <label class="cid-form-label">
+                                        Corps du message
+                                        <span class="cid-form-hint">— pré-rempli avec les détails du dossier</span>
+                                    </label>
+                                    <textarea class="cid-form-input cid-form-input--textarea"
+                                              rows="14"
+                                              t-on-input="(ev) => state.corps = ev.target.value"
+                                              t-esc="state.corps"/>
+                                </div>
+
+                                <t t-set-slot="footer">
+                                    <CidButton variant="'secondary'" icon="'fa-floppy-o'"
+                                               onClick="() => this.onSaveDraft()"
+                                               disabled="isDone or state.sending">
+                                        Enregistrer brouillon
+                                    </CidButton>
+                                    <CidButton variant="'primary'" icon="'fa-paper-plane'"
+                                               loading="state.sending"
+                                               disabled="isDone"
+                                               onClick="() => this.onSendEmail()">
+                                        Envoyer l'email
+                                    </CidButton>
+                                </t>
+                            </CidCard>
+                        </t>
+
+                        <!-- ===== TYPES NON GÉRÉS ===== -->
+                        <t t-else="">
+                            <CidEmptyState
+                                icon="'fa-info-circle'"
+                                title="'Type d&apos;action non géré ici'"
+                                description="'Cette action est gérée via le formulaire Odoo standard.'"/>
+                        </t>
+                    </div>
+
+                    <!-- ============ COL SIDE : factures + historique ============ -->
+                    <div class="cid-action-page__side">
+
+                        <!-- Factures concernées -->
+                        <CidCard padded="false">
+                            <t t-set-slot="header">
+                                <span><i class="fa fa-file-text-o"/> Factures concernées</span>
+                                <strong t-if="totalReste &gt; 0">
+                                    <t t-esc="fmt(totalReste)"/> DH
+                                </strong>
+                            </t>
+                            <t t-if="state.factures.length === 0">
+                                <div style="padding: 16px; text-align: center;" class="text-muted">
+                                    Aucune facture pour ce client dans ce dossier.
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="cid-action-page__factures">
+                                    <t t-foreach="state.factures" t-as="f" t-key="f.id">
+                                        <div class="cid-action-page__facture">
+                                            <CidStatusPill color="f.statut_interface" size="'sm'">
+                                                <t t-esc="f.statut_interface"/>
+                                            </CidStatusPill>
+                                            <div class="cid-action-page__facture-main">
+                                                <strong t-esc="f.name"/>
+                                                <div class="cid-action-page__facture-sub">
+                                                    <t t-esc="fmtDate(f.date_facture)"/>
+                                                    · TTC <t t-esc="fmt(f.montant_ttc)"/>
+                                                </div>
+                                            </div>
+                                            <div t-att-class="'cid-action-page__facture-amount' + (f.reste_a_payer === 0 ? ' is-paid' : '')">
+                                                <t t-esc="fmt(f.reste_a_payer)"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+                        </CidCard>
+
+                        <!-- Historique des actions -->
+                        <CidCard padded="false">
+                            <t t-set-slot="header">
+                                <span><i class="fa fa-history"/> Historique sur ce client</span>
+                                <CidBadge variant="'neutral'" subtle="true" size="'sm'">
+                                    <t t-esc="state.history.length"/>
+                                </CidBadge>
+                            </t>
+                            <t t-if="state.history.length === 0">
+                                <div style="padding: 16px; text-align: center;" class="text-muted">
+                                    Aucune action passée pour ce client.
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="cid-action-page__history">
+                                    <t t-foreach="state.history" t-as="h" t-key="h.id">
+                                        <div class="cid-action-page__history-item">
+                                            <div t-att-class="'cid-action-item__icon cid-action-item__icon--' + h.action_type">
+                                                <i t-att-class="'fa ' + actionTypeIcon(h.action_type)"/>
+                                            </div>
+                                            <div class="cid-action-page__history-main">
+                                                <div t-esc="h.name" class="cid-action-page__history-title"/>
+                                                <div class="cid-action-page__history-sub">
+                                                    <t t-esc="fmtDate(h.date_done)"/>
+                                                    <t t-if="h.action_prise and h.action_prise !== 'aucune'">
+                                                        · <t t-esc="_qualifyLabel(h.action_prise)"/>
+                                                    </t>
+                                                    <t t-if="h.duree_minutes">
+                                                        · <t t-esc="h.duree_minutes"/> min
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+                        </CidCard>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+
+</templates>

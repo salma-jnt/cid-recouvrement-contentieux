@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.CidEmptyState">
+        <div class="cid-empty">
+            <div class="cid-empty__icon">
+                <i t-att-class="'fa ' + props.icon"/>
+            </div>
+            <h3 class="cid-empty__title" t-esc="props.title"/>
+            <p t-if="props.description" class="cid-empty__desc" t-esc="props.description"/>
+            <div class="cid-empty__actions" t-if="props.actionLabel">
+                <CidButton t-if="props.actionLabel"
+                           variant="'primary'"
+                           onClick="props.onAction">
+                    <t t-esc="props.actionLabel"/>
+                </CidButton>
+                <t t-slot="default"/>
+            </div>
+        </div>
+    </t>
+
+</templates>

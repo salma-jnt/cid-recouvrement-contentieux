@@ -1,0 +1,78 @@
+.cid-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--cid-space-4);
+    padding: var(--cid-space-3) var(--cid-space-4);
+    background: var(--cid-surface);
+    border-top: 1px solid var(--cid-divider);
+    flex-wrap: wrap;
+
+    &__info {
+        font-size: var(--cid-text-sm);
+        color: var(--cid-text-muted);
+        strong { color: var(--cid-text); font-weight: var(--cid-weight-semibold); }
+    }
+
+    &__size {
+        display: flex;
+        align-items: center;
+        gap: var(--cid-space-2);
+        font-size: var(--cid-text-sm);
+        color: var(--cid-text-muted);
+
+        select {
+            height: 30px;
+            padding: 0 8px;
+            border: 1px solid var(--cid-border-strong);
+            border-radius: var(--cid-radius-sm);
+            background: var(--cid-surface);
+            color: var(--cid-text);
+            font-size: var(--cid-text-sm);
+            font-family: var(--cid-font-sans);
+        }
+    }
+
+    &__nav {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+    }
+
+    &__btn {
+        @include cid-reset-button;
+        min-width: 32px;
+        height: 32px;
+        padding: 0 8px;
+        border-radius: var(--cid-radius-sm);
+        font-size: var(--cid-text-sm);
+        font-weight: var(--cid-weight-medium);
+        color: var(--cid-text-soft);
+        border: 1px solid transparent;
+        transition: all var(--cid-trans-fast);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover:not([disabled]):not(.is-active) {
+            background: var(--cid-surface-alt);
+            color: var(--cid-text);
+        }
+
+        &.is-active {
+            background: var(--cid-primary-500);
+            color: #fff;
+        }
+
+        &[disabled] {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+    }
+
+    &__ellipsis {
+        padding: 0 4px;
+        color: var(--cid-text-faint);
+        font-size: var(--cid-text-sm);
+    }
+}

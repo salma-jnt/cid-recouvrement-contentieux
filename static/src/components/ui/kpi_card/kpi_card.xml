@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.CidKpiCard">
+        <div t-att-class="classes" t-on-click="onClick">
+            <div class="cid-kpi__header">
+                <span class="cid-kpi__label" t-esc="props.label"/>
+                <div t-if="props.icon" class="cid-kpi__icon">
+                    <i t-att-class="'fa ' + props.icon"/>
+                </div>
+            </div>
+            <div class="cid-kpi__value">
+                <t t-if="props.loading">
+                    <span class="cid-kpi__skel"/>
+                </t>
+                <t t-else="" t-esc="props.value"/>
+            </div>
+            <div class="cid-kpi__footer">
+                <span t-if="props.subtitle" class="cid-kpi__subtitle" t-esc="props.subtitle"/>
+                <span t-if="props.trend"
+                      t-att-class="'cid-kpi__trend cid-kpi__trend--' + props.trendDirection">
+                    <i t-att-class="'fa ' + trendIcon"/>
+                    <span t-esc="props.trend"/>
+                </span>
+            </div>
+        </div>
+    </t>
+
+</templates>

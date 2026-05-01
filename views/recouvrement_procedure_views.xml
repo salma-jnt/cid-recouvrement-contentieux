@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- ================================================================
+             PROCÉDURE DE RECOUVREMENT (stratégie) + MODÈLES D'ACTIONS
+        ===================================================================== -->
+
+        <record id="view_recouvrement_procedure_list" model="ir.ui.view">
+            <field name="name">recouvrement.procedure.list</field>
+            <field name="model">recouvrement.procedure</field>
+            <field name="arch" type="xml">
+                <list string="Procédures de recouvrement">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="nb_phases"/>
+                    <field name="active" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_recouvrement_procedure_form" model="ir.ui.view">
+            <field name="name">recouvrement.procedure.form</field>
+            <field name="model">recouvrement.procedure</field>
+            <field name="arch" type="xml">
+                <form string="Procédure de recouvrement">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" placeholder="ex: Procédure Standard"/></h1>
+                            <h3><field name="code" placeholder="STANDARD"/></h3>
+                        </div>
+                        <group>
+                            <field name="active"/>
+                            <field name="description"/>
+                        </group>
+                        <notebook>
+                            <page string="Phases (modèles d'actions ordonnés)">
+                                <p class="text-muted">
+                                    <i class="fa fa-info-circle"/>
+                                    Définissez ici l'enchaînement des phases. Le
+                                    <strong>statut visuel cible</strong> (couleur)
+                                    sera propagé automatiquement vers les factures
+                                    quand la phase devient courante.
+                                    Le délai s'additionne à la phase précédente.
+                                </p>
+                                <field name="action_template_ids">
+                                    <list editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="name"/>
+                                        <field name="action_type"/>
+                                        <field name="delay"/>
+                                        <field name="statut_interface_cible" widget="badge"
+                                               decoration-success="statut_interface_cible=='vert'"
+                                               decoration-warning="statut_interface_cible=='orange'"
+                                               decoration-danger="statut_interface_cible=='rouge'"
+                                               decoration-info="statut_interface_cible=='mauve'"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- =================== Modèles d'actions (vue dédiée) =================== -->
+        <record id="view_recouvrement_action_template_list" model="ir.ui.view">
+            <field name="name">recouvrement.action.template.list</field>
+            <field name="model">recouvrement.action.template</field>
+            <field name="arch" type="xml">
+                <list string="Modèles d'actions">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="procedure_id"/>
+                    <field name="action_type"/>
+                    <field name="delay"/>
+                    <field name="statut_interface_cible" widget="badge"
+                           decoration-success="statut_interface_cible=='vert'"
+                           decoration-warning="statut_interface_cible=='orange'"
+                           decoration-danger="statut_interface_cible=='rouge'"
+                           decoration-info="statut_interface_cible=='mauve'"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_recouvrement_action_template_form" model="ir.ui.view">
+            <field name="name">recouvrement.action.template.form</field>
+            <field name="model">recouvrement.action.template</field>
+            <field name="arch" type="xml">
+                <form string="Modèle d'action">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" placeholder="Nom de la phase"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="procedure_id"/>
+                                <field name="sequence"/>
+                                <field name="action_type"/>
+                                <field name="delay"/>
+                            </group>
+                            <group>
+                                <field name="statut_interface_cible"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Description">
+                                <field name="description"/>
+                            </page>
+                            <page string="Templates email"
+                                  invisible="action_type not in ('email','courrier','mise_en_demeure')">
+                                <group>
+                                    <field name="email_subject_template"
+                                           placeholder="Objet pré-rempli pour les emails de cette phase"/>
+                                </group>
+                                <field name="email_body_template"
+                                       placeholder="Corps HTML pré-rempli pour les emails de cette phase"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_recouvrement_action_template_search" model="ir.ui.view">
+            <field name="name">recouvrement.action.template.search</field>
+            <field name="model">recouvrement.action.template</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="procedure_id"/>
+                    <separator/>
+                    <filter name="couleur_vert" string="Vert"
+                            domain="[('statut_interface_cible','=','vert')]"/>
+                    <filter name="couleur_orange" string="Orange"
+                            domain="[('statut_interface_cible','=','orange')]"/>
+                    <filter name="couleur_rouge" string="Rouge"
+                            domain="[('statut_interface_cible','=','rouge')]"/>
+                    <filter name="couleur_mauve" string="Mauve"
+                            domain="[('statut_interface_cible','=','mauve')]"/>
+                    <separator/>
+                    <filter name="group_by_proc" string="Procédure"
+                            context="{'group_by': 'procedure_id'}"/>
+                    <filter name="group_by_type" string="Type"
+                            context="{'group_by': 'action_type'}"/>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>

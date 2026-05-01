@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="recouvrement_contentieux.ImportEncaissementsPage" owl="1">
+    <div class="cid-page cid-import-page">
+
+        <!-- Header -->
+        <header class="cid-page__header">
+            <div>
+                <h1 class="cid-page__title">Importer des encaissements</h1>
+                <p class="cid-page__subtitle">
+                    Téléversez votre fichier Excel des paiements.
+                </p>
+            </div>
+
+            <CidButton variant="'ghost'" icon="'fa-arrow-left'" onClick="() => this.onBack()">
+                Retour
+            </CidButton>
+        </header>
+
+        <!-- Main -->
+        <div class="cid-import-page__col-main">
+
+            <CidCard padded="true">
+                <t t-set-slot="header">
+                    <span><i class="fa fa-cloud-upload"/> Fichier à importer</span>
+                    <CidBadge variant="'info'" subtle="true">.xlsx · .xls</CidBadge>
+                </t>
+
+                <CidDropzone
+                    accept="'.xlsx,.xls'"
+                    multiple="false"
+                    maxSizeMB="25"
+                    files="state.files"
+                    onFilesChanged="(f) => this.onFilesChanged(f)"
+                    title="'Glissez votre fichier Excel ici'"
+                    subtitle="'ou cliquez pour parcourir'"/>
+
+                
+
+                <t t-set-slot="footer">
+                    <CidButton variant="'secondary'"
+                               onClick="() => this.onReset()"
+                               disabled="state.importing or state.files.length === 0">
+                        Réinitialiser
+                    </CidButton>
+
+                    <CidButton variant="'primary'"
+                               icon="'fa-upload'"
+                               loading="state.importing"
+                               onClick="() => this.onImport()"
+                               disabled="!canImport()">
+                        Importer
+                    </CidButton>
+                </t>
+            </CidCard>
+
+            <!-- Résultat -->
+            <t t-if="state.result">
+                <CidCard padded="true" accentBar="'success'">
+                    <t t-set-slot="header">
+                        <span><i class="fa fa-check-circle text-success"/> Importation terminée</span>
+                    </t>
+
+                    <div class="cid-import-summary">
+                        <div class="cid-import-summary__cell">
+                            <div class="cid-import-summary__label">Créés</div>
+                            <div class="cid-import-summary__value cid-import-summary__value--success">
+                                <t t-esc="state.result.created || 0"/>
+                            </div>
+                        </div>
+
+                        <div class="cid-import-summary__cell">
+                            <div class="cid-import-summary__label">Mises à jour</div>
+                            <div class="cid-import-summary__value cid-import-summary__value--info">
+                                <t t-esc="state.result.updated || 0"/>
+                            </div>
+                        </div>
+
+                        <div class="cid-import-summary__cell">
+                            <div class="cid-import-summary__label">Ignorés</div>
+                            <div class="cid-import-summary__value cid-import-summary__value--danger">
+                                <t t-esc="state.result.ignored || 0"/>
+                            </div>
+                        </div>
+
+                        <div class="cid-import-summary__cell">
+                            <div class="cid-import-summary__label">Total</div>
+                            <div class="cid-import-summary__value">
+                                <t t-esc="state.result.total || 0"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <t t-set-slot="footer">
+                        <CidButton variant="'primary'" icon="'fa-list'"
+                                   onClick="() => this.onBack()">
+                            Voir les encaissements
+                        </CidButton>
+                    </t>
+                </CidCard>
+            </t>
+
+        </div>
+    </div>
+</t>
+
+</templates>

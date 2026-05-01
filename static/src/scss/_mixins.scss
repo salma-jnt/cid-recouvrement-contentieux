@@ -1,0 +1,93 @@
+/*
+ * ============================================================================
+ *  CID MIXINS (Sass)
+ *  Reproduisent les patterns de shadcn/ui (focus visible, button reset,
+ *  truncate, etc.) avec les tokens CID.
+ * ============================================================================
+ */
+
+@mixin cid-reset-button {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+}
+
+@mixin cid-focus-ring($color: var(--cid-focus-ring)) {
+    outline: 0;
+    box-shadow: $color;
+}
+
+@mixin cid-truncate($lines: 1) {
+    @if $lines == 1 {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    } @else {
+        display: -webkit-box;
+        -webkit-line-clamp: $lines;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+}
+
+@mixin cid-card {
+    background: var(--cid-surface);
+    border: 1px solid var(--cid-border);
+    border-radius: var(--cid-radius-lg);
+    box-shadow: var(--cid-shadow-sm);
+}
+
+@mixin cid-scrollbar {
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: var(--cid-border-strong);
+        border-radius: var(--cid-radius-full);
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        background: var(--cid-text-faint);
+    }
+}
+
+@mixin cid-animation-fade-in($duration: 180ms) {
+    animation: cid-fade-in $duration cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes cid-fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cid-slide-in-right {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes cid-slide-in-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cid-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.5; }
+}
+
+@keyframes cid-spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes cid-shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}

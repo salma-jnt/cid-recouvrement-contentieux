@@ -1,0 +1,125 @@
+/*
+ * ============================================================================
+ *  Compléments SCSS pour CidDataTable
+ *  À inclure dans recouvrement.scss (ou dans data_table.scss directement).
+ * ============================================================================
+ */
+
+/* ── Toolbar : champ de recherche ───────────────────────────────────────── */
+.cid-dt-toolbar {
+    &__search {
+        display: flex;
+        align-items: center;
+        gap: var(--cid-space-2);
+        flex: 1;
+        max-width: 320px;
+        background: var(--cid-surface);
+        border: 1px solid var(--cid-border-strong);
+        border-radius: var(--cid-radius-sm);
+        padding: 0 var(--cid-space-3);
+        height: 34px;
+        transition: border-color var(--cid-trans-fast), box-shadow var(--cid-trans-fast);
+
+        &:focus-within {
+            border-color: var(--cid-primary-400);
+            box-shadow: var(--cid-focus-ring);
+        }
+
+        .fa {
+            color: var(--cid-text-faint);
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+    }
+
+    &__input {
+        border: 0;
+        outline: none;
+        background: transparent;
+        font-size: var(--cid-text-sm);
+        color: var(--cid-text);
+        font-family: var(--cid-font-sans);
+        width: 100%;
+
+        &::placeholder { color: var(--cid-text-faint); }
+    }
+}
+
+/* ── Boutons d'action en ligne (slot row_actions) ───────────────────────── */
+.cid-dt-row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--cid-space-1);
+    opacity: 0;
+    transition: opacity var(--cid-trans-fast);
+
+    /* Afficher au survol de la ligne */
+    .cid-dt__row:hover & { opacity: 1; }
+
+    &__btn {
+        @include cid-reset-button;
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--cid-radius-sm);
+        color: var(--cid-text-muted);
+        transition: all var(--cid-trans-fast);
+
+        .fa { font-size: 13px; }
+
+        &:hover {
+            background: var(--cid-surface-alt);
+            color: var(--cid-text);
+        }
+
+        &--danger:hover {
+            background: var(--cid-rouge-soft);
+            color: var(--cid-rouge);
+        }
+    }
+}
+
+/* ── Page layout helpers (utilisés dans l'exemple) ──────────────────────── */
+.cid-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cid-space-6);
+    padding: var(--cid-space-6);
+    max-width: 100%;
+
+    &__header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: var(--cid-space-4);
+        flex-wrap: wrap;
+    }
+
+    &__header-left {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    &__header-right {
+        display: flex;
+        align-items: center;
+        gap: var(--cid-space-2);
+    }
+
+    &__title {
+        font-size: var(--cid-text-2xl);
+        font-weight: var(--cid-weight-bold);
+        color: var(--cid-text);
+        line-height: var(--cid-leading-tight);
+        margin: 0;
+    }
+
+    &__subtitle {
+        font-size: var(--cid-text-sm);
+        color: var(--cid-text-muted);
+    }
+}

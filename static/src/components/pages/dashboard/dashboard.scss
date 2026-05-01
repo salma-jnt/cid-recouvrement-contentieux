@@ -1,0 +1,161 @@
+.cid-dashboard {
+    &__kpis {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: var(--cid-space-3);
+        margin-bottom: var(--cid-space-5);
+
+        @media (max-width: 1280px) { grid-template-columns: repeat(3, 1fr); }
+        @media (max-width: 768px)  { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    &__row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--cid-space-4);
+        margin-bottom: var(--cid-space-5);
+
+        @media (max-width: 1024px) {
+            grid-template-columns: 1fr;
+        }
+    }
+}
+
+/* ============================================================
+   Action items list (utilisée dans dashboard et autres pages)
+   ============================================================ */
+.cid-action-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.cid-action-item {
+    display: flex;
+    align-items: center;
+    gap: var(--cid-space-3);
+    padding: var(--cid-space-3) var(--cid-space-4);
+    border-bottom: 1px solid var(--cid-divider);
+    cursor: pointer;
+    transition: background var(--cid-trans-fast);
+
+    &:last-child { border-bottom: 0; }
+    &:hover { background: var(--cid-surface-alt); }
+
+    &__icon {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--cid-radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+        background: var(--cid-primary-50);
+        color: var(--cid-primary-500);
+
+        &--appel  { background: var(--cid-primary-50);  color: var(--cid-primary-600); }
+        &--email  { background: var(--cid-accent-50);   color: var(--cid-accent-700); }
+        &--courrier { background: var(--cid-mauve-soft); color: var(--cid-mauve-fg); }
+        &--mise_en_demeure { background: var(--cid-rouge-soft); color: var(--cid-rouge-fg); }
+        &--contentieux { background: var(--cid-rouge-soft); color: var(--cid-rouge-fg); }
+        &--danger { background: var(--cid-rouge-soft); color: var(--cid-rouge-fg); }
+    }
+
+    &__main { flex: 1; min-width: 0; }
+    &__title {
+        font-weight: var(--cid-weight-medium);
+        font-size: var(--cid-text-sm);
+        color: var(--cid-text);
+        @include cid-truncate(1);
+    }
+    &__sub {
+        margin-top: 2px;
+        font-size: var(--cid-text-xs);
+        color: var(--cid-text-muted);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: wrap;
+        i { font-size: 11px; }
+    }
+
+    &__arrow {
+        color: var(--cid-text-faint);
+        font-size: 12px;
+    }
+
+    &__amount {
+        font-weight: var(--cid-weight-semibold);
+        color: var(--cid-danger);
+        font-feature-settings: "tnum";
+    }
+}
+
+/* ============================================================
+   Répartition bar
+   ============================================================ */
+.cid-repart-bar {
+    display: flex;
+    height: 32px;
+    border-radius: var(--cid-radius-md);
+    overflow: hidden;
+    background: var(--cid-surface-alt);
+    margin-bottom: var(--cid-space-4);
+
+    &__seg {
+        transition: width 280ms ease;
+        cursor: default;
+
+        &--vert   { background: var(--cid-vert); }
+        &--orange { background: var(--cid-orange); }
+        &--rouge  { background: var(--cid-rouge); }
+        &--mauve  { background: var(--cid-mauve); }
+    }
+}
+
+.cid-repart-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--cid-space-3);
+
+    @media (max-width: 600px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.cid-repart-cell {
+    background: var(--cid-surface-alt);
+    border: 1px solid var(--cid-border);
+    border-radius: var(--cid-radius-md);
+    padding: var(--cid-space-3);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+    transition: all var(--cid-trans-fast);
+
+    &:hover {
+        background: var(--cid-surface);
+        border-color: var(--cid-border-strong);
+        transform: translateY(-1px);
+    }
+
+    &__count {
+        font-size: var(--cid-text-2xl);
+        font-weight: var(--cid-weight-bold);
+        color: var(--cid-text);
+        font-feature-settings: "tnum";
+        margin-top: 4px;
+    }
+    &__pct {
+        font-size: var(--cid-text-xs);
+        color: var(--cid-text-muted);
+        font-weight: var(--cid-weight-medium);
+    }
+}
+
+/* Helper text colors */
+.text-primary { color: var(--cid-primary-500); }
+.text-danger  { color: var(--cid-danger); }
+.text-success { color: var(--cid-success); }
+.text-muted   { color: var(--cid-text-muted); }

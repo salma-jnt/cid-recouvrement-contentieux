@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- CORRECTION : owl="1" obligatoire pour tout template OWL -->
+    <t t-name="recouvrement_contentieux.CidToastContainer" owl="1">
+        <div class="cid-toast-container" role="region" aria-label="Notifications">
+            <!--
+                CORRECTION : utiliser toastState.toasts (exposé dans setup())
+                au lieu de this.toast.state.toasts.
+                OWL ne peut tracker la réactivité qu'à travers des propriétés
+                directement accessibles sur le composant, pas à travers une
+                chaîne de service.
+            -->
+            <t t-foreach="state.toasts" t-as="t" t-key="t.id">
+                <div t-att-class="'cid-toast cid-toast--' + t.variant" role="status">
+                    <div class="cid-toast__icon">
+                        <i t-att-class="'fa ' + iconFor(t.variant)"/>
+                    </div>
+                    <div class="cid-toast__body">
+                        <div class="cid-toast__title" t-esc="t.title"/>
+                        <div t-if="t.description" class="cid-toast__description" t-esc="t.description"/>
+                    </div>
+                    <button t-if="t.actionLabel" class="cid-toast__action"
+                            t-on-click="() => this.onActionClick(t)">
+                        <t t-esc="t.actionLabel"/>
+                    </button>
+                    <button class="cid-toast__close" aria-label="Fermer"
+                            t-on-click="() => this.onClose(t.id)">
+                        <i class="fa fa-times"/>
+                    </button>
+                </div>
+            </t>
+        </div>
+    </t>
+
+</templates>

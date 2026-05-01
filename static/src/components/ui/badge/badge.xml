@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.CidBadge">
+        <span t-att-class="classes">
+            <i t-if="props.icon" t-att-class="'fa ' + props.icon"/>
+            <t t-slot="default"/>
+        </span>
+    </t>
+
+</templates>

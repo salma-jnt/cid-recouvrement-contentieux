@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.CidSkeleton">
+        <t t-if="props.lines &lt;= 1">
+            <div t-att-class="classes" t-att-style="style"/>
+        </t>
+        <t t-else="">
+            <div class="cid-skel-group">
+                <t t-foreach="range" t-as="i" t-key="i">
+                    <div t-att-class="classes" t-att-style="style"/>
+                </t>
+            </div>
+        </t>
+    </t>
+
+</templates>

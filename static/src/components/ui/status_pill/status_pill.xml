@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.CidStatusPill">
+        <span t-att-class="classes" t-att-title="colorLabels[props.color]">
+            <span t-if="props.withDot" class="cid-status-pill__dot"/>
+            <span class="cid-status-pill__label"><t t-slot="default"/></span>
+        </span>
+    </t>
+
+</templates>

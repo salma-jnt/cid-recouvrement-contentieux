@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- ================================================================
+             DOSSIER DE RECOUVREMENT (multi-factures, logique du convoi)
+        ===================================================================== -->
+
+        <record id="view_recouvrement_dossier_list" model="ir.ui.view">
+            <field name="name">recouvrement.recouvrement.list</field>
+            <field name="model">recouvrement.recouvrement</field>
+            <field name="arch" type="xml">
+                <list string="Dossiers de recouvrement"
+                      decoration-success="state=='solde'"
+                      decoration-warning="state=='en_cours'"
+                      decoration-danger="state=='en_retard' or state=='bloque'">
+                    <field name="name"/>
+                    <field name="procedure_id"/>
+                    <field name="phase_courante"/>
+                    <field name="date_depot_groupe"/>
+                    <field name="nombre_factures"/>
+                    <field name="nombre_clients"/>
+                    <field name="montant_ttc" sum="Total TTC"/>
+                    <field name="montant_encaisse" sum="Total encaissé"/>
+                    <field name="reste_a_recouvrer" sum="Reste à recouvrer"/>
+                    <field name="currency_id" column_invisible="1"/>
+                    <field name="prochaine_echeance"/>
+                    <field name="state" widget="badge"
+                           decoration-success="state=='solde'"
+                           decoration-warning="state in ('ouvert','en_cours')"
+                           decoration-danger="state in ('en_retard','bloque')"/>
+                    <button name="action_open_dossier_page" type="object"
+                           string="" icon="fa-folder-open"
+                           title="Ouvrir le dossier"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_recouvrement_dossier_kanban" model="ir.ui.view">
+            <field name="name">recouvrement.recouvrement.kanban</field>
+            <field name="model">recouvrement.recouvrement</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="state" class="o_kanban_dashboard">
+                    <field name="name"/>
+                    <field name="procedure_id"/>
+                    <field name="phase_courante"/>
+                    <field name="nombre_factures"/>
+                    <field name="nombre_clients"/>
+                    <field name="reste_a_recouvrer"/>
+                    <field name="prochaine_echeance"/>
+                    <field name="state"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_card oe_kanban_global_click">
+                                <div class="o_kanban_card_header">
+                                    <strong><field name="name"/></strong>
+                                </div>
+                                <div>
+                                    <i class="fa fa-sitemap"/> <field name="procedure_id"/>
+                                </div>
+                                <div>
+                                    <i class="fa fa-flag"/> <field name="phase_courante"/>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <span><field name="nombre_factures"/> factures · <field name="nombre_clients"/> clients</span>
+                                    <span class="float-end">
+                                        <strong><field name="reste_a_recouvrer" widget="monetary"/></strong>
+                                    </span>
+                                </div>
+                                <div class="text-muted">
+                                    <small>Échéance : <field name="prochaine_echeance"/></small>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="view_recouvrement_dossier_form" model="ir.ui.view">
+            <field name="name">recouvrement.recouvrement.form</field>
+            <field name="model">recouvrement.recouvrement</field>
+            <field name="arch" type="xml">
+                <form string="Dossier de recouvrement">
+                    <header>
+                        <button name="action_generate_actions" type="object"
+                                string="Régénérer les actions"
+                                class="btn-secondary"
+                                invisible="state in ('solde','bloque')"/>
+                        <button name="action_block" type="object"
+                                string="Bloquer"
+                                class="btn-warning"
+                                invisible="state == 'bloque'"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="ouvert,en_cours,en_retard,solde"/>
+                    </header>
+                    <sheet>
+                        <widget name="web_ribbon" title="Soldé"
+                                bg_color="text-bg-success"
+                                invisible="state != 'solde'"/>
+                        <widget name="web_ribbon" title="Bloqué"
+                                bg_color="text-bg-danger"
+                                invisible="state != 'bloque'"/>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                            <h3>
+                                Phase : <field name="phase_courante" readonly="1"/>
+                            </h3>
+                        </div>
+                        <group>
+                            <group string="Stratégie et regroupement">
+                                <field name="procedure_id"/>
+                                <field name="date_depot_groupe"/>
+                                <field name="prochaine_echeance" readonly="1"/>
+                                <field name="last_action_date" readonly="1"/>
+                            </group>
+                            <group string="Indicateurs">
+                                <field name="nombre_factures" readonly="1"/>
+                                <field name="nombre_clients" readonly="1"/>
+                                <field name="montant_ttc" readonly="1"/>
+                                <field name="montant_encaisse" readonly="1"/>
+                                <field name="reste_a_recouvrer" readonly="1"/>
+                                <field name="currency_id" groups="base.group_multi_currency"/>
+                            </group>
+                        </group>
+                        <field name="motif_blocage" placeholder="Motif de blocage (si applicable)"
+                               invisible="state != 'bloque'"/>
+                        <notebook>
+                            <page string="Factures du dossier"
+                                  name="factures">
+                                <field name="facture_ids" readonly="1">
+                                    <list>
+                                        <field name="statut_interface" widget="badge"
+                                               decoration-success="statut_interface=='vert'"
+                                               decoration-warning="statut_interface=='orange'"
+                                               decoration-danger="statut_interface=='rouge'"
+                                               decoration-info="statut_interface=='mauve'"/>
+                                        <field name="name"/>
+                                        <field name="client_id"/>
+                                        <field name="code_affaire"/>
+                                        <field name="date_facture"/>
+                                        <field name="montant_ttc" sum="Total TTC"/>
+                                        <field name="montant_paye" sum="Total payé"/>
+                                        <field name="reste_a_payer" sum="Reste à payer"/>
+                                        <field name="currency_id" column_invisible="1"/>
+                                        <field name="recouvrement_status" widget="badge"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Actions de relance" name="actions">
+                                <field name="action_ids" context="{'default_recouvrement_id': id}">
+                                    <list editable="bottom"
+                                          decoration-warning="state=='reporte'"
+                                          decoration-danger="is_overdue and state in ('todo','reporte')">
+                                        <field name="name"/>
+                                        <field name="client_id"/>
+                                        <field name="action_type"/>
+                                        <field name="mandatory_date"/>
+                                        <field name="responsible_id"/>
+                                        <field name="state" widget="badge"
+                                               decoration-success="state=='done'"
+                                               decoration-warning="state=='reporte'"
+                                               decoration-info="state=='todo'"/>
+                                        <field name="is_overdue" optional="hide"/>
+                                        <button name="action_done" type="object"
+                                                icon="fa-check" title="Réaliser"
+                                                invisible="state == 'done'"/>
+                                        <button name="action_reporter" type="object"
+                                                icon="fa-clock-o" title="Reporter à J+1"
+                                                invisible="state in ('done','cancel')"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Encaissements (informatif)" name="encaissements">
+                                <field name="encaissement_ids" readonly="1">
+                                    <list>
+                                        <field name="name"/>
+                                        <field name="client_id"/>
+                                        <field name="date_operation"/>
+                                        <field name="montant"/>
+                                        <field name="montant_alloue"/>
+                                        <field name="reste_a_allouer"/>
+                                        <field name="etat_lettrage" widget="badge"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_recouvrement_dossier_search" model="ir.ui.view">
+            <field name="name">recouvrement.recouvrement.search</field>
+            <field name="model">recouvrement.recouvrement</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="procedure_id"/>
+                    <field name="phase_courante"/>
+                    <separator/>
+                    <filter name="ouverts" string="Ouverts"
+                            domain="[('state','in',['ouvert','en_cours','en_retard'])]"/>
+                    <filter name="en_retard" string="En retard"
+                            domain="[('state','=','en_retard')]"/>
+                    <filter name="bloques" string="Bloqués"
+                            domain="[('state','=','bloque')]"/>
+                    <filter name="soldes" string="Soldés"
+                            domain="[('state','=','solde')]"/>
+                    <separator/>
+                    <filter name="action_aujourdhui" string="Action aujourd'hui"
+                            domain="[('next_action_date','=', context_today())]"/>
+                    <filter name="action_cette_semaine" string="Action cette semaine"
+                            domain="[('next_action_date','&gt;=', context_today()),
+                                     ('next_action_date','&lt;=', (context_today() + relativedelta(days=7)))]"/>
+                    <separator/>
+                    <filter name="group_by_state" string="Statut"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_procedure" string="Procédure"
+                            context="{'group_by': 'procedure_id'}"/>
+                    <filter name="group_by_phase" string="Phase courante"
+                            context="{'group_by': 'phase_courante'}"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_recouvrement_recouvrement" model="ir.actions.act_window">
+            <field name="search_view_id" ref="view_recouvrement_dossier_search"/>
+        </record>
+    </data>
+</odoo>

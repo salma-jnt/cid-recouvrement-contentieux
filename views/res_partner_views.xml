@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_recouvrement_partner_list" model="ir.ui.view">
+            <field name="name">res.partner.list.recouvrement</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <list string="Clients">
+                    <field name="name"/>
+                    <field name="email"/>
+                    <field name="phone"/>
+                    <field name="client_type_id"/>
+                    <field name="facture_recouvrement_count"/>
+                    <field name="recouvrement_count"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_recouvrement_partner_form" model="ir.ui.view">
+            <field name="name">res.partner.form.recouvrement</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//sheet" position="inside">
+                    <notebook position="inside">
+                        <page string="Recouvrement" name="recouvrement">
+                            <group>
+                                <field name="client_type_id"/>
+                                <field name="recouvrement_count" readonly="1"/>
+                                <field name="facture_recouvrement_count" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

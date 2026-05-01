@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.CidChatbotFab">
+        <div class="cid-chatbot-root">
+            <!-- Floating action button -->
+            <button t-att-class="'cid-chatbot-fab' + (state.open ? ' is-open' : '')"
+                    t-on-click="toggle"
+                    aria-label="Assistant CID">
+                <i t-if="!state.open" class="fa fa-comments cid-chatbot-fab__icon"/>
+                <i t-else="" class="fa fa-times cid-chatbot-fab__icon"/>
+                <span t-if="!state.open" class="cid-chatbot-fab__pulse"/>
+            </button>
+
+            <!-- Chat panel -->
+            <t t-if="state.open">
+                <div class="cid-chatbot-panel" role="dialog" aria-label="Assistant">
+                    <header class="cid-chatbot-panel__header">
+                        <div class="cid-chatbot-panel__brand">
+                            <div class="cid-chatbot-panel__avatar">
+                                <i class="fa fa-magic"/>
+                            </div>
+                            <div>
+                                <div class="cid-chatbot-panel__title">Assistant CID</div>
+                                <div class="cid-chatbot-panel__subtitle">
+                                    <span class="cid-chatbot-panel__dot"/> En ligne
+                                </div>
+                            </div>
+                        </div>
+                        <button class="cid-chatbot-panel__close"
+                                t-on-click="toggle" aria-label="Fermer">
+                            <i class="fa fa-times"/>
+                        </button>
+                    </header>
+
+                    <div class="cid-chatbot-panel__messages" t-ref="scrollArea">
+                        <t t-foreach="state.messages" t-as="msg" t-key="msg.id">
+                            <div t-att-class="'cid-chat-msg cid-chat-msg--' + msg.role + (msg.error ? ' cid-chat-msg--error' : '')">
+                                <div t-if="msg.role === 'assistant'" class="cid-chat-msg__avatar">
+                                    <i class="fa fa-magic"/>
+                                </div>
+                                <div class="cid-chat-msg__bubble">
+                                    <t t-esc="msg.content"/>
+                                </div>
+                            </div>
+                        </t>
+                        <div t-if="state.sending" class="cid-chat-msg cid-chat-msg--assistant">
+                            <div class="cid-chat-msg__avatar">
+                                <i class="fa fa-magic"/>
+                            </div>
+                            <div class="cid-chat-msg__bubble cid-chat-msg__bubble--typing">
+                                <span/><span/><span/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div t-if="state.messages.length === 1" class="cid-chatbot-panel__suggestions">
+                        <button class="cid-chat-suggestion"
+                                t-on-click="() => this.suggestionClick('Combien de factures non soldées ce mois-ci ?')">
+                            Factures non soldées ce mois-ci ?
+                        </button>
+                        <button class="cid-chat-suggestion"
+                                t-on-click="() => this.suggestionClick('Top 5 clients par reste à recouvrer')">
+                            Top 5 clients à recouvrer
+                        </button>
+                        <button class="cid-chat-suggestion"
+                                t-on-click="() => this.suggestionClick('Total encaissé en 2026')">
+                            Total encaissé en 2026
+                        </button>
+                    </div>
+
+                    <div class="cid-chatbot-panel__input">
+                        <textarea
+                            t-model="state.input"
+                            t-on-keydown="onInputKey"
+                            placeholder="Posez votre question..."
+                            rows="1"/>
+                        <button class="cid-chatbot-panel__send"
+                                t-on-click="send"
+                                t-att-disabled="!state.input.trim() or state.sending"
+                                aria-label="Envoyer">
+                            <i class="fa fa-paper-plane"/>
+                        </button>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+
+</templates>
