@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="recouvrement_contentieux.CidDrawer">
+        <t t-if="props.isOpen">
+
+            <!-- Overlay semi-transparent -->
+            <div class="cid-drawer__overlay" t-on-click="onOverlayClick"/>
+
+            <!-- Panel latéral -->
+            <div t-att-class="panelClass">
+
+                <!-- ── Header ───────────────────────────────────────── -->
+                <div class="cid-drawer__header">
+                    <div class="cid-drawer__header-left">
+                        <div t-if="props.title" class="cid-drawer__title"
+                             t-esc="props.title"/>
+                        <div t-if="props.subtitle" class="cid-drawer__subtitle"
+                             t-esc="props.subtitle"/>
+                    </div>
+                    <div class="cid-drawer__header-right">
+                        <!-- Slot pour badges / actions supplémentaires dans le header -->
+                        <t t-if="props.slots and props.slots['header-extra']">
+                            <t t-slot="header-extra"/>
+                        </t>
+                        <button class="cid-drawer__close-btn"
+                                t-on-click="onCloseClick"
+                                title="Fermer">
+                            <i class="fa fa-times"/>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── Body (scroll) ────────────────────────────────── -->
+                <div class="cid-drawer__body">
+                    <t t-slot="default"/>
+                </div>
+
+                <!-- ── Footer (fixe en bas) ─────────────────────────── -->
+                <t t-if="props.slots and props.slots['footer']">
+                    <div class="cid-drawer__footer">
+                        <t t-slot="footer"/>
+                    </div>
+                </t>
+
+            </div>
+        </t>
+    </t>
+
+    <!-- ── Sous-composant : Section dans le drawer ─────────────────── -->
+    <!--
+        <CidDrawerSection title="'Informations client'" icon="'fa-user'">
+            ...contenu...
+        </CidDrawerSection>
+    -->
+    <t t-name="recouvrement_contentieux.CidDrawerSection">
+        <div class="cid-drawer__section">
+            <div t-if="props.title" class="cid-drawer__section-title">
+                <i t-if="props.icon" t-att-class="'fa ' + props.icon"/>
+                <span t-esc="props.title"/>
+            </div>
+            <div class="cid-drawer__section-body">
+                <t t-slot="default"/>
+            </div>
+        </div>
+    </t>
+
+    <!-- ── Sous-composant : Ligne info dans le drawer ──────────────── -->
+    <!--
+        <CidDrawerInfoRow icon="'fa-envelope-o'" label="'Email'" value="client.email"/>
+    -->
+    <t t-name="recouvrement_contentieux.CidDrawerInfoRow">
+        <div class="cid-drawer__info-row">
+            <span class="cid-drawer__info-icon">
+                <i t-att-class="'fa ' + props.icon"/>
+            </span>
+            <span class="cid-drawer__info-label" t-esc="props.label"/>
+            <span class="cid-drawer__info-value">
+                <t t-if="props.href">
+                    <a t-att-href="props.href" t-esc="props.value"/>
+                </t>
+                <t t-else="">
+                    <t t-esc="props.value || '—'"/>
+                </t>
+            </span>
+        </div>
+    </t>
+
+</templates>

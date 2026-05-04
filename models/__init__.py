@@ -1,4 +1,5 @@
 from . import recouvrement_client_type
+from . import recouvrement_client_assignment
 from . import recouvrement_procedure
 from . import recouvrement_facture
 from . import res_partner

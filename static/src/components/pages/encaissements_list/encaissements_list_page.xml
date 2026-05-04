@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="recouvrement_contentieux.EncaissementsListPage">
+    <div class="cid-page cid-enc-list-page">
+
+        <!-- ── Header ─────────────────────────────────────────── -->
+        <header class="cid-page__header cid-enc-list-page__header">
+            <div class="cid-enc-list-page__title-row">
+                <h1 class="cid-page__title">
+                    <i class="fa fa-credit-card"/> Encaissements
+                </h1>
+                <span t-if="!state.loading" class="cid-enc-list-page__count">
+                    <t t-esc="state.total"/> encaissement<t t-if="state.total > 1">s</t>
+                </span>
+            </div>
+
+            <!-- Filtres rapides -->
+            <div class="cid-enc-list-page__filters">
+                <button t-att-class="'cid-filter-btn' + (state.filter === 'all' ? ' is-active' : '')"
+                        t-on-click="() => this.onFilterChange('all')">
+                    Tous
+                </button>
+                <button t-att-class="'cid-filter-btn' + (state.filter === 'pending' ? ' is-active' : '')"
+                        t-on-click="() => this.onFilterChange('pending')">
+                    <i class="fa fa-clock-o"/> À traiter (reste à allouer)
+                </button>
+                <button t-att-class="'cid-filter-btn' + (state.filter === 'solde' ? ' is-active' : '')"
+                        t-on-click="() => this.onFilterChange('solde')">
+                    <i class="fa fa-check-circle"/> Soldés
+                </button>
+            </div>
+
+            <!-- Actions header -->
+            <div class="cid-enc-list-page__actions">
+                <CidButton variant="'ghost'" icon="'fa-refresh'"
+                           onClick="() => this.loadData()">
+                    Actualiser
+                </CidButton>
+                <CidButton variant="'primary'" icon="'fa-plus'"
+                           onClick="() => this.onNew()">
+                    Nouveau
+                </CidButton>
+            </div>
+        </header>
+
+        <!-- ── Tableau ─────────────────────────────────────────── -->
+        <div class="cid-enc-list-page__body">
+            <CidDataTable
+                columns="columns"
+                rows="state.rows"
+                loading="state.loading"
+                rowKey="'id'"
+                sortable="true"
+                sortColumn="state.sortColumn"
+                sortDir="state.sortDir"
+                paginated="true"
+                page="state.page"
+                pageSize="state.pageSize"
+                total="state.total"
+                stickyHeader="true"
+                hoverable="true"
+                emptyIcon="'fa-credit-card'"
+                emptyTitle="'Aucun encaissement'"
+                emptyDescription="'Aucun encaissement ne correspond aux critères sélectionnés.'"
+                onSort.bind="onSort"
+                onRowClick.bind="onRowClick"
+                onPageChange.bind="onPageChange"
+                onPageSizeChange.bind="onPageSizeChange">
+
+                <!-- Slot rendu colonne état — doit correspondre à col.render = "etat_badge" -->
+                <t t-set-slot="etat_badge" t-slot-scope="scope">
+                    <CidBadge
+                        variant="etatVariant(scope.row.etat_lettrage)"
+                        subtle="true">
+                        <t t-esc="etatLabel(scope.row.etat_lettrage)"/>
+                    </CidBadge>
+                </t>
+
+            </CidDataTable>
+        </div>
+
+    </div>
+</t>
+
+</templates>

@@ -44,7 +44,7 @@ const SIDEBAR_SECTIONS = [
         title: "Suivi de recouvrement",
         items: [
             { label: "Dossiers de recouvrements", icon: "fa-folder-open-o",
-              actionXmlId: "recouvrement_contentieux.action_recouvrement_recouvrement" },
+              actionXmlId: "recouvrement_contentieux.action_recouvrement_dossiers_owl" },
             { label: "Blocages techniques",       icon: "fa-ban",
               actionXmlId: "recouvrement_contentieux.action_recouvrement_factures_blocage_technique" },
         ],
@@ -58,9 +58,9 @@ const SIDEBAR_SECTIONS = [
             { label: "Calendrier", icon: "fa-calendar",
               actionXmlId: "recouvrement_contentieux.action_recouvrement_action_calendar" },
             { label: "Appels",     icon: "fa-phone",
-              actionXmlId: "recouvrement_contentieux.action_recouvrement_action_appels" },
+              actionXmlId: "recouvrement_contentieux.action_recouvrement_appels_owl" },
             { label: "Emails",     icon: "fa-envelope-o",
-              actionXmlId: "recouvrement_contentieux.action_recouvrement_action_emails" },
+              actionXmlId: "recouvrement_contentieux.action_recouvrement_emails_owl" },
         ],
     },
 
@@ -76,7 +76,7 @@ const SIDEBAR_SECTIONS = [
             { label: "Types de clients",           icon: "fa-users",
               actionXmlId: "recouvrement_contentieux.action_recouvrement_client_type" },
             { label: "Clients",                    icon: "fa-address-book-o",
-              actionXmlId: "recouvrement_contentieux.action_recouvrement_clients" },
+              actionXmlId: "recouvrement_contentieux.action_recouvrement_clients_attribution_owl" },
         ],
     },
 ];

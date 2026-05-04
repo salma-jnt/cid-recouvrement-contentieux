@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="recouvrement_contentieux.EmailsListPage">
+    <div class="cid-page cid-emails-list-page">
+
+        <!-- ── Header ─────────────────────────────────────────── -->
+        <header class="cid-emails-list-page__header">
+
+            <div class="cid-emails-list-page__title-row">
+                <h1 class="cid-page__title">
+                    <i class="fa fa-envelope-o"/> Emails / Courriers
+                </h1>
+                <span t-if="!state.loading" class="cid-emails-list-page__count">
+                    <t t-esc="state.total"/> message<t t-if="state.total > 1">s</t>
+                </span>
+            </div>
+
+            <div class="cid-emails-list-page__toolbar">
+
+                <CidSearchBar
+                    placeholder="'Rechercher (intitulé, client, dossier)…'"
+                    value="state.search"
+                    onSearch.bind="onSearch"/>
+
+                <div class="cid-filter-group">
+                    <button t-att-class="'cid-filter-btn' + (state.filter === 'todo'      ? ' is-active' : '')"
+                            t-on-click="() => this.onFilterChange('todo')">
+                        <i class="fa fa-circle-o"/> À faire
+                    </button>
+                    <button t-att-class="'cid-filter-btn cid-filter-btn--danger' + (state.filter === 'en_retard' ? ' is-active' : '')"
+                            t-on-click="() => this.onFilterChange('en_retard')">
+                        <i class="fa fa-clock-o"/> En retard
+                    </button>
+                    <button t-att-class="'cid-filter-btn cid-filter-btn--warning' + (state.filter === 'reporte'  ? ' is-active' : '')"
+                            t-on-click="() => this.onFilterChange('reporte')">
+                        <i class="fa fa-refresh"/> Reportés
+                    </button>
+                    <button t-att-class="'cid-filter-btn cid-filter-btn--success' + (state.filter === 'done'     ? ' is-active' : '')"
+                            t-on-click="() => this.onFilterChange('done')">
+                        <i class="fa fa-check-circle"/> Réalisés
+                    </button>
+                    <button t-att-class="'cid-filter-btn' + (state.filter === 'all'       ? ' is-active' : '')"
+                            t-on-click="() => this.onFilterChange('all')">
+                        Tous
+                    </button>
+                </div>
+
+                <div class="cid-emails-list-page__actions">
+                    <CidButton variant="'ghost'" icon="'fa-refresh'"
+                               onClick="() => this.loadData()">
+                        Actualiser
+                    </CidButton>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- ── Tableau ─────────────────────────────────────────── -->
+        <div class="cid-emails-list-page__body">
+            <CidDataTable
+                columns="columns"
+                rows="state.rows"
+                loading="state.loading"
+                rowKey="'id'"
+                sortable="true"
+                sortColumn="state.sortColumn"
+                sortDir="state.sortDir"
+                paginated="true"
+                page="state.page"
+                pageSize="state.pageSize"
+                total="state.total"
+                stickyHeader="true"
+                hoverable="true"
+                emptyIcon="'fa-envelope-o'"
+                emptyTitle="'Aucun email trouvé'"
+                emptyDescription="'Aucun email ne correspond aux critères sélectionnés.'"
+                onSort.bind="onSort"
+                onRowClick.bind="onRowClick"
+                onPageChange.bind="onPageChange"
+                onPageSizeChange.bind="onPageSizeChange">
+
+                <!-- Type d'action -->
+                <t t-set-slot="type_badge" t-slot-scope="scope">
+                    <CidBadge variant="typeVariant(scope.row.action_type)" subtle="true">
+                        <t t-esc="typeLabel(scope.row.action_type)"/>
+                    </CidBadge>
+                </t>
+
+                <!-- État email -->
+                <t t-set-slot="email_status_badge" t-slot-scope="scope">
+                    <t t-if="scope.row.email_status">
+                        <CidBadge variant="emailStatusVariant(scope.row.email_status)" subtle="true">
+                            <t t-esc="emailStatusLabel(scope.row.email_status)"/>
+                        </CidBadge>
+                    </t>
+                    <span t-else="" class="cid-cell-muted">—</span>
+                </t>
+
+                <!-- Statut -->
+                <t t-set-slot="state_badge" t-slot-scope="scope">
+                    <CidBadge variant="stateVariant(scope.row.state)" subtle="true">
+                        <t t-esc="stateLabel(scope.row.state)"/>
+                    </CidBadge>
+                </t>
+
+                <!-- En retard -->
+                <t t-set-slot="overdue_badge" t-slot-scope="scope">
+                    <t t-if="scope.row.is_overdue and scope.row.state !== 'done'">
+                        <CidBadge variant="'danger'" subtle="true">
+                            <i class="fa fa-clock-o"/> En retard
+                        </CidBadge>
+                    </t>
+                    <span t-else="" class="cid-cell-muted">—</span>
+                </t>
+
+            </CidDataTable>
+        </div>
+
+    </div>
+</t>
+
+</templates>

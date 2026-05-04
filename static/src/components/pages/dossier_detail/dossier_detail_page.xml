@@ -101,6 +101,11 @@
                                             <span>TTC : <strong><t t-esc="fmt(group.total)"/></strong></span>
                                             <span>·</span>
                                             <span>Reste : <strong t-att-class="group.reste &gt; 0 ? 'text-danger' : 'text-success'"><t t-esc="fmt(group.reste)"/></strong></span>
+                                            <span>·</span>
+                                            <button class="cid-client-group__action-btn"
+                                                    t-on-click="() => this.openClientDrawer(group)">
+                                                <i class="fa fa-bolt"/> Agir
+                                            </button>
                                         </div>
                                     </div>
                                 </t>
@@ -186,13 +191,15 @@
                                             <t t-if="a.responsible_id" t-esc="a.responsible_id[1]"/>
                                         </td>
                                         <td class="cid-table__actions">
-                                            <CidButton t-if="a.state === 'todo' or a.state === 'reporte'"
+                                            <!-- Boutons uniquement sur la DERNIÈRE action active du client -->
+                                            <!-- (la plus récente todo/reportée — calculée dans activeActionIds) -->
+                                            <CidButton t-if="state.activeActionIds and state.activeActionIds.has(a.id)"
                                                        variant="'primary'" size="'sm'"
                                                        icon="'fa-bolt'"
                                                        onClick="() => this.onActionClick(a)">
                                                 Exécuter
                                             </CidButton>
-                                            <CidButton t-if="a.state === 'todo' or a.state === 'reporte'"
+                                            <CidButton t-if="state.activeActionIds and state.activeActionIds.has(a.id)"
                                                        variant="'ghost'" size="'sm'"
                                                        icon="'fa-clock-o'"
                                                        onClick="() => this.onActionReport(a)">
@@ -206,6 +213,122 @@
                     </CidCard>
                 </t>
             </t>
+        <!-- ── Drawer client (CidDrawer réutilisable) ───────────────── -->
+        <CidDrawer isOpen="!!state.drawer"
+                   title="state.drawer ? state.drawer.group.client_name : ''"
+                   subtitle="state.drawer ? (state.drawer.group.city || '') : ''"
+                   size="'md'"
+                   onClose="() => this.closeDrawer()">
+
+            <!-- Badge statut action dans le header -->
+            <t t-set-slot="header-extra">
+                <t t-if="state.drawer and state.drawer.action">
+                    <CidBadge t-if="state.drawer.action.state === 'reporte'"
+                              variant="'warning'" subtle="true">Reportée</CidBadge>
+                    <CidBadge t-else="" variant="'info'" subtle="true">À faire</CidBadge>
+                </t>
+                <t t-elif="state.drawer">
+                    <CidBadge variant="'success'" subtle="true">Tout réalisé</CidBadge>
+                </t>
+            </t>
+
+            <!-- ── Corps du drawer ──────────────────────────────── -->
+
+            <!-- Section 1 : Coordonnées client -->
+            <CidDrawerSection title="'Coordonnées'" icon="'fa-user-circle'">
+                <CidDrawerInfoRow icon="'fa-phone'"
+                                  label="'Téléphone'"
+                                  value="state.drawer ? (state.drawer.group.phone || '—') : ''"
+                                  href="state.drawer and state.drawer.group.phone ? 'tel:' + state.drawer.group.phone : ''"/>
+                <CidDrawerInfoRow icon="'fa-envelope-o'"
+                                  label="'Email'"
+                                  value="state.drawer ? (state.drawer.group.email || '—') : ''"
+                                  href="state.drawer and state.drawer.group.email ? 'mailto:' + state.drawer.group.email : ''"/>
+                <CidDrawerInfoRow icon="'fa-map-marker'"
+                                  label="'Ville'"
+                                  value="state.drawer ? (state.drawer.group.city || '—') : ''"/>
+            </CidDrawerSection>
+
+            <!-- Section 2 : Action en cours -->
+            <CidDrawerSection title="'Action en cours'" icon="'fa-bolt'">
+                <t t-if="state.drawer and state.drawer.action">
+                    <!-- Carte action -->
+                    <div class="cid-dossier-page__action-card">
+                        <div class="cid-dossier-page__action-card-title">
+                            <i t-att-class="'fa ' + actionTypeIcon(state.drawer.action.action_type)"/>
+                            <span t-esc="state.drawer.action.name"/>
+                        </div>
+                        <div class="cid-dossier-page__action-card-meta">
+                            <span>
+                                <i class="fa fa-calendar-o"/>
+                                Échéance : <strong t-esc="fmtDate(state.drawer.action.mandatory_date)"/>
+                            </span>
+                            <span t-if="state.drawer.action.responsible_id" class="text-muted">
+                                <i class="fa fa-user-o"/>
+                                <t t-esc="state.drawer.action.responsible_id[1]"/>
+                            </span>
+                        </div>
+                    </div>
+                </t>
+                <t t-else="">
+                    <div class="cid-dossier-page__no-action">
+                        <i class="fa fa-check-circle"/> Aucune action en attente.
+                    </div>
+                </t>
+            </CidDrawerSection>
+
+            <!-- Section 3 : Factures du client dans ce dossier -->
+            <CidDrawerSection title="'Factures'" icon="'fa-file-text-o'">
+                <t t-if="state.drawer">
+                    <t t-foreach="state.drawer.group.factures" t-as="f" t-key="f.id">
+                        <div class="cid-dossier-page__drawer-facture">
+                            <div class="cid-dossier-page__drawer-facture-left">
+                                <CidStatusPill color="f.statut_interface" withDot="true">
+                                    <t t-esc="f.statut_interface"/>
+                                </CidStatusPill>
+                                <div>
+                                    <div class="cid-dossier-page__drawer-facture-name">
+                                        <strong t-esc="f.name"/>
+                                    </div>
+                                    <div class="text-muted" style="font-size:12px;">
+                                        <t t-esc="f.code_affaire || '—'"/>
+                                        · <t t-esc="fmtDate(f.date_facture)"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cid-dossier-page__drawer-facture-right">
+                                <div class="text-muted" style="font-size:12px;">TTC</div>
+                                <div><strong t-esc="fmt(f.montant_ttc)"/></div>
+                                <div t-att-class="f.reste_a_payer > 0 ? 'text-danger' : 'text-success'"
+                                     style="font-size:12px;">
+                                    Reste <strong t-esc="fmt(f.reste_a_payer)"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </CidDrawerSection>
+
+            <!-- ── Footer : boutons principaux ──────────────────── -->
+            <t t-set-slot="footer">
+                <t t-if="state.drawer and state.drawer.action">
+                    <CidButton variant="'primary'" icon="'fa-bolt'"
+                               onClick="() => this.drawerExecute()">
+                        Exécuter
+                    </CidButton>
+                    <CidButton variant="'ghost'" icon="'fa-clock-o'"
+                               onClick="() => this.drawerReport()">
+                        Reporter
+                    </CidButton>
+                </t>
+                <CidButton variant="'ghost'" icon="'fa-times'"
+                           onClick="() => this.closeDrawer()">
+                    Fermer
+                </CidButton>
+            </t>
+
+        </CidDrawer>
+
         </div>
     </t>
 

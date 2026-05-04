@@ -1,0 +1,69 @@
+/* ================================================================
+   CidSearchBar
+   ================================================================ */
+
+.cid-searchbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 240px;
+    max-width: 400px;
+    width: 100%;
+
+    &__icon {
+        position: absolute;
+        left: 12px;
+        color: var(--cid-text-faint);
+        font-size: 13px;
+        pointer-events: none;
+        transition: color var(--cid-trans-fast);
+    }
+
+    &__input {
+        width: 100%;
+        height: 36px;
+        padding: 0 36px 0 36px;
+        border: 1.5px solid var(--cid-border);
+        border-radius: var(--cid-radius-lg);
+        background: var(--cid-surface);
+        color: var(--cid-text);
+        font-size: var(--cid-text-sm);
+        transition: border-color var(--cid-trans-fast), box-shadow var(--cid-trans-fast);
+        outline: none;
+
+        &::placeholder {
+            color: var(--cid-text-faint);
+        }
+
+        &:focus {
+            border-color: var(--cid-primary-400);
+            box-shadow: 0 0 0 3px rgba(59, 130, 224, 0.12);
+
+            ~ .cid-searchbar__icon {
+                color: var(--cid-primary-400);
+            }
+        }
+    }
+
+    &__clear {
+        position: absolute;
+        right: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border: none;
+        border-radius: 50%;
+        background: var(--cid-border);
+        color: var(--cid-text-muted);
+        font-size: 10px;
+        cursor: pointer;
+        transition: all var(--cid-trans-fast);
+
+        &:hover {
+            background: var(--cid-border-strong);
+            color: var(--cid-text);
+        }
+    }
+}

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="recouvrement_contentieux.DossiersListPage">
+    <div class="cid-page cid-dossiers-list-page">
+
+        <!-- ── Header ─────────────────────────────────────────── -->
+        <header class="cid-dossiers-list-page__header">
+
+            <!-- Titre + compteur -->
+            <div class="cid-dossiers-list-page__title-row">
+                <h1 class="cid-page__title">
+                    <i class="fa fa-folder-open-o"/> Dossiers de recouvrement
+                </h1>
+                <span t-if="!state.loading" class="cid-dossiers-list-page__count">
+                    <t t-esc="state.total"/> dossier<t t-if="state.total > 1">s</t>
+                </span>
+            </div>
+
+            <!-- Barre de recherche + filtres -->
+            <div class="cid-dossiers-list-page__toolbar">
+
+                <CidSearchBar
+                    placeholder="'Rechercher (référence, procédure, phase)…'"
+                    value="state.search"
+                    onSearch.bind="onSearch"/>
+
+                <div class="cid-filter-group">
+                    <button t-att-class="'cid-filter-btn' + (state.filter === 'all'      ? ' is-active' : '')"
+                            t-on-click="() => this.onFilterChange('all')">
+                        Tous
+                    </button>
+                    <button t-att-class="'cid-filter-btn' + (state.filter === 'ouverts'  ? ' is-active' : '')"
+                            t-on-click="() => this.onFilterChange('ouverts')">
+                        <i class="fa fa-circle-o"/> Ouverts
+                    </button>
+                    <button t-att-class="'cid-filter-btn cid-filter-btn--danger' + (state.filter === 'en_retard' ? ' is-active' : '')"
+                            t-on-click="() => this.onFilterChange('en_retard')">
+                        <i class="fa fa-clock-o"/> En retard
+                    </button>
+                    <button t-att-class="'cid-filter-btn cid-filter-btn--danger' + (state.filter === 'bloque'   ? ' is-active' : '')"
+                            t-on-click="() => this.onFilterChange('bloque')">
+                        <i class="fa fa-ban"/> Bloqués
+                    </button>
+                    <button t-att-class="'cid-filter-btn cid-filter-btn--success' + (state.filter === 'solde'   ? ' is-active' : '')"
+                            t-on-click="() => this.onFilterChange('solde')">
+                        <i class="fa fa-check-circle"/> Soldés
+                    </button>
+                </div>
+
+                <div class="cid-dossiers-list-page__actions">
+                    <CidButton variant="'ghost'" icon="'fa-refresh'"
+                               onClick="() => this.loadData()">
+                        Actualiser
+                    </CidButton>
+                </div>
+
+            </div>
+
+        </header>
+
+        <!-- ── Tableau ─────────────────────────────────────────── -->
+        <div class="cid-dossiers-list-page__body">
+            <CidDataTable
+                columns="columns"
+                rows="state.rows"
+                loading="state.loading"
+                rowKey="'id'"
+                sortable="true"
+                sortColumn="state.sortColumn"
+                sortDir="state.sortDir"
+                paginated="true"
+                page="state.page"
+                pageSize="state.pageSize"
+                total="state.total"
+                stickyHeader="true"
+                hoverable="true"
+                emptyIcon="'fa-folder-open-o'"
+                emptyTitle="'Aucun dossier trouvé'"
+                emptyDescription="'Aucun dossier ne correspond aux critères sélectionnés.'"
+                onSort.bind="onSort"
+                onRowClick.bind="onRowClick"
+                onPageChange.bind="onPageChange"
+                onPageSizeChange.bind="onPageSizeChange">
+
+                <t t-set-slot="state_badge" t-slot-scope="scope">
+                    <CidBadge
+                        variant="stateVariant(scope.row.state)"
+                        subtle="true">
+                        <t t-esc="stateLabel(scope.row.state)"/>
+                    </CidBadge>
+                </t>
+
+            </CidDataTable>
+        </div>
+
+    </div>
+</t>
+
+</templates>

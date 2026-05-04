@@ -116,12 +116,13 @@ export class ActionExecutionPage extends Component {
                 const [client] = await this.orm.read(
                     "res.partner",
                     [action.client_id[0]],
-                    ["id", "name", "email", "phone", "mobile", "client_type_id"],
+                    ["id", "name", "email", "phone", "client_type_id"],
                 );
                 this.state.client = client;
                 if (!this.state.destinataire && client.email) {
                     this.state.destinataire = client.email;
                 }
+                // Note: champ 'mobile' non disponible dans cette config Odoo
             }
 
             // Lecture dossier + factures du client dans ce dossier

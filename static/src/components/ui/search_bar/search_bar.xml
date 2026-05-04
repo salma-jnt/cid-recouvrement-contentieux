@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="recouvrement_contentieux.CidSearchBar">
+    <div class="cid-searchbar">
+        <i class="fa fa-search cid-searchbar__icon"/>
+        <input class="cid-searchbar__input"
+               type="text"
+               t-att-placeholder="props.placeholder"
+               t-att-value="state.query"
+               t-on-input="onInput"/>
+        <button t-if="state.query"
+                class="cid-searchbar__clear"
+                type="button"
+                t-on-click="onClear">
+            <i class="fa fa-times"/>
+        </button>
+    </div>
+</t>
+
+</templates>

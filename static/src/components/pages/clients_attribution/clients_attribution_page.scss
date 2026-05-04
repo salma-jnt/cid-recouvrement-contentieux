@@ -1,0 +1,91 @@
+.cid-clients-page {
+    &__title-row {
+        display: flex;
+        align-items: center;
+        gap: var(--cid-space-3);
+        margin-top: var(--cid-space-3);
+    }
+
+    &__count {
+        font-size: var(--cid-text-sm);
+        color: var(--cid-text-muted);
+        background: var(--cid-surface-alt);
+        border: 1px solid var(--cid-border);
+        border-radius: var(--cid-radius-full);
+        padding: 2px var(--cid-space-3);
+        font-weight: var(--cid-weight-medium);
+    }
+
+    &__toolbar {
+        display: flex;
+        align-items: center;
+        gap: var(--cid-space-3);
+        margin-top: var(--cid-space-4);
+        flex-wrap: wrap;
+    }
+
+    &__actions { margin-left: auto; }
+
+    &__saving-bar {
+        display: flex;
+        align-items: center;
+        gap: var(--cid-space-2);
+        margin-top: var(--cid-space-2);
+        font-size: var(--cid-text-sm);
+        color: var(--cid-primary-600);
+        background: var(--cid-primary-50);
+        border-radius: var(--cid-radius-md);
+        padding: var(--cid-space-2) var(--cid-space-3);
+        border: 1px solid var(--cid-primary-200);
+    }
+
+    &__body { margin-top: var(--cid-space-4); }
+}
+
+/* ── Inline type select ──────────────────────────────────── */
+
+.cid-type-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--cid-space-2);
+}
+
+.cid-type-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--cid-surface);
+    border: 1.5px solid var(--cid-border);
+    border-radius: var(--cid-radius-md);
+    padding: 5px var(--cid-space-8) 5px var(--cid-space-3);
+    font-size: var(--cid-text-sm);
+    font-family: var(--cid-font-sans);
+    color: var(--cid-text);
+    cursor: pointer;
+    width: 100%;
+    max-width: 220px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--cid-space-3) center;
+    transition: border-color var(--cid-trans-fast), box-shadow var(--cid-trans-fast);
+
+    &:hover:not(:disabled) {
+        border-color: var(--cid-primary-400);
+    }
+
+    &:focus {
+        outline: none;
+        border-color: var(--cid-primary-500);
+        box-shadow: 0 0 0 3px var(--cid-primary-100);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.cid-type-select__check {
+    color: var(--cid-success);
+    font-size: var(--cid-text-sm);
+    flex-shrink: 0;
+}

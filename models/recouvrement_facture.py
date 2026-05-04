@@ -117,6 +117,32 @@ class RecouvrementFacture(models.Model):
     # ------------------------------------------------------------------
     # Montants & lettrage
     # ------------------------------------------------------------------
+    # Action de la phase courante pour ce client/facture
+    # Affichée dans l'UI de la facture pour que l'agent sache quoi faire
+    action_courante_id = fields.Many2one(
+        'recouvrement.action',
+        string='Action en cours',
+        compute='_compute_action_courante',
+        store=False,
+        help="Action active (todo/reportée) de la phase courante du dossier "
+             "pour le client de cette facture.",
+    )
+    action_courante_type = fields.Char(
+        string='Type action courante',
+        compute='_compute_action_courante',
+        store=False,
+    )
+    action_courante_date = fields.Date(
+        string='Échéance action courante',
+        compute='_compute_action_courante',
+        store=False,
+    )
+    action_courante_state = fields.Char(
+        string='Statut action courante',
+        compute='_compute_action_courante',
+        store=False,
+    )
+
     montant_ttc = fields.Monetary(string='Montant TTC')
     montant_ht = fields.Monetary(string='Montant HT')
     lettrage_ids = fields.One2many(
@@ -136,6 +162,39 @@ class RecouvrementFacture(models.Model):
     # ==================================================================
     # COMPUTES
     # ==================================================================
+    @api.depends('recouvrement_id', 'recouvrement_id.action_ids',
+                 'recouvrement_id.action_ids.state',
+                 'recouvrement_id.action_ids.mandatory_date',
+                 'client_id')
+    def _compute_action_courante(self):
+        """Trouve l'action active (todo/reporte) de la phase courante
+        pour le client de cette facture dans son dossier."""
+        for facture in self:
+            if not facture.recouvrement_id or not facture.client_id:
+                facture.action_courante_id = False
+                facture.action_courante_type = False
+                facture.action_courante_date = False
+                facture.action_courante_state = False
+                continue
+
+            # Actions actives pour ce client dans ce dossier
+            pending = facture.recouvrement_id.action_ids.filtered(
+                lambda a: (
+                    a.client_id == facture.client_id
+                    and a.state in ('todo', 'reporte')
+                )
+            ).sorted(key=lambda a: (a.mandatory_date or fields.Date.today(), a.id))
+
+            action = pending[:1]
+            facture.action_courante_id = action or False
+            facture.action_courante_type = dict(
+                action._fields['action_type'].selection
+            ).get(action.action_type, '') if action else ''
+            facture.action_courante_date = action.mandatory_date if action else False
+            facture.action_courante_state = dict(
+                action._fields['state'].selection
+            ).get(action.state, '') if action else ''
+
     @api.depends('date_depot_client', 'depot_comment')
     def _compute_depot_display(self):
         for rec in self:
@@ -203,7 +262,59 @@ class RecouvrementFacture(models.Model):
         inferred_type = self._infer_facture_type_from_sheet(vals.get('source_sheet'))
         if inferred_type:
             vals['facture_type'] = inferred_type
-        return super().write(vals)
+
+        res = super().write(vals)
+
+        # Si on vient de rattacher une facture à un dossier → déclencher
+        # la planification de la phase 0 (si pas encore faite)
+        if 'recouvrement_id' in vals and vals['recouvrement_id']:
+            dossiers = self.mapped('recouvrement_id')
+            for dossier in dossiers:
+                dossier._planifier_apres_rattachement()
+
+        # Si une facture est soldée (reste_a_payer=0 ou statut recouvre)
+        # → annuler les actions en attente si toutes les factures du client
+        # dans ce dossier sont soldées
+        recouvre_change = vals.get('recouvrement_status') == 'recouvre'
+        reste_zero = 'reste_a_payer' in vals and vals['reste_a_payer'] == 0
+        if recouvre_change or reste_zero:
+            for facture in self:
+                if not facture.recouvrement_id or not facture.client_id:
+                    continue
+                dossier = facture.recouvrement_id
+                client = facture.client_id
+                # Vérifier si TOUTES les factures de ce client
+                # ont reste_a_payer == 0 ou statut recouvre
+                factures_client = dossier.facture_ids.filtered(
+                    lambda f, c=client: f.client_id == c
+                )
+                toutes_recouvertes = all(
+                    f.reste_a_payer == 0 or f.recouvrement_status == 'recouvre'
+                    for f in factures_client
+                )
+                if toutes_recouvertes:
+                    # Annuler les actions en attente pour ce client
+                    actions_pending = dossier.action_ids.filtered(
+                        lambda a: (
+                            a.client_id == client
+                            and a.state in ('todo', 'reporte')
+                        )
+                    )
+                    if actions_pending:
+                        actions_pending.write({'state': 'cancel'})
+                        dossier.message_post(
+                            body=_(
+                                "✅ Factures de <strong>%(client)s</strong> recouvrées "
+                                "— actions annulées automatiquement.",
+                                client=client.name,
+                            ),
+                            message_type='comment',
+                            subtype_xmlid='mail.mt_note',
+                        )
+                    # Vérifier si la phase peut avancer
+                    dossier._check_and_advance_phase()
+
+        return res
     def action_open_dossier(self):
         """Ouvre le dossier de recouvrement lié depuis le stat button."""
         self.ensure_one()

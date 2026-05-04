@@ -11,6 +11,7 @@ import { CidStatusPill } from "../../ui/status_pill/status_pill";
 import { CidStepper } from "../../ui/stepper/stepper";
 import { CidKpiCard } from "../../ui/kpi_card/kpi_card";
 import { CidSkeleton } from "../../ui/skeleton/skeleton";
+import { CidDrawer, CidDrawerSection, CidDrawerInfoRow } from "../../ui/drawer/drawer";
 
 /**
  * Page « Détail d'un dossier de recouvrement »
@@ -27,6 +28,7 @@ export class DossierDetailPage extends Component {
     static components = {
         CidButton, CidCard, CidBadge, CidStatusPill, CidStepper,
         CidKpiCard, CidSkeleton,
+        CidDrawer, CidDrawerSection, CidDrawerInfoRow,
     };
     static props = { "*": true };
 
@@ -42,6 +44,8 @@ export class DossierDetailPage extends Component {
             actions: [],
             phases: [],           // for stepper
             activeTab: "factures",
+            // Drawer client
+            drawer: null,         // { group, action, clientInfo } ou null
         });
 
         onWillStart(async () => {
@@ -91,13 +95,31 @@ export class DossierDetailPage extends Component {
             );
             // group by client
             const groups = {};
+            const clientIds = [];
             for (const f of factures) {
                 const cid = f.client_id?.[0] || 0;
                 const cname = f.client_id?.[1] || "—";
-                if (!groups[cid]) groups[cid] = { client_id: cid, client_name: cname, factures: [], total: 0, reste: 0 };
+                if (!groups[cid]) {
+                    groups[cid] = { client_id: cid, client_name: cname, factures: [], total: 0, reste: 0, email: "", phone: "" };
+                    clientIds.push(cid);
+                }
                 groups[cid].factures.push(f);
                 groups[cid].total += f.montant_ttc || 0;
                 groups[cid].reste += f.reste_a_payer || 0;
+            }
+            // Charger email + téléphone des clients
+            if (clientIds.length) {
+                const partners = await this.orm.read(
+                    "res.partner", clientIds, ["id", "email", "phone", "street", "city"]
+                );
+                for (const p of partners) {
+                    if (groups[p.id]) {
+                        groups[p.id].email  = p.email  || "";
+                        groups[p.id].phone  = p.phone  || "";
+                        groups[p.id].street = p.street || "";
+                        groups[p.id].city   = p.city   || "";
+                    }
+                }
             }
             this.state.factures = Object.values(groups);
 
@@ -110,6 +132,24 @@ export class DossierDetailPage extends Component {
                  "action_template_id", "responsible_id"],
             );
             this.state.actions = actions;
+
+            // Calculer l'action active (la plus récente non-done) par client
+            // C'est la seule qui doit afficher les boutons Exécuter/Reporter
+            const clientMap = new Map();
+            for (const a of actions) {
+                if (a.state !== "todo" && a.state !== "reporte") continue;
+                const clientId = a.client_id?.[0];
+                if (!clientId) continue;
+                const existing = clientMap.get(clientId);
+                // Garder l'action avec la date la plus récente (la dernière générée)
+                if (!existing || (a.mandatory_date || "") > (existing.mandatory_date || "")) {
+                    clientMap.set(clientId, a);
+                }
+            }
+            // Set d'IDs des actions qui doivent afficher les boutons
+            this.state.activeActionIds = new Set(
+                [...clientMap.values()].map((a) => a.id)
+            );
 
             // Build stepper depuis les action templates de la procédure
             const procedureId = dossier.procedure_id?.[0];
@@ -186,14 +226,42 @@ export class DossierDetailPage extends Component {
         this.state.activeTab = tab;
     }
 
+    // ── Drawer client ──────────────────────────────────────────────────
+
+    openClientDrawer(group) {
+        // Trouver l'action active du client dans ce dossier
+        const clientId = group.client_id;
+        const activeAction = this.state.actions.find(
+            (a) => a.client_id?.[0] === clientId &&
+                   this.state.activeActionIds &&
+                   this.state.activeActionIds.has(a.id)
+        ) || null;
+        this.state.drawer = { group, action: activeAction };
+    }
+
+    closeDrawer() {
+        this.state.drawer = null;
+    }
+
+    async drawerExecute() {
+        if (!this.state.drawer?.action) return;
+        await this.onActionClick(this.state.drawer.action);
+        this.state.drawer = null;
+    }
+
+    async drawerReport() {
+        if (!this.state.drawer?.action) return;
+        await this.onActionReport(this.state.drawer.action);
+        this.state.drawer = null;
+    }
+
     onActionClick(action) {
-        // Phase 5 : ouvrira la page d'exécution (page action_execution)
-        // Pour l'instant on fait un fallback vers le form Odoo
+        // Ouvre la page OWL d'exécution d'action (appel ou email)
         this.actionService.doAction({
-            type: "ir.actions.act_window",
-            res_model: "recouvrement.action",
-            res_id: action.id,
-            views: [[false, "form"]],
+            type: "ir.actions.client",
+            tag: "recouvrement_contentieux.action_execution_page",
+            name: action.name || "Exécuter l'action",
+            context: { action_id: action.id },
             target: "current",
         });
     }

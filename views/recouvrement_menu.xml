@@ -33,11 +33,21 @@
             <field name="view_mode">list,kanban</field>
         </record>
 
+        <!-- Ancienne action act_window conservée (ne pas changer le modèle d'un external_id existant) -->
         <record id="action_recouvrement_encaissement" model="ir.actions.act_window">
-            <field name="name">Encaissements</field>
+            <field name="name">Encaissements (legacy)</field>
             <field name="res_model">recouvrement.encaissement</field>
             <field name="view_mode">list,form</field>
-            <field name="context">{'search_default_a_traiter': 1}</field>
+        </record>
+        <!-- Page OWL liste encaissements — nouvel external_id -->
+        <record id="action_recouvrement_encaissements_owl" model="ir.actions.client">
+            <field name="name">Encaissements</field>
+            <field name="tag">recouvrement_contentieux.encaissements_list_page</field>
+        </record>
+        <!-- Page OWL détail encaissement -->
+        <record id="action_recouvrement_encaissement_detail_page" model="ir.actions.client">
+            <field name="name">Détail encaissement</field>
+            <field name="tag">recouvrement_contentieux.encaissement_detail_page</field>
         </record>
 
         <record id="action_recouvrement_action_calendar" model="ir.actions.act_window">
@@ -48,19 +58,29 @@
         </record>
 
         <record id="action_recouvrement_action_appels" model="ir.actions.act_window">
-            <field name="name">Appels</field>
+            <field name="name">Appels (legacy)</field>
             <field name="res_model">recouvrement.action</field>
             <field name="view_mode">list,form</field>
             <field name="domain">[('action_type','=','appel')]</field>
             <field name="context">{'default_action_type': 'appel'}</field>
         </record>
+        <!-- Page OWL liste appels -->
+        <record id="action_recouvrement_appels_owl" model="ir.actions.client">
+            <field name="name">Appels</field>
+            <field name="tag">recouvrement_contentieux.appels_list_page</field>
+        </record>
 
         <record id="action_recouvrement_action_emails" model="ir.actions.act_window">
-            <field name="name">Emails</field>
+            <field name="name">Emails (legacy)</field>
             <field name="res_model">recouvrement.action</field>
             <field name="view_mode">list,form</field>
             <field name="domain">[('action_type','in',['email','courrier','mise_en_demeure'])]</field>
             <field name="context">{'default_action_type': 'email'}</field>
+        </record>
+        <!-- Page OWL liste emails -->
+        <record id="action_recouvrement_emails_owl" model="ir.actions.client">
+            <field name="name">Emails / Courriers</field>
+            <field name="tag">recouvrement_contentieux.emails_list_page</field>
         </record>
 
         <record id="action_recouvrement_action_template" model="ir.actions.act_window">
@@ -104,6 +124,12 @@
             <field name="tag">recouvrement_contentieux.encaissement_lettrage_page</field>
         </record>
 
+        <!-- Page liste dossiers OWL moderne -->
+        <record id="action_recouvrement_dossiers_owl" model="ir.actions.client">
+            <field name="name">Dossiers de recouvrement</field>
+            <field name="tag">recouvrement_contentieux.dossiers_list_page</field>
+        </record>
+
         <!-- Page détail dossier OWL moderne -->
         <record id="action_recouvrement_dossier_detail_page" model="ir.actions.client">
             <field name="name">Détail dossier</field>
@@ -114,6 +140,12 @@
         <record id="action_recouvrement_action_execution_page" model="ir.actions.client">
             <field name="name">Exécution d'action</field>
             <field name="tag">recouvrement_contentieux.action_execution_page</field>
+        </record>
+
+        <!-- Page OWL attribution clients ↔ types -->
+        <record id="action_recouvrement_clients_attribution_owl" model="ir.actions.client">
+            <field name="name">Clients</field>
+            <field name="tag">recouvrement_contentieux.clients_attribution_page</field>
         </record>
 
         <!-- Action : factures en blocage technique (pour le pôle) -->
@@ -189,7 +221,7 @@ côté pôle technique avant que la procédure puisse continuer.</field>
         <record id="recouvrement_menu_encaissements" model="ir.ui.menu">
             <field name="name">Encaissements</field>
             <field name="parent_id" ref="recouvrement_menu_encaissement_section"/>
-            <field name="action" ref="action_recouvrement_encaissement"/>
+            <field name="action" ref="action_recouvrement_encaissements_owl"/>
             <field name="sequence">20</field>
         </record>
 
@@ -204,7 +236,7 @@ côté pôle technique avant que la procédure puisse continuer.</field>
         <record id="recouvrement_menu_dossiers" model="ir.ui.menu">
             <field name="name">Dossiers de recouvrements</field>
             <field name="parent_id" ref="recouvrement_menu_suivi_section"/>
-            <field name="action" ref="action_recouvrement_recouvrement"/>
+            <field name="action" ref="action_recouvrement_dossiers_owl"/>
             <field name="sequence">10</field>
         </record>
         <record id="recouvrement_menu_blocage_technique" model="ir.ui.menu">
@@ -231,13 +263,13 @@ côté pôle technique avant que la procédure puisse continuer.</field>
         <record id="recouvrement_menu_appels" model="ir.ui.menu">
             <field name="name">Appels</field>
             <field name="parent_id" ref="recouvrement_menu_relances_section"/>
-            <field name="action" ref="action_recouvrement_action_appels"/>
+            <field name="action" ref="action_recouvrement_appels_owl"/>
             <field name="sequence">20</field>
         </record>
         <record id="recouvrement_menu_emails" model="ir.ui.menu">
             <field name="name">Emails</field>
             <field name="parent_id" ref="recouvrement_menu_relances_section"/>
-            <field name="action" ref="action_recouvrement_action_emails"/>
+            <field name="action" ref="action_recouvrement_emails_owl"/>
             <field name="sequence">30</field>
         </record>
 
@@ -270,7 +302,7 @@ côté pôle technique avant que la procédure puisse continuer.</field>
         <record id="recouvrement_menu_parametrage_clients" model="ir.ui.menu">
             <field name="name">Clients</field>
             <field name="parent_id" ref="recouvrement_menu_parametrage"/>
-            <field name="action" ref="action_recouvrement_clients"/>
+            <field name="action" ref="action_recouvrement_clients_attribution_owl"/>
             <field name="sequence">40</field>
         </record>
 

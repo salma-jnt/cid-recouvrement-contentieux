@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+<data>
+
+    <!-- ============================================================
+         VUE LIST — Factures avec colonne "Action courante"
+    =============================================================== -->
+    <record id="view_recouvrement_facture_list" model="ir.ui.view">
+        <field name="name">recouvrement.facture.list</field>
+        <field name="model">recouvrement.facture</field>
+        <field name="arch" type="xml">
+            <list string="Factures" decoration-danger="recouvrement_status in ('contentieux','bloque_juridique','bloque_technique')"
+                  decoration-warning="recouvrement_status == 'precontentieux'"
+                  decoration-success="recouvrement_status == 'recouvre'">
+                <field name="statut_interface" widget="badge"
+                       decoration-success="statut_interface == 'vert'"
+                       decoration-warning="statut_interface == 'orange'"
+                       decoration-danger="statut_interface == 'rouge'"
+                       string="Statut"/>
+                <field name="name" string="N° Facture"/>
+                <field name="client_id"/>
+                <field name="code_affaire"/>
+                <field name="date_facture"/>
+                <field name="montant_ttc" widget="monetary"/>
+                <field name="montant_paye" widget="monetary"/>
+                <field name="reste_a_payer" widget="monetary"
+                       decoration-danger="reste_a_payer > 0"
+                       decoration-success="reste_a_payer == 0"/>
+                <field name="recouvrement_status" widget="badge"
+                       decoration-success="recouvrement_status == 'recouvre'"
+                       decoration-warning="recouvrement_status == 'precontentieux'"
+                       decoration-danger="recouvrement_status in ('contentieux','bloque_juridique','bloque_technique')"
+                       string="Statut recouvrement"/>
+                <!-- Action courante de la phase -->
+                <field name="action_courante_type" string="Action en cours" optional="show"/>
+                <field name="action_courante_date" string="Échéance action" optional="show"/>
+                <field name="action_courante_state" string="État action" optional="show"/>
+                <field name="recouvrement_id" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         VUE FORM — Facture avec bandeau "Action courante"
+    =============================================================== -->
+    <record id="view_recouvrement_facture_form" model="ir.ui.view">
+        <field name="name">recouvrement.facture.form</field>
+        <field name="model">recouvrement.facture</field>
+        <field name="arch" type="xml">
+            <form string="Facture" class="o_rcv_facture_form">
+                <header>
+                    <field name="recouvrement_status" widget="statusbar"
+                           statusbar_visible="normal,precontentieux,contentieux,recouvre"/>
+                </header>
+                <sheet>
+
+                    <!-- ── Bandeau action courante ───────────────────── -->
+                    <div class="alert alert-info d-flex align-items-center gap-2 mb-3"
+                         invisible="action_courante_id == False">
+                        <i class="fa fa-bell-o fa-lg"/>
+                        <div>
+                            <strong>Action en cours — Phase courante :</strong>
+                            <span class="ms-1">
+                                <field name="action_courante_type" readonly="1" nolabel="1"/>
+                            </span>
+                            <span class="text-muted ms-2">·</span>
+                            <span class="ms-2">Échéance :
+                                <field name="action_courante_date" readonly="1" nolabel="1"/>
+                            </span>
+                            <span class="text-muted ms-2">·</span>
+                            <span class="ms-2">État :
+                                <field name="action_courante_state" readonly="1" nolabel="1"/>
+                            </span>
+                            <button name="%(recouvrement_contentieux.action_recouvrement_action_appels)d"
+                                    type="action"
+                                    string="Voir l'action"
+                                    class="btn btn-sm btn-primary ms-3"
+                                    invisible="action_courante_id == False"/>
+                        </div>
+                    </div>
+                    <div class="alert alert-success d-flex align-items-center gap-2 mb-3"
+                         invisible="recouvrement_status != 'recouvre'">
+                        <i class="fa fa-check-circle fa-lg"/>
+                        <strong>Facture recouvrée — toutes les phases terminées.</strong>
+                    </div>
+
+                    <!-- ── En-tête facture ───────────────────────────── -->
+                    <div class="o_facture_header">
+                        <div class="o_facture_identity">
+                            <h1 class="o_facture_number">
+                                <field name="name" placeholder="N° Facture"/>
+                            </h1>
+                            <div class="o_facture_meta_line">
+                                <span class="o_facture_meta_label">Client :</span>
+                                <field name="client_id" options="{'no_create': True}"/>
+                                <span class="o_facture_meta_sep">·</span>
+                                <span class="o_facture_meta_label">Code affaire :</span>
+                                <field name="code_affaire" placeholder="—"/>
+                                <span class="o_facture_meta_sep">·</span>
+                                <span class="o_facture_meta_label">Type :</span>
+                                <field name="facture_type"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── Groupes de champs ─────────────────────────── -->
+                    <group>
+                        <group string="Informations financières">
+                            <field name="montant_ttc" widget="monetary"/>
+                            <field name="montant_ht" widget="monetary"/>
+                            <field name="montant_paye" widget="monetary"/>
+                            <field name="reste_a_payer" widget="monetary"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                        </group>
+                        <group string="Dates">
+                            <field name="date_facture"/>
+                            <field name="date_depot_client"/>
+                            <field name="date_signature"/>
+                            <field name="date_reception_ordre"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Recouvrement">
+                            <field name="recouvrement_id" readonly="1"/>
+                            <field name="statut_interface" widget="badge"/>
+                            <field name="state"/>
+                        </group>
+                        <group string="Identification">
+                            <field name="division_id"/>
+                            <field name="pole_id"/>
+                            <field name="ice"/>
+                            <field name="numero_marche"/>
+                            <field name="reference_justificatif"/>
+                        </group>
+                    </group>
+
+                    <!-- ── Onglet actions liées ──────────────────────── -->
+                    <notebook>
+                        <page string="Actions de recouvrement" name="actions">
+                            <field name="recouvrement_id" invisible="1"/>
+                            <!-- Liste des actions du dossier filtrées sur ce client -->
+                            <field name="action_courante_id" invisible="1"/>
+                            <p class="text-muted" invisible="recouvrement_id != False">
+                                <i class="fa fa-info-circle"/> Cette facture n'est pas encore rattachée à un dossier de recouvrement.
+                            </p>
+                            <button name="action_open_dossier"
+                                    type="object"
+                                    string="Voir le dossier complet"
+                                    class="btn btn-secondary"
+                                    invisible="recouvrement_id == False"/>
+                        </page>
+                        <page string="Détails" name="details">
+                            <group>
+                                <field name="source_sheet"/>
+                                <field name="mois_upload"/>
+                                <field name="numero_enreg"/>
+                                <field name="depot_comment"/>
+                                <field name="nature"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Lier list + form à l'action existante -->
+    <record id="action_recouvrement_facture_list_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_recouvrement_facture_list"/>
+        <field name="act_window_id" ref="recouvrement_contentieux.action_recouvrement_facture"/>
+    </record>
+    <record id="action_recouvrement_facture_form_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_recouvrement_facture_form"/>
+        <field name="act_window_id" ref="recouvrement_contentieux.action_recouvrement_facture"/>
+    </record>
+
+</data>
+</odoo>

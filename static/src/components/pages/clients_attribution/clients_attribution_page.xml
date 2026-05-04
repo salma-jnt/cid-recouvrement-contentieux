@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="recouvrement_contentieux.ClientsAttributionPage">
+    <div class="cid-page cid-clients-page">
+
+        <!-- ── Header ─────────────────────────────────────────── -->
+        <header class="cid-clients-page__header">
+
+            <div class="cid-clients-page__title-row">
+                <h1 class="cid-page__title">
+                    <i class="fa fa-address-book-o"/> Clients
+                </h1>
+                <span t-if="!state.loading" class="cid-clients-page__count">
+                    <t t-esc="state.total"/>
+                    <t t-if="state.total > 1"> clients</t>
+                    <t t-else=""> client</t>
+                </span>
+            </div>
+
+            <div class="cid-clients-page__toolbar">
+                <CidSearchBar
+                    placeholder="'Rechercher (nom, email, téléphone)…'"
+                    value="state.search"
+                    onSearch.bind="onSearch"/>
+
+                <div class="cid-clients-page__actions">
+                    <CidButton variant="'ghost'" icon="'fa-refresh'"
+                               onClick="() => this.loadAll()">
+                        Actualiser
+                    </CidButton>
+                </div>
+            </div>
+
+            <!-- Bandeau sauvegarde en cours -->
+            <div t-if="state.saving" class="cid-clients-page__saving-bar">
+                <i class="fa fa-spinner fa-spin"/> Enregistrement en cours…
+            </div>
+
+        </header>
+
+        <!-- ── Tableau ─────────────────────────────────────────── -->
+        <div class="cid-clients-page__body">
+            <CidDataTable
+                columns="columns"
+                rows="state.rows"
+                loading="state.loading"
+                rowKey="'id'"
+                paginated="true"
+                page="state.page"
+                pageSize="state.pageSize"
+                total="state.total"
+                stickyHeader="true"
+                hoverable="true"
+                emptyIcon="'fa-address-book-o'"
+                emptyTitle="'Aucun client trouvé'"
+                emptyDescription="'Aucun client ne correspond à la recherche.'"
+                onPageChange.bind="onPageChange"
+                onPageSizeChange.bind="onPageSizeChange">
+
+                <!-- Dropdown type de client -->
+                <t t-set-slot="type_select" t-slot-scope="scope">
+                    <div class="cid-type-select-wrap">
+                        <select class="cid-type-select"
+                                t-att-disabled="state.saving"
+                                t-on-change="(ev) => this.onTypeChange(scope.row, ev)">
+                            <option value="">— Aucun —</option>
+                            <t t-foreach="clientTypes" t-as="ct" t-key="ct.id">
+                                <option t-att-value="ct.id"
+                                        t-att-selected="scope.row.current_type_id === ct.id">
+                                    <t t-esc="ct.name"/>
+                                </option>
+                            </t>
+                        </select>
+                        <i t-if="scope.row.current_type_id" class="fa fa-check cid-type-select__check"/>
+                    </div>
+                </t>
+
+                <!-- Date d'attribution -->
+                <t t-set-slot="date_cell" t-slot-scope="scope">
+                    <span t-if="scope.row.date_attribution" class="cid-cell-muted">
+                        <t t-esc="fmtDate(scope.row.date_attribution)"/>
+                    </span>
+                    <span t-else="" class="cid-cell-muted">—</span>
+                </t>
+
+            </CidDataTable>
+        </div>
+
+    </div>
+</t>
+
+</templates>

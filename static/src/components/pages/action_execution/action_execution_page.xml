@@ -5,9 +5,9 @@
         <div class="cid-page cid-action-page">
 
             <t t-if="state.loading">
-                <CidSkeleton width="'100%'" height="80px"/>
+                <CidSkeleton width="'100%'" height="'80px'"/>
                 <div style="height:16px;"/>
-                <CidSkeleton width="'100%'" height="200px"/>
+                <CidSkeleton width="'100%'" height="'200px'"/>
             </t>
 
             <t t-elif="state.action">
@@ -226,8 +226,8 @@
                         <t t-else="">
                             <CidEmptyState
                                 icon="'fa-info-circle'"
-                                title="'Type d&apos;action non géré ici'"
-                                description="'Cette action est gérée via le formulaire Odoo standard.'"/>
+                                title="`Type d'action non géré ici`"
+                                description="`Cette action est gérée via le formulaire Odoo standard.`"/>
                         </t>
                     </div>
 
@@ -243,27 +243,66 @@
                                 </strong>
                             </t>
                             <t t-if="state.factures.length === 0">
-                                <div style="padding: 16px; text-align: center;" class="text-muted">
+                                <div class="cid-facture-empty">
+                                    <i class="fa fa-file-o"/>
                                     Aucune facture pour ce client dans ce dossier.
                                 </div>
                             </t>
                             <t t-else="">
-                                <div class="cid-action-page__factures">
+                                <div class="cid-facture-cards">
                                     <t t-foreach="state.factures" t-as="f" t-key="f.id">
-                                        <div class="cid-action-page__facture">
-                                            <CidStatusPill color="f.statut_interface" size="'sm'">
-                                                <t t-esc="f.statut_interface"/>
-                                            </CidStatusPill>
-                                            <div class="cid-action-page__facture-main">
-                                                <strong t-esc="f.name"/>
-                                                <div class="cid-action-page__facture-sub">
-                                                    <t t-esc="fmtDate(f.date_facture)"/>
-                                                    · TTC <t t-esc="fmt(f.montant_ttc)"/>
+                                        <div t-att-class="'cid-facture-card' + (f.reste_a_payer === 0 ? ' is-paid' : '')">
+
+                                            <!-- Ligne 1 : référence + reste à payer -->
+                                            <div class="cid-facture-card__top">
+                                                <div class="cid-facture-card__ref">
+                                                    <CidStatusPill color="f.statut_interface" size="'sm'" withDot="true"/>
+                                                    <strong class="cid-facture-card__name" t-esc="f.name"/>
+                                                </div>
+                                                <span t-att-class="'cid-facture-card__reste' + (f.reste_a_payer === 0 ? ' is-paid' : ' is-due')">
+                                                    <t t-if="f.reste_a_payer === 0">
+                                                        <i class="fa fa-check-circle"/> Soldée
+                                                    </t>
+                                                    <t t-else="">
+                                                        <t t-esc="fmt(f.reste_a_payer)"/> DH
+                                                    </t>
+                                                </span>
+                                            </div>
+
+                                            <!-- Ligne 2 : date + code affaire -->
+                                            <div class="cid-facture-card__meta">
+                                                <i class="fa fa-calendar-o"/>
+                                                <t t-esc="fmtDate(f.date_facture)"/>
+                                                <t t-if="f.code_affaire">
+                                                    <span class="cid-facture-card__sep">·</span>
+                                                    <i class="fa fa-tag"/>
+                                                    <t t-esc="f.code_affaire"/>
+                                                </t>
+                                            </div>
+
+                                            <!-- Barre de progression (payé / TTC) -->
+                                            <div class="cid-facture-card__progress-track">
+                                                <div class="cid-facture-card__progress-fill"
+                                                     t-att-class="f.reste_a_payer === 0 ? 'is-full' : ''"
+                                                     t-att-style="'width:' + Math.round(Math.max(0, Math.min(100, (1 - f.reste_a_payer / (f.montant_ttc || 1)) * 100))) + '%'"/>
+                                            </div>
+
+                                            <!-- Montants TTC / Payé -->
+                                            <div class="cid-facture-card__amounts">
+                                                <div class="cid-facture-card__amount">
+                                                    <span class="cid-facture-card__amount-label">Total TTC</span>
+                                                    <span class="cid-facture-card__amount-value">
+                                                        <t t-esc="fmt(f.montant_ttc)"/> DH
+                                                    </span>
+                                                </div>
+                                                <div class="cid-facture-card__amount cid-facture-card__amount--paid">
+                                                    <span class="cid-facture-card__amount-label">Déjà payé</span>
+                                                    <span class="cid-facture-card__amount-value">
+                                                        <t t-esc="fmt(f.montant_ttc - f.reste_a_payer)"/> DH
+                                                    </span>
                                                 </div>
                                             </div>
-                                            <div t-att-class="'cid-action-page__facture-amount' + (f.reste_a_payer === 0 ? ' is-paid' : '')">
-                                                <t t-esc="fmt(f.reste_a_payer)"/>
-                                            </div>
+
                                         </div>
                                     </t>
                                 </div>

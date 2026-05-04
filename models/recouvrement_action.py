@@ -185,6 +185,10 @@ class RecouvrementAction(models.Model):
         # Si on change de phase courante (action devient done) → propager statut_interface
         if 'state' in vals and vals['state'] == 'done':
             self._propagate_statut_interface_to_factures()
+            # Vérifier avancement de phase
+            dossiers = self.mapped('recouvrement_id')
+            for dossier in dossiers:
+                dossier._check_and_advance_phase()
 
         # Sync Outlook automatique sur les champs sensibles
         if not self.env.context.get('skip_outlook_sync'):
@@ -218,6 +222,11 @@ class RecouvrementAction(models.Model):
             rec.state = 'done'
             rec.date_done = fields.Date.today()
         self._propagate_statut_interface_to_factures()
+        # Vérifier si toutes les actions de la phase sont terminées
+        # → planifier automatiquement la phase suivante
+        dossiers = self.mapped('recouvrement_id')
+        for dossier in dossiers:
+            dossier._check_and_advance_phase()
         return True
 
     def action_reset(self):

@@ -72,7 +72,7 @@
                                 <t t-foreach="props.columns" t-as="col" t-key="col.key or col_index">
                                     <td class="cid-dt__td">
                                         <CidSkeleton height="'14px'"
-                                                     t-att-width="col_index % 2 === 0 ? '80%' : '60%'"/>
+                                                     width="col_index % 2 === 0 ? '80%' : '60%'"/>
                                     </td>
                                 </t>
                                 <td t-if="props.slots and props.slots.row_actions"
@@ -91,9 +91,9 @@
                                                + (props.slots and props.slots.row_actions ? 1 : 0)"
                                 class="cid-dt__td cid-dt__td--empty">
                                 <CidEmptyState
-                                    t-att-icon="props.emptyIcon"
-                                    t-att-title="props.emptyTitle"
-                                    t-att-description="props.emptyDescription"/>
+                                    icon="props.emptyIcon"
+                                    title="props.emptyTitle"
+                                    description="props.emptyDescription"/>
                             </td>
                         </tr>
                     </tbody>
@@ -119,8 +119,8 @@
                                     <td t-att-class="colCellClass(col)" t-att-style="colStyle(col)">
                                         <!-- Rendu via slot nommé (ex: slot "cell_status") -->
                                         <t t-if="col.render and props.slots and props.slots[col.render]">
-                                            <t t-slot="t-att-name=\"col.render\"" row="row" col="col"
-                                               value="row[col.key]"/>
+                                            <t t-slot="col.render" row="row" col="col"
+                                                  value="row[col.key]"/>
                                         </t>
                                         <!-- Rendu texte par défaut -->
                                         <t t-else="">
@@ -147,10 +147,10 @@
             <!-- ── Pagination ── -->
             <t t-if="props.paginated and !isEmpty">
                 <CidPagination
-                    t-att-total="props.total or props.rows.length"
-                    t-att-page="props.page"
-                    t-att-pageSize="props.pageSize"
-                    t-att-pageSizeOptions="props.pageSizeOptions"
+                    total="props.total or props.rows.length"
+                    page="props.page"
+                    pageSize="props.pageSize"
+                    pageSizeOptions="props.pageSizeOptions"
                     onPageChange.bind="onPageChange"
                     onPageSizeChange.bind="onPageSizeChange"/>
             </t>

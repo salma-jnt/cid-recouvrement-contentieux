@@ -44,6 +44,14 @@ class Recouvrement(models.Model):
 
     motif_blocage = fields.Text(string='Motif de blocage')
 
+    # Index de la phase en cours (0 = première phase, -1 = terminée)
+    # Toutes les actions créées appartiennent à UN seul numéro de phase.
+    phase_index = fields.Integer(
+        string='Index phase courante',
+        default=0,
+        help="0 = phase 1 active, 1 = phase 2, etc. -1 = procédure terminée.",
+    )
+
     # ------------------------------------------------------------------
     # Stratégie & regroupement
     # ------------------------------------------------------------------
@@ -203,9 +211,10 @@ class Recouvrement(models.Model):
                 seq = self.env['ir.sequence'].next_by_code('recouvrement.recouvrement')
                 vals['name'] = seq or _('Dossier #%d') % self.env['recouvrement.recouvrement'].search_count([])
         records = super().create(vals_list)
-        for rec in records:
-            if rec.procedure_id and not rec.action_ids:
-                rec.action_generate_actions()
+        # NOTE: on ne génère PAS les actions ici car les factures ne sont pas
+        # encore rattachées au dossier à ce stade. La planification est
+        # déclenchée par _planifier_apres_rattachement() après le write()
+        # de la facture (recouvrement_id) dans le wizard ou le modèle facture.
         return records
 
     def _get_action_base_date(self):
@@ -221,46 +230,271 @@ class Recouvrement(models.Model):
             or fields.Date.today()
         )
 
+    def _planifier_apres_rattachement(self):
+        """
+        Appelé APRÈS qu'une ou plusieurs factures ont été rattachées au dossier.
+
+        Cas 1 — Dossier nouveau (aucune action) :
+            Génère la phase 0 pour tous les clients présents.
+
+        Cas 2 — Dossier existant avec phase en cours (actions déjà là) :
+            Vérifie si un nouveau client vient d'être ajouté (pas encore
+            d'action pour lui dans la phase courante) et crée son action.
+
+        Méthode idempotente — sûre à appeler plusieurs fois.
+        """
+        self.ensure_one()
+        if not self.procedure_id:
+            return
+        # Uniquement les clients avec factures non recouvrées
+        clients = self._get_clients_actifs()
+        if not clients:
+            return
+
+        # Cas 1 : aucune action → planifier la phase 0 complète
+        if not self.action_ids:
+            self._planifier_phase(0)
+            return
+
+        # Cas 2 : phase en cours → vérifier les nouveaux clients sans action
+        if self.phase_index < 0:
+            return  # procédure terminée
+
+        templates = self.procedure_id.action_template_ids.sorted(
+            key=lambda t: (t.sequence, t.id)
+        )
+        if not templates or self.phase_index >= len(templates):
+            return
+        current_template = templates[self.phase_index]
+
+        # Clients actifs (non soldés) sans action pour la phase courante
+        clients_with_action = self.action_ids.filtered(
+            lambda a: a.action_template_id == current_template
+        ).mapped('client_id')
+        # clients = déjà filtrés par _get_clients_actifs (reste_a_payer > 0)
+        new_clients = clients - clients_with_action
+
+        if not new_clients:
+            return
+
+        base_date = self._get_action_base_date()
+        cumul_delay = sum(
+            (t.delay or 0) for t in templates[:self.phase_index + 1]
+        )
+        action_date = base_date + timedelta(days=cumul_delay)
+
+        actions_to_create = []
+        for client in new_clients:
+            actions_to_create.append({
+                'name': current_template.name,
+                'recouvrement_id': self.id,
+                'client_id': client.id,
+                'action_template_id': current_template.id,
+                'action_type': current_template.action_type,
+                'mandatory_date': action_date,
+                'comment': current_template.description or False,
+                'responsible_id': self.env.user.id,
+            })
+        if actions_to_create:
+            self.env['recouvrement.action'].create(actions_to_create)
+            self._update_state()
+
     def action_generate_actions(self):
-        """Génère les actions d'un dossier à partir des templates de la procédure.
-        Une action est créée par template ET par client distinct dans le dossier
-        (logique du convoi : chaque client doit valider chaque phase)."""
-        action_obj = self.env['recouvrement.action']
+        """Réinitialise la procédure depuis la phase 1.
+        Supprime toutes les actions non réalisées et repart de zéro."""
         for record in self:
             if not record.procedure_id:
                 raise UserError(_(
                     "Veuillez sélectionner une procédure avant de générer les actions."
                 ))
-            base_date = record._get_action_base_date()
-
-            # Wipe les actions non encore réalisées
+            # Supprimer uniquement les actions non encore réalisées
             record.action_ids.filtered(lambda a: a.state != 'done').unlink()
-
-            clients = record.facture_ids.mapped('client_id')
-            templates = record.procedure_id.action_template_ids.sorted(
-                key=lambda t: (t.sequence, t.id)
-            )
-
-            actions_to_create = []
-            for client in clients:
-                running_date = base_date
-                for template in templates:
-                    running_date = running_date + timedelta(days=template.delay or 0)
-                    actions_to_create.append({
-                        'name': template.name,
-                        'recouvrement_id': record.id,
-                        'client_id': client.id,
-                        'action_template_id': template.id,
-                        'action_type': template.action_type,
-                        'mandatory_date': running_date,
-                        'comment': template.description or False,
-                        'responsible_id': self.env.user.id,
-                    })
-            if actions_to_create:
-                action_obj.create(actions_to_create)
-
-            record._update_state()
+            record.phase_index = 0
+            record._planifier_phase(0)
         return True
+
+    def _get_clients_actifs(self):
+        """
+        Retourne les clients du dossier pour lesquels il reste encore
+        des factures à recouvrer.
+
+        Un client est EXCLU si TOUTES ses factures dans ce dossier
+        satisfont l'une des conditions suivantes :
+          - reste_a_payer == 0 (déjà payée, même sans statut 'recouvre')
+          - recouvrement_status == 'recouvre'
+
+        Cela évite de créer des actions pour des factures déjà soldées.
+        """
+        self.ensure_one()
+        clients_actifs = self.env['res.partner']
+        for client in self.facture_ids.mapped('client_id'):
+            factures_client = self.facture_ids.filtered(
+                lambda f, c=client: f.client_id == c
+            )
+            # Garder le client si au moins 1 facture a encore du reste à payer
+            # ET n'est pas marquée recouvrée
+            if any(
+                f.reste_a_payer > 0 and f.recouvrement_status != 'recouvre'
+                for f in factures_client
+            ):
+                clients_actifs |= client
+        return clients_actifs
+
+    def _planifier_phase(self, phase_index):
+        """
+        Crée les actions pour UNE SEULE phase (phase_index = position 0-based
+        dans la liste des templates triés par séquence).
+
+        Règle du cahier de charge :
+          - Phase planifiée = 1 action par CLIENT du dossier
+          - La date de l'action = date_base + cumul des délais des phases 0..phase_index
+          - Après la dernière phase, on ne crée rien (procédure terminée).
+        """
+        self.ensure_one()
+        templates = self.procedure_id.action_template_ids.sorted(
+            key=lambda t: (t.sequence, t.id)
+        )
+        if not templates or phase_index >= len(templates):
+            # Toutes les phases sont terminées
+            self.phase_index = -1
+            self._update_state()
+            return
+
+        template = templates[phase_index]
+        self.phase_index = phase_index
+
+        # Calcul de la date cumulée depuis la date de base
+        base_date = self._get_action_base_date()
+        cumul_delay = sum(
+            (t.delay or 0) for t in templates[:phase_index + 1]
+        )
+        action_date = base_date + timedelta(days=cumul_delay)
+
+        # Uniquement les clients avec au moins 1 facture non recouvrée
+        clients = self._get_clients_actifs()
+        if not clients:
+            # Tous les clients sont soldés → procédure terminée
+            self.phase_index = -1
+            self._update_state()
+            return
+
+        actions_to_create = []
+        for client in clients:
+            actions_to_create.append({
+                'name': template.name,
+                'recouvrement_id': self.id,
+                'client_id': client.id,
+                'action_template_id': template.id,
+                'action_type': template.action_type,
+                'mandatory_date': action_date,
+                'comment': template.description or False,
+                'responsible_id': self.env.user.id,
+            })
+        if actions_to_create:
+            self.env['recouvrement.action'].create(actions_to_create)
+
+        self._update_state()
+        self.message_post(
+            body=_(
+                "📋 Phase <strong>%(num)s/%(total)s</strong> planifiée : "
+                "<em>%(name)s</em> — échéance le %(date)s",
+                num=phase_index + 1,
+                total=len(templates),
+                name=template.name,
+                date=action_date.strftime('%d/%m/%Y'),
+            ),
+            message_type='comment',
+            subtype_xmlid='mail.mt_note',
+        )
+
+    def _check_and_advance_phase(self):
+        """
+        Appelée après qu'une action est marquée 'done'.
+        Vérifie si TOUTES les actions de la phase courante sont terminées.
+        Si oui → planifie la phase suivante.
+        """
+        self.ensure_one()
+        if self.phase_index < 0 or self.state in ('solde', 'bloque'):
+            return
+
+        templates = self.procedure_id.action_template_ids.sorted(
+            key=lambda t: (t.sequence, t.id)
+        )
+        if not templates:
+            return
+
+        # Récupérer le template de la phase courante
+        if self.phase_index >= len(templates):
+            return
+        current_template = templates[self.phase_index]
+
+        # Actions de la phase courante = celles liées à ce template.
+        # Règle de comptage par CLIENT :
+        #   - Si un client a au moins 1 action 'todo'  → phase pas finie pour lui
+        #   - Si toutes ses actions sont 'done' ou 'reporte' ou 'cancel'
+        #     ET qu'il a au moins 1 'done'              → phase finie pour lui
+        #   - 'reporte' seul (sans aucun 'done')        → on attend encore
+        # En résumé : la phase avance quand chaque client a au moins 1 'done'
+        # et plus aucun 'todo' dans cette phase.
+
+        phase_actions = self.action_ids.filtered(
+            lambda a: a.action_template_id == current_template
+        )
+        if not phase_actions:
+            return
+
+        # Grouper par client
+        clients_in_phase = phase_actions.mapped('client_id')
+        all_done = True
+        for client in clients_in_phase:
+            client_actions = phase_actions.filtered(lambda a, c=client: a.client_id == c)
+
+            # Si toutes les factures de ce client ont reste_a_payer=0
+            # → on considère ce client comme "terminé" peu importe l'état de ses actions
+            factures_client = self.facture_ids.filtered(
+                lambda f, c=client: f.client_id == c
+            )
+            client_solde = all(
+                f.reste_a_payer == 0 or f.recouvrement_status == 'recouvre'
+                for f in factures_client
+            )
+            if client_solde:
+                # Annuler les éventuelles actions todo/reporte restantes
+                pending = client_actions.filtered(lambda a: a.state in ('todo', 'reporte'))
+                if pending:
+                    pending.write({'state': 'cancel'})
+                continue  # ce client ne bloque pas l'avancement
+
+            has_todo = any(a.state == 'todo' for a in client_actions)
+            has_done = any(a.state == 'done' for a in client_actions)
+            if has_todo or not has_done:
+                all_done = False
+                break
+        if all_done:
+            next_index = self.phase_index + 1
+            # Vérifier s'il reste encore des clients actifs avant de planifier
+            clients_actifs = self._get_clients_actifs()
+            if not clients_actifs:
+                # Tous recouvrés → terminer la procédure
+                self.phase_index = -1
+                self._update_state()
+                self.message_post(
+                    body=_("✅ Toutes les factures du dossier sont recouvrées."),
+                    message_type='comment',
+                    subtype_xmlid='mail.mt_note',
+                )
+                return
+            if next_index < len(templates):
+                self._planifier_phase(next_index)
+            else:
+                # Dernière phase terminée
+                self.phase_index = -1
+                self._update_state()
+                self.message_post(
+                    body=_("✅ Toutes les phases de la procédure sont terminées."),
+                    message_type='comment',
+                    subtype_xmlid='mail.mt_note',
+                )
 
     # ==================================================================
     # ÉTAT & PROPAGATION

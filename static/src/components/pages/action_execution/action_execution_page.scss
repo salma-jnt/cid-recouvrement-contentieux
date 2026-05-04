@@ -101,37 +101,8 @@
         }
     }
 
-    /* Side : factures */
-    &__factures {
-        display: flex;
-        flex-direction: column;
-    }
-
-    &__facture {
-        display: flex;
-        align-items: center;
-        gap: var(--cid-space-2);
-        padding: var(--cid-space-3) var(--cid-space-4);
-        border-bottom: 1px solid var(--cid-divider);
-        &:last-child { border-bottom: 0; }
-    }
-    &__facture-main {
-        flex: 1;
-        min-width: 0;
-        strong { font-size: var(--cid-text-sm); display: block; @include cid-truncate(1); }
-    }
-    &__facture-sub {
-        font-size: var(--cid-text-xs);
-        color: var(--cid-text-muted);
-        margin-top: 2px;
-    }
-    &__facture-amount {
-        font-weight: var(--cid-weight-semibold);
-        color: var(--cid-danger);
-        font-feature-settings: "tnum";
-        font-size: var(--cid-text-sm);
-        &.is-paid { color: var(--cid-text-faint); text-decoration: line-through; }
-    }
+    /* Side : placeholder vide factures */
+    // (remplacé par .cid-facture-cards / .cid-facture-card hors BEM)
 
     /* Side : history */
     &__history { display: flex; flex-direction: column; }
@@ -219,4 +190,146 @@
     min-height: 90px;
     line-height: var(--cid-leading-relaxed);
     font-family: var(--cid-font-sans);
+}
+
+/* ── Cartes factures (panneau latéral) ───────────────────── */
+
+.cid-facture-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cid-space-2);
+    padding: var(--cid-space-5);
+    color: var(--cid-text-faint);
+    font-size: var(--cid-text-sm);
+}
+
+.cid-facture-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.cid-facture-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cid-space-2);
+    padding: var(--cid-space-4);
+    border-bottom: 1px solid var(--cid-divider);
+    transition: background 0.15s;
+
+    &:last-child { border-bottom: 0; }
+
+    &:hover { background: var(--cid-surface-alt); }
+
+    &.is-paid {
+        opacity: 0.7;
+        background: var(--cid-vert-soft);
+        &:hover { background: #BBFBCA; }
+    }
+
+    /* Ligne 1 : référence + reste à payer */
+    &__top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: var(--cid-space-2);
+    }
+
+    &__ref {
+        display: flex;
+        align-items: center;
+        gap: var(--cid-space-2);
+        min-width: 0;
+    }
+
+    &__name {
+        font-size: var(--cid-text-sm);
+        font-weight: 700;
+        color: var(--cid-text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__reste {
+        font-size: var(--cid-text-sm);
+        font-weight: 700;
+        font-feature-settings: "tnum";
+        white-space: nowrap;
+        flex-shrink: 0;
+
+        &.is-due  { color: var(--cid-rouge); }
+        &.is-paid {
+            color: var(--cid-vert-fg);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: var(--cid-text-xs);
+        }
+    }
+
+    /* Ligne 2 : date + code affaire */
+    &__meta {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: var(--cid-text-xs);
+        color: var(--cid-text-muted);
+
+        .fa { font-size: 10px; opacity: 0.7; }
+    }
+
+    &__sep { opacity: 0.4; }
+
+    /* Barre de progression */
+    &__progress-track {
+        height: 6px;
+        border-radius: 999px;
+        background: var(--cid-border);
+        overflow: hidden;
+        margin: 2px 0;
+    }
+
+    &__progress-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: var(--cid-primary-400);
+        transition: width 0.4s ease;
+
+        &.is-full { background: var(--cid-vert); }
+    }
+
+    /* Ligne montants */
+    &__amounts {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--cid-space-2);
+        padding-top: var(--cid-space-1);
+    }
+
+    &__amount {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        &--paid .cid-facture-card__amount-value {
+            color: var(--cid-vert-fg);
+            font-weight: 600;
+        }
+    }
+
+    &__amount-label {
+        font-size: var(--cid-text-xs);
+        color: var(--cid-text-faint);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    &__amount-value {
+        font-size: var(--cid-text-sm);
+        font-weight: 600;
+        font-feature-settings: "tnum";
+        color: var(--cid-text-soft);
+    }
 }

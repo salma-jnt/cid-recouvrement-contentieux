@@ -1,6 +1,6 @@
 {
     'name': 'Recouvrement, litiges et contentieux',
-    'version': '19.0.2.0.0',
+    'version': '19.0.3.0.0',
     'summary': 'Gestion moderne du recouvrement, des litiges et du contentieux (CID)',
     'description': """
 Module de gestion des recouvrements, litiges et contentieux pour CID Développement.
@@ -33,6 +33,7 @@ Refactor v2.0.0 :
         'views/res_partner_views.xml',
         'views/res_config_settings_views.xml',
         'views/recouvrement_facture_views.xml',
+        'views/recouvrement_facture_form_views.xml',
         'views/recouvrement_encaissement_views.xml',
         'views/recouvrement_lettrage_views.xml',
         'views/recouvrement_dossier_views.xml',
@@ -59,6 +60,15 @@ Refactor v2.0.0 :
             'recouvrement_contentieux/static/src/components/ui/card/card.js',
             'recouvrement_contentieux/static/src/components/ui/card/card.xml',
             'recouvrement_contentieux/static/src/components/ui/skeleton/skeleton.js',
+            # DataTable
+            'recouvrement_contentieux/static/src/components/ui/data_table/data_table.scss',
+            'recouvrement_contentieux/static/src/components/ui/data_table/data_table_extras.scss',
+            'recouvrement_contentieux/static/src/components/ui/data_table/data_table.xml',
+            'recouvrement_contentieux/static/src/components/ui/data_table/data_table.js',
+            # Drawer
+            'recouvrement_contentieux/static/src/components/ui/drawer/drawer.scss',
+            'recouvrement_contentieux/static/src/components/ui/drawer/drawer.xml',
+            'recouvrement_contentieux/static/src/components/ui/drawer/drawer.js',
             'recouvrement_contentieux/static/src/components/ui/skeleton/skeleton.xml',
             'recouvrement_contentieux/static/src/components/ui/empty_state/empty_state.js',
             'recouvrement_contentieux/static/src/components/ui/empty_state/empty_state.xml',
@@ -74,6 +84,9 @@ Refactor v2.0.0 :
             'recouvrement_contentieux/static/src/components/ui/pagination/pagination.xml',
             'recouvrement_contentieux/static/src/components/ui/kpi_card/kpi_card.js',
             'recouvrement_contentieux/static/src/components/ui/kpi_card/kpi_card.xml',
+            # SearchBar
+            'recouvrement_contentieux/static/src/components/ui/search_bar/search_bar.xml',
+            'recouvrement_contentieux/static/src/components/ui/search_bar/search_bar.js',
 
             # ==========  DASHBOARD + SIDEBAR OWL (menu fixe persistant)  ==========
             # Ces 3 fichiers sont OBLIGATOIRES pour que la sidebar navy s'affiche.
@@ -95,8 +108,19 @@ Refactor v2.0.0 :
             'recouvrement_contentieux/static/src/components/pages/import_encaissements/import_encaissements_page.js',
             'recouvrement_contentieux/static/src/components/pages/import_encaissements/import_encaissements_page.xml',
 
+            # Encaissements list + detail pages
+            'recouvrement_contentieux/static/src/components/pages/encaissements_list/encaissements_list_page.scss',
+            'recouvrement_contentieux/static/src/components/pages/encaissements_list/encaissements_list_page.xml',
+            'recouvrement_contentieux/static/src/components/pages/encaissements_list/encaissements_list_page.js',
+            'recouvrement_contentieux/static/src/components/pages/encaissement_detail/encaissement_detail_page.scss',
+            'recouvrement_contentieux/static/src/components/pages/encaissement_detail/encaissement_detail_page.xml',
+            'recouvrement_contentieux/static/src/components/pages/encaissement_detail/encaissement_detail_page.js',
             'recouvrement_contentieux/static/src/components/pages/encaissement_lettrage/encaissement_lettrage_page.js',
             'recouvrement_contentieux/static/src/components/pages/encaissement_lettrage/encaissement_lettrage_page.xml',
+
+            # Dossiers list page OWL
+            'recouvrement_contentieux/static/src/components/pages/dossiers_list/dossiers_list_page.xml',
+            'recouvrement_contentieux/static/src/components/pages/dossiers_list/dossiers_list_page.js',
 
             'recouvrement_contentieux/static/src/components/pages/dossier_detail/dossier_detail_page.js',
             'recouvrement_contentieux/static/src/components/pages/dossier_detail/dossier_detail_page.xml',
@@ -104,8 +128,21 @@ Refactor v2.0.0 :
             'recouvrement_contentieux/static/src/components/pages/dashboard/dashboard.js',
             'recouvrement_contentieux/static/src/components/pages/dashboard/dashboard.xml',
 
+            'recouvrement_contentieux/static/src/components/pages/action_execution/action_execution_page.scss',
             'recouvrement_contentieux/static/src/components/pages/action_execution/action_execution_page.js',
             'recouvrement_contentieux/static/src/components/pages/action_execution/action_execution_page.xml',
+
+            # Appels list page OWL
+            'recouvrement_contentieux/static/src/components/pages/appels_list/appels_list_page.xml',
+            'recouvrement_contentieux/static/src/components/pages/appels_list/appels_list_page.js',
+
+            # Emails list page OWL
+            'recouvrement_contentieux/static/src/components/pages/emails_list/emails_list_page.xml',
+            'recouvrement_contentieux/static/src/components/pages/emails_list/emails_list_page.js',
+
+            # Clients attribution page OWL
+            'recouvrement_contentieux/static/src/components/pages/clients_attribution/clients_attribution_page.xml',
+            'recouvrement_contentieux/static/src/components/pages/clients_attribution/clients_attribution_page.js',
         ],
     },
     'installable': True,

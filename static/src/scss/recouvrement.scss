@@ -22,16 +22,28 @@
 @import "recouvrement_contentieux/static/src/components/ui/stepper/stepper";
 @import "recouvrement_contentieux/static/src/components/ui/pagination/pagination";
 @import "recouvrement_contentieux/static/src/components/ui/kpi_card/kpi_card";
+@import "recouvrement_contentieux/static/src/components/ui/search_bar/search_bar";
 
 /* ----- Chatbot ----- */
 @import "recouvrement_contentieux/static/src/components/chatbot/chatbot_fab";
 
+/* ----- UI Components ----- */
+@import "recouvrement_contentieux/static/src/components/ui/data_table/data_table";
+@import "recouvrement_contentieux/static/src/components/ui/data_table/data_table_extras";
+@import "recouvrement_contentieux/static/src/components/ui/drawer/drawer";
+
 /* ----- Pages ----- */
+@import "recouvrement_contentieux/static/src/components/pages/encaissements_list/encaissements_list_page";
+@import "recouvrement_contentieux/static/src/components/pages/encaissement_detail/encaissement_detail_page";
 @import "recouvrement_contentieux/static/src/components/pages/import_factures/import_factures_page";
 @import "recouvrement_contentieux/static/src/components/pages/encaissement_lettrage/encaissement_lettrage_page";
 @import "recouvrement_contentieux/static/src/components/pages/dossier_detail/dossier_detail_page";
 @import "recouvrement_contentieux/static/src/components/pages/dashboard/dashboard";
 @import "recouvrement_contentieux/static/src/components/pages/action_execution/action_execution_page";
+@import "recouvrement_contentieux/static/src/components/pages/dossiers_list/dossiers_list_page";
+@import "recouvrement_contentieux/static/src/components/pages/appels_list/appels_list_page";
+@import "recouvrement_contentieux/static/src/components/pages/emails_list/emails_list_page";
+@import "recouvrement_contentieux/static/src/components/pages/clients_attribution/clients_attribution_page";
 
 /* ============================================================
    FIX SCROLL — Pages OWL custom (Odoo 17)

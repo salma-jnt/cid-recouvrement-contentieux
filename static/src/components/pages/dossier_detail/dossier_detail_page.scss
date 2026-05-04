@@ -187,3 +187,300 @@
         font-size: 13px;
     }
 }
+
+/* ── Bouton "Agir" sur le header du groupe client ─────────────────── */
+.cid-client-group__action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--cid-primary, #145da8);
+    background: transparent;
+    color: var(--cid-primary, #145da8);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover {
+        background: var(--cid-primary, #145da8);
+        color: #fff;
+    }
+}
+
+/* ── Overlay ──────────────────────────────────────────────────────── */
+.cid-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 30, 60, 0.35);
+    z-index: 200;
+    backdrop-filter: blur(2px);
+    animation: cid-fade-in 0.15s ease;
+}
+
+@keyframes cid-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ── Drawer panel ─────────────────────────────────────────────────── */
+.cid-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 420px;
+    max-width: 95vw;
+    background: #ffffff;
+    border-left: 1px solid var(--cid-divider, #e2e8f0);
+    box-shadow: -8px 0 32px rgba(10, 30, 60, 0.18);
+    z-index: 201;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    animation: cid-slide-in 0.2s cubic-bezier(.22,.68,0,1.2);
+}
+
+@keyframes cid-slide-in {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
+}
+
+/* Header */
+.cid-drawer__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--cid-divider, #e2e8f0);
+    background: linear-gradient(135deg, #f7fbff 0%, #eef5ff 100%);
+}
+
+.cid-drawer__client {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.cid-drawer__avatar {
+    font-size: 36px;
+    color: var(--cid-primary, #145da8);
+    margin-top: 2px;
+}
+
+.cid-drawer__client-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--cid-text, #1a2e44);
+    line-height: 1.2;
+}
+
+.cid-drawer__client-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.cid-drawer__contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--cid-primary, #145da8);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+
+    &:hover { text-decoration: underline; }
+}
+
+.cid-drawer__close {
+    border: none;
+    background: transparent;
+    color: var(--cid-muted, #64748b);
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-size: 16px;
+    flex-shrink: 0;
+
+    &:hover { background: #f1f5f9; color: #1a2e44; }
+}
+
+/* Sections */
+.cid-drawer__section {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--cid-divider, #e2e8f0);
+}
+
+.cid-drawer__section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--cid-muted, #64748b);
+    margin-bottom: 12px;
+}
+
+.cid-drawer__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: var(--cid-primary, #145da8);
+    color: #fff;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* Action card */
+.cid-drawer__action-card {
+    background: #f7fbff;
+    border: 1px solid #c8dff7;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+}
+
+.cid-drawer__action-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a2e44;
+    margin-bottom: 8px;
+}
+
+.cid-drawer__action-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #64748b;
+    flex-wrap: wrap;
+}
+
+.cid-drawer__action-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.cid-drawer__no-action {
+    font-size: 13px;
+    color: #64748b;
+    padding: 8px 0;
+}
+
+/* Factures */
+.cid-drawer__facture-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cid-drawer__facture-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    background: #f9fafb;
+    border: 1px solid #e8edf5;
+    border-radius: 8px;
+}
+
+.cid-drawer__facture-main {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    flex-wrap: wrap;
+}
+
+.cid-drawer__facture-amounts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* ── Contenu spécifique drawer dossier ────────────────────────── */
+.cid-dossier-page__action-card {
+    background: var(--cid-primary-50);
+    border: 1px solid var(--cid-primary-100);
+    border-radius: var(--cid-radius-lg);
+    padding: var(--cid-space-3) var(--cid-space-4);
+}
+
+.cid-dossier-page__action-card-title {
+    display: flex;
+    align-items: center;
+    gap: var(--cid-space-2);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--cid-text);
+    margin-bottom: var(--cid-space-2);
+
+    .fa { color: var(--cid-primary-500); }
+}
+
+.cid-dossier-page__action-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cid-space-3);
+    font-size: var(--cid-text-sm);
+    color: var(--cid-text-muted);
+}
+
+.cid-dossier-page__no-action {
+    display: flex;
+    align-items: center;
+    gap: var(--cid-space-2);
+    font-size: var(--cid-text-sm);
+    color: var(--cid-text-muted);
+    padding: var(--cid-space-2) 0;
+
+    .fa { color: var(--cid-success); }
+}
+
+.cid-dossier-page__drawer-facture {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--cid-space-3);
+    padding: var(--cid-space-3);
+    border: 1px solid var(--cid-divider);
+    border-radius: var(--cid-radius-md);
+    background: #fafbfc;
+    transition: background var(--cid-trans-fast);
+
+    &:hover { background: var(--cid-primary-50); }
+}
+
+.cid-dossier-page__drawer-facture-left {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--cid-space-2);
+    min-width: 0;
+}
+
+.cid-dossier-page__drawer-facture-name {
+    font-size: var(--cid-text-sm);
+    color: var(--cid-text);
+}
+
+.cid-dossier-page__drawer-facture-right {
+    text-align: right;
+    flex-shrink: 0;
+}
